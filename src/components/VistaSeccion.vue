@@ -39,7 +39,7 @@
               </div>
             </div>
 
-            <button class="button is-info" @click="clickTestAddItem">Add Item</button>
+            <!-- <button class="button is-info" @click="clickTestAddItem">Add Item</button> -->
           </div>
         </v-col>
       </v-row>
@@ -60,6 +60,7 @@
   </section>
 </template>
 <script lang="ts">
+// @ts-ignore
 import { CalendarView, CalendarViewHeader } from "vue-simple-calendar";
 import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
@@ -74,6 +75,9 @@ export default {
     CalendarViewHeader,
   },
   data: () => ({
+    newItemTitle: '',
+    newItemStartDate: '',
+    newItemEndDate: '',
     selecionado: {},
     estudiantes: [
       {
@@ -107,7 +111,7 @@ export default {
     showDate: new Date(),
   }),
   methods: {
-    setShowDate(d) {
+    setShowDate(d: any) {
       this.showDate = d;
     },
   },
