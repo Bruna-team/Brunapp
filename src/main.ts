@@ -4,14 +4,52 @@ import App from './App.vue'
 
 // Vuetify
 import "vuetify/styles";
-import { createVuetify } from "vuetify";
+import { ThemeDefinition, createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import '@mdi/font/css/materialdesignicons.css'
 
+const darkTheme: ThemeDefinition = {
+  dark: true,
+  colors: {
+    primary: '#6200EE',
+    'primary-darken-1': '#3700B3',
+    secondary: '#03DAC6',
+    'secondary-darken-1': '#018786',
+    background: '#FFFFFF',
+    surface: '#FFFFFF',
+    error: '#B00020',
+    info: '#2196F3',
+    success: '#4CAF50',
+    warning: '#FB8C00',
+  },
+}
+const lightTheme: ThemeDefinition = {
+  dark: false,
+  colors: {
+    primary: '#EFB810',
+    'primary-darken-1': '#3700B3',
+    secondary: '#03DAC6',
+    'secondary-darken-1': '#018786',
+    background: '#FFFFFF',
+    surface: '#FFFFFF',
+    error: '#B00020',
+    info: '#2196F3',
+    success: '#4CAF50',
+    warning: '#FB8C00',
+  },
+}
+
 const vuetify = createVuetify({
   icons: {
     defaultSet: 'mdi',
+  },
+  theme: {
+    defaultTheme: 'lightTheme',
+    themes: {
+      darkTheme,
+      lightTheme
+    }
   },
   components,
   directives,
@@ -21,5 +59,3 @@ const app = createApp(App);
 app.use(router);
 app.use(vuetify);
 app.mount("#app");
-
-// createApp(App).mount('#app')

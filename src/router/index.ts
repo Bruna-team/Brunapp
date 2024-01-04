@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import VistaInicio from "../views/VistaInicio.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,12 +6,12 @@ const router = createRouter({
     {
       path: "/",
       name: "VistaInicio",
-      component: VistaInicio,
+      component: () => import("../views/VistaInicio.vue"),
     },
     {
       path: "/usuario",
       name: "Perfil",
-      component: () => import("../components/PerfilUsuario.vue"),
+      component: () => import("../views/PerfilUsuario.vue"),
     },
     {
       path: "/seccion",

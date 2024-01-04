@@ -17,16 +17,6 @@
         <v-col>
           <p class="color-heading bold">Coordinación</p>
         </v-col>
-        <v-col cols="2">
-          <v-switch v-model="temaLight" inset />
-        </v-col>
-        <v-col cols="2">
-          <v-btn
-            variant="text"
-            color="grey-lighten-5"
-            icon="fas fa-right-from-bracket"
-          ></v-btn>
-        </v-col>
       </v-row>
     </v-app-bar>
 
@@ -48,33 +38,24 @@
   </v-layout>
 </template>
 
-<script lang="ts">
-export default {
-  data: () => ({
-    drawer: false,
-    group: null,
-    temaLight: true,
-  }),
-  watch: {
-    tema() {
-      document.documentElement.setAttribute(
-        "tema",
-        this.temaLight ? "light" : "dark"
-      );
-      console.log(document.documentElement)
-    },
-    group() {
-      this.drawer = false;
-    },
-  },
-};
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useTheme } from 'vuetify'
+
+const theme = useTheme()
+
+const drawer = ref(false)
+
+localStorage.getItem("brunaTheme") == 'dark'
+  ? theme.global.name.value = 'dark'
+  : theme.global.name.value = 'light'
 </script>
 
 <style>
 i.logo::before {
   display: block;
   width: 100%;
-  content: url("assets/vue.svg");
+  content: url("assets/logo.svg");
 }
 i.logo {
   display: block;
