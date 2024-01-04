@@ -70,4 +70,8 @@ div.v-row.v-row--no-gutters > div > div > div.v-input__details {
   padding: 1.5rem 2rem;
   font-size: 1.2rem;
 }
+a:hover {
+  transition: all .5s ease;
+  box-shadow: 4px 4px 0px 0px #ffc400;
+}
 </style>
