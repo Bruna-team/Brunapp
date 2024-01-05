@@ -112,9 +112,5 @@
   </v-expansion-panels>
 </v-container>
 </template>
-<script lang="ts">
-export default {
-  data: () => ({}),
-};
-
+<script setup lang="ts">
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-app-bar color="amber-accent-3" prominent>
+    <v-app-bar color="primario" prominent>
       <v-app-bar-nav-icon
         variant="text"
         color="white"
@@ -10,12 +10,12 @@
       <i class="logo" />
       <v-toolbar-title>
         <RouterLink to="/">
-          <span class="titulo-logo"> Bruna </span>
+          <span class="font-bruna text-white">Bruna</span>
         </RouterLink>
       </v-toolbar-title>
       <v-row no-gutters justify="end" align="center">
         <v-col>
-          <p class="color-heading bold">Coordinación</p>
+          <p class="font-bruna text-white">Coordinación</p>
         </v-col>
       </v-row>
     </v-app-bar>
@@ -46,9 +46,9 @@ const theme = useTheme()
 
 const drawer = ref(false)
 
-localStorage.getItem("brunaTheme") == 'dark'
-  ? theme.global.name.value = 'dark'
-  : theme.global.name.value = 'light'
+localStorage.getItem("brunaTheme") == 'darkTheme'
+  ? theme.global.name.value = 'darkTheme'
+  : theme.global.name.value = 'lightTheme'
 </script>
 
 <style>

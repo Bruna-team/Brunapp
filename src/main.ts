@@ -13,12 +13,13 @@ import '@mdi/font/css/materialdesignicons.css'
 const darkTheme: ThemeDefinition = {
   dark: true,
   colors: {
-    primary: '#6200EE',
+    primario: '#ffc400',
     'primary-darken-1': '#3700B3',
-    secondary: '#03DAC6',
-    'secondary-darken-1': '#018786',
-    background: '#FFFFFF',
-    surface: '#FFFFFF',
+    // secondary: '#03DAC6',
+    // 'secondary-darken-1': '#018786',
+    white: '#f3f3f3',
+    // background: '#FFFFFF',
+    // surface: '#FFFFFF',
     error: '#B00020',
     info: '#2196F3',
     success: '#4CAF50',
@@ -28,12 +29,13 @@ const darkTheme: ThemeDefinition = {
 const lightTheme: ThemeDefinition = {
   dark: false,
   colors: {
-    primary: '#EFB810',
+    primario: '#ffc400',
     'primary-darken-1': '#3700B3',
-    secondary: '#03DAC6',
-    'secondary-darken-1': '#018786',
-    background: '#FFFFFF',
-    surface: '#FFFFFF',
+    // secondary: '#03DAC6',
+    // 'secondary-darken-1': '#018786',
+    white: '#f3f3f3',
+    // background: '#FFFFFF',
+    // surface: '#FFFFFF',
     error: '#B00020',
     info: '#2196F3',
     success: '#4CAF50',
@@ -50,7 +52,7 @@ const vuetify = createVuetify({
     themes: {
       darkTheme,
       lightTheme
-    }
+    },
   },
   components,
   directives,

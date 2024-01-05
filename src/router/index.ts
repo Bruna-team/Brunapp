@@ -6,6 +6,7 @@ const router = createRouter({
     {
       path: "/",
       name: "VistaInicio",
+      alias: '/home',
       component: () => import("../views/VistaInicio.vue"),
     },
     {
@@ -17,6 +18,11 @@ const router = createRouter({
       path: "/seccion",
       name: "Sección",
       component: () => import("../components/VistaSeccion.vue"),
+    },
+    {
+      path: "/login",
+      name: "Login",
+      component: () => import("../views/Login.vue"),
     },
   ],
 });

@@ -1,12 +1,15 @@
 <template>
 <v-container>
-  <div class="d-flex justify-center">
-    <v-avatar size="70">
+  <div class="d-flex justify-center align-center">
+    <v-avatar size="70" class="flex-fill">
       <v-img
         src="https://cdn.vuetifyjs.com/images/john.jpg"
         alt="Mildred"
       ></v-img>
     </v-avatar>
+    <v-btn append-icon="mdi-logout" @click="cerrarSesion()">
+      Cerrar sesión
+    </v-btn>
   </div>
   <p class="text-h4 text-center my-3">Mildred</p>
   <v-divider></v-divider>
@@ -25,6 +28,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useTheme } from 'vuetify'
+import router from '../router';
 
 const theme = useTheme()
 
@@ -39,7 +43,11 @@ localStorage.getItem("brunaTheme") == 'dark'
 : temaLight.value = true
 
 watch(temaLight, () => {
-  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
-  localStorage.setItem("brunaTheme", theme.global.current.value.dark ? 'dark' : 'light')
+  theme.global.name.value = theme.global.current.value.dark ? 'lightTheme' : 'darkTheme'
+  localStorage.setItem("brunaTheme", theme.global.current.value.dark ? 'darkTheme' : 'lightTheme')
 });
+
+function cerrarSesion() {
+  router
+}
 </script>
