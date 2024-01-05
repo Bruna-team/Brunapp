@@ -92,7 +92,7 @@ watch(router.currentRoute, (value) => {
         ></v-text-field>
         <v-divider class="my-2"></v-divider>
         <v-btn
-          class="my-2"
+          class="my-2 mx-1"
           rounded
           variant="flat"
           @click="router.push('SingIn')"
@@ -103,7 +103,7 @@ watch(router.currentRoute, (value) => {
         </v-btn>
         <v-btn
           :loading="loading"
-          class="my-2"
+          class="my-2 mx-1"
           prepend-icon="mdi-check"
           variant="tonal"
           color="primario"
@@ -163,7 +163,7 @@ watch(router.currentRoute, (value) => {
         ></v-text-field>
         <v-divider class="my-4"></v-divider>
         <v-btn
-          class="my-2"
+          class="my-2 mx-1"
           rounded
           variant="flat"
           @click="router.push('LogIn')"
@@ -174,7 +174,7 @@ watch(router.currentRoute, (value) => {
         </v-btn>
         <v-btn
           :loading="loading"
-          class="my-2"
+          class="my-2 mx-1"
           prepend-icon="mdi-check"
           variant="tonal"
           color="primario"
