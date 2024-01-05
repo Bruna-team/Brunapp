@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-
 const drawer = ref(false)
 </script>
-
 <template>
 <v-app-bar color="primario" prominent>
   <v-app-bar-nav-icon
@@ -41,3 +39,9 @@ const drawer = ref(false)
   <RouterView />
 </v-main>
 </template>
+<style>
+a:hover {
+  transition: all .5s ease;
+  box-shadow: 4px 4px 0px 0px #ffc400;
+}
+</style>

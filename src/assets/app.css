@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Megrim&display=swap");
-
 a {
   text-decoration: none;
   color: initial;
@@ -8,4 +7,22 @@ a {
   font-family: 'Megrim', cursive !important;
   font-weight: bold;
   letter-spacing: .2rem;
+}
+i.logo::before {
+  display: block;
+  width: 100%;
+  content: url("assets/logo.svg");
+}
+i.logo {
+  display: block;
+  position: absolute;
+  top: -2.3rem;
+  left: 10rem;
+}
+div.v-row.v-row--no-gutters > div > div > div.v-input__details {
+  display: none;
+}
+.nav-link {
+  padding: 1.5rem 2rem;
+  font-size: 1.2rem;
 }
