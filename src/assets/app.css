@@ -5,7 +5,7 @@ a {
   color: initial;
 }
 .font-bruna {
-  font-family: 'Megrim', cursive;
+  font-family: 'Megrim', cursive !important;
   font-weight: bold;
   letter-spacing: .2rem;
 }

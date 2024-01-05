@@ -1,3 +1,62 @@
+<script lang="ts">
+// @ts-ignore
+import { CalendarView, CalendarViewHeader } from "vue-simple-calendar";
+import "/node_modules/vue-simple-calendar/dist/style.css";
+import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
+import "/node_modules/vue-simple-calendar/dist/css/default.css";
+
+// The next two lines are optional themes
+// import "..relative-path-to-node_modules/vue-simple-calendar/dist/css/default.css";
+// import "..relative-path-to-node_modules/vue-simple-calendar/dist/css/holidays-us.css";
+export default {
+  components: {
+    CalendarView,
+    CalendarViewHeader,
+  },
+  data: () => ({
+    newItemTitle: '',
+    newItemStartDate: '',
+    newItemEndDate: '',
+    selecionado: {},
+    estudiantes: [
+      {
+        id: "12",
+        nombre: "Antonio Jose Castellano",
+        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
+        cedula: "23322323",
+        telefono: "04243333333",
+        area: "Coordinación 1",
+      },
+      {
+        id: "12",
+        nombre: "Maria Jose Alvarez",
+        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
+        cedula: "23322323",
+        telefono: "04243333333",
+        area: "Coordinación 1",
+      },
+      {
+        id: "12",
+        nombre: "Luis Camilo Castellano",
+        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
+        cedula: "23322323",
+        telefono: "04243333333",
+        area: "Coordinación 1",
+      },
+    ],
+    periodos: ["week", "month", "year"],
+    periodo: "month",
+    Lunes: 1,
+    showDate: new Date(),
+  }),
+  methods: {
+    setShowDate(d: any) {
+      this.showDate = d;
+    },
+  },
+};
+</script>
+
 <template>
   <section class="main-container d-flex">
     <v-list lines="one">
@@ -59,61 +118,3 @@
     </div>
   </section>
 </template>
-<script lang="ts">
-// @ts-ignore
-import { CalendarView, CalendarViewHeader } from "vue-simple-calendar";
-import "/node_modules/vue-simple-calendar/dist/style.css";
-import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
-import "/node_modules/vue-simple-calendar/dist/css/default.css";
-
-// The next two lines are optional themes
-// import "..relative-path-to-node_modules/vue-simple-calendar/dist/css/default.css";
-// import "..relative-path-to-node_modules/vue-simple-calendar/dist/css/holidays-us.css";
-export default {
-  components: {
-    CalendarView,
-    CalendarViewHeader,
-  },
-  data: () => ({
-    newItemTitle: '',
-    newItemStartDate: '',
-    newItemEndDate: '',
-    selecionado: {},
-    estudiantes: [
-      {
-        id: "12",
-        nombre: "Antonio Jose Castellano",
-        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
-        cedula: "23322323",
-        telefono: "04243333333",
-        area: "Coordinación 1",
-      },
-      {
-        id: "12",
-        nombre: "Maria Jose Alvarez",
-        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
-        cedula: "23322323",
-        telefono: "04243333333",
-        area: "Coordinación 1",
-      },
-      {
-        id: "12",
-        nombre: "Luis Camilo Castellano",
-        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
-        cedula: "23322323",
-        telefono: "04243333333",
-        area: "Coordinación 1",
-      },
-    ],
-    periodos: ["week", "month", "year"],
-    periodo: "month",
-    Lunes: 1,
-    showDate: new Date(),
-  }),
-  methods: {
-    setShowDate(d: any) {
-      this.showDate = d;
-    },
-  },
-};
-</script>

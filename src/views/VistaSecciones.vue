@@ -1,3 +1,5 @@
+<script setup lang="ts">
+</script>
 <template>
 <v-container>
   <v-expansion-panels>
@@ -9,7 +11,7 @@
       </v-expansion-panel-title>
       <v-row no-gutters>
         <v-col>
-          <a href="seccion">
+          <RouterLink :to="'/seccion'">
             <v-expansion-panel-text>
               <v-card width="300">
                 <v-card-item>
@@ -19,7 +21,8 @@
                 <v-card-text> Semanero: Angel Moreno </v-card-text>
               </v-card>
             </v-expansion-panel-text>
-          </a>
+
+          </RouterLink>
         </v-col>
         <v-col>
           <v-expansion-panel-text>
@@ -112,5 +115,3 @@
   </v-expansion-panels>
 </v-container>
 </template>
-<script setup lang="ts">
-</script>
