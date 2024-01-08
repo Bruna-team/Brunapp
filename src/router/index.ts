@@ -5,24 +5,56 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "VistaInicio",
-      alias: '/home',
-      component: () => import("../views/VistaInicio.vue"),
+      name: "Home",
+      component: () => import("../components/NavBar.vue"),
+      children: [
+        {
+          path: "/seccion",
+          name: "seccion",
+          component: () => import("../views/VistaSeccion.vue"),
+        },
+        {
+          path: "/",
+          name: "secciones",
+          component: () => import("../views/VistaSecciones.vue"),
+        },
+        {
+          path: "/maestros",
+          name: "maestros",
+          component: () => import("../views/VistaMaestros.vue"),
+        },
+        {
+          path: "/reportes",
+          name: "reportes",
+          component: () => import("../views/VistaReportes.vue"),
+        },
+        {
+          path: "/diario",
+          name: "diario",
+          component: () => import("../views/VistaDiario.vue"),
+        },
+        {
+          path: "/usuario",
+          name: "Perfil",
+          component: () => import("../views/PerfilUsuario.vue"),
+        },
+      ]
     },
     {
-      path: "/usuario",
-      name: "Perfil",
-      component: () => import("../views/PerfilUsuario.vue"),
-    },
-    {
-      path: "/seccion",
-      name: "Sección",
-      component: () => import("../components/VistaSeccion.vue"),
-    },
-    {
-      path: "/login",
-      name: "Login",
-      component: () => import("../views/Login.vue"),
+      path: "/sesion",
+      name: "sesion",
+      children: [
+        {
+          path: "/LogIn",
+          name: "LogIn",
+          component: () => import("../views/LogIn.vue"),
+        },
+        {
+          path: "/SingIn",
+          name: "SingIn",
+          component: () => import("../views/LogIn.vue"),
+        }
+      ]
     },
   ],
 });
