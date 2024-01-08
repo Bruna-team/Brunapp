@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { brunaApi } from '../funciones/api.js';
 import router from '../router';
 
 const loading  = ref(false)
@@ -50,6 +51,16 @@ async function checkApi (userName:string) {
 
       return resolve(true)
     }, 1000)
+  })
+}
+function iniciarSesion() {
+  brunaApi({ s: 'auth' }, `usuario=${userData.value.username.value}&clave=${btoa(userData.value.password.value)}&k=1`)
+  .then((res) => {
+    if (res.data.r || res.data.Seleccion === 'No existe') {
+      router.push('/')
+    } else {
+      // mensaje de error
+    }
   })
 }
 
@@ -108,6 +119,7 @@ watch(router.currentRoute, (value) => {
           variant="tonal"
           color="primario"
           type="submit"
+          @click="iniciarSesion"
         >Iniciar sesión</v-btn>
       </v-form>
     </v-sheet>

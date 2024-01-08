@@ -1,8 +1,9 @@
 import axios from 'axios'
-import router from '@/router'
-const baseURL = process.env.NODE_ENV === 'production'
-  ? ''
-  : 'http://localhost/Bruna/Bruna__api/api/consultas.php'
+import router from '../router'
+const baseURL = 'http://localhost/Bruna/Bruna__api/api/consultas.php'
+// const baseURL = process.env.NODE_ENV === 'production'
+//   ? ''
+//   : 'http://localhost/Bruna/Bruna__api/api/consultas.php'
 
 /**
  * @param {object} params
@@ -20,7 +21,7 @@ function brunaApi (params, data) {
     })
       .then((respuesta) => {
         if (typeof respuesta.data === 'string' && respuesta.data.indexOf('<!--log-->') === 0) {
-          router.push('/login')
+          router.push('LogIn')
         }
         return resolve(respuesta)
       })
