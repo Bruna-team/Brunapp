@@ -12,7 +12,7 @@ const userData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El correo es necesario',
-      (v: string) => checkApi(v)
+      // (v: string) => checkApi(v)
     ],
   },
   rol: {
@@ -25,14 +25,14 @@ const userData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El nombre de usuario es necesario',
-      (v: string) => checkApi(v)
+      // (v: string) => checkApi(v)
     ],
   },
   password: {
     value: '',
     rules: [
       (v: string) => !!v || 'La contraseña es necesaria',
-      (v: string) => checkApi(v),
+      // (v: string) => checkApi(v),
     ]
   }
 });
@@ -43,15 +43,15 @@ async function validar (event:any) {
   loading.value = false
   alert(JSON.stringify(results, null, 2))
 }
-async function checkApi (userName:string) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      if (userName === 'johnleider') return resolve('User name already taken. Please try another one.')
+// async function checkApi (userName:string) {
+//   return new Promise(resolve => {
+//     setTimeout(() => {
+//       if (userName === 'johnleider') return resolve('User name already taken. Please try another one.')
 
-      return resolve(true)
-    }, 1000)
-  })
-}
+//       return resolve(true)
+//     }, 1000)
+//   })
+// }
 
 watch(router.currentRoute, (value) => {
   logType.value = value.name
