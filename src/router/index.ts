@@ -9,14 +9,29 @@ const router = createRouter({
       component: () => import("../components/NavBar.vue"),
       children: [
         {
+          path: "/seccion",
+          name: "seccion",
+          component: () => import("../views/VistaSeccion.vue"),
+        },
+        {
           path: "/",
           name: "secciones",
           component: () => import("../views/VistaSecciones.vue"),
         },
         {
-          path: "/seccion",
-          name: "sección",
-          component: () => import("../views/VistaSeccion.vue"),
+          path: "/maestros",
+          name: "maestros",
+          component: () => import("../views/VistaMaestros.vue"),
+        },
+        {
+          path: "/reportes",
+          name: "reportes",
+          component: () => import("../views/VistaReportes.vue"),
+        },
+        {
+          path: "/diario",
+          name: "diario",
+          component: () => import("../views/VistaDiario.vue"),
         },
         {
           path: "/usuario",

@@ -3,6 +3,12 @@ a {
   text-decoration: none;
   color: initial;
 }
+.large-icon, .large-icon::before {
+  font-size: 10rem !important;
+}
+.letter-spacing {
+  letter-spacing: 1.4px !important;
+}
 .font-bruna {
   font-family: 'Megrim', cursive !important;
   font-weight: bold;

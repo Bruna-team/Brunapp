@@ -26,8 +26,20 @@ const drawer = ref(false)
 <v-navigation-drawer v-model="drawer" location="left" temporary>
   <v-list class="d-flex flex-column">
     <RouterLink to="/" class="ma-2 nav-link">
-      <v-icon icon="mdi-home" />
-      Inicio
+      <v-icon icon="mdi-chair-school" />
+      Secciones
+    </RouterLink>
+    <RouterLink to="maestros" class="ma-2 nav-link">
+      <v-icon icon="mdi-human-male-board" />
+      Maestros
+    </RouterLink>
+    <RouterLink to="reportes" class="ma-2 nav-link">
+      <v-icon icon="mdi-file-chart" />
+      Reportes
+    </RouterLink>
+    <RouterLink to="diario" class="ma-2 nav-link">
+      <v-icon icon="mdi-notebook" />
+      Diario
     </RouterLink>
     <RouterLink to="usuario" class="ma-2 nav-link">
       <v-icon icon="mdi-account" />
