@@ -89,7 +89,7 @@ watch(router.currentRoute, (value) => {
           v-model="userData.username.value"
           :rules="userData.username.rules"
           prepend-icon="mdi-account"
-          label="Nombre de usuario"
+          label="Cédula"
           ></v-text-field>
           <v-text-field
           v-model="userData.password.value"
@@ -137,7 +137,7 @@ watch(router.currentRoute, (value) => {
           v-model="userData.username.value"
           :rules="userData.username.rules"
           prepend-icon="mdi-account"
-          label="Nombre de usuario"
+          label="Cédula"
         ></v-text-field>
         <v-text-field
           v-model="userData.email.value"
