@@ -4,7 +4,7 @@ import { CalendarView, CalendarViewHeader } from "vue-simple-calendar";
 import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
-import AgregarEstudiante from '../components/AgregarEstudiante.vue';
+import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import { ref } from "vue";
 import { useDisplay } from 'vuetify'
 import router from "../router";

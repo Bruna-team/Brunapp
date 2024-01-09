@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay()
@@ -14,7 +14,7 @@ const agregar = computed(()=>{return props})
 
 const firstName = ref('')
 const firstNameRules = [
-  value => {
+  (value: string) => {
     if (value?.length > 3) return true
     return 'First name must be at least 3 characters.'
   },
@@ -22,7 +22,7 @@ const firstNameRules = [
 
 const lastName = ref('')
 const lastNameRules = [
-  value => {
+  (value: string) => {
     if (/[^0-9]/.test(value)) return true
     return 'Last name can not contain digits.'
   },
