@@ -1,6 +1,6 @@
 import axios from 'axios'
 import router from '../router'
-const baseURL = 'http://localhost/Bruna/Bruna__api/api/consultas.php'
+const baseURL = 'http://localhost/Bruna/Brunapi/api/consultas.php'
 // const baseURL = process.env.NODE_ENV === 'production'
 //   ? ''
 //   : 'http://localhost/Bruna/Bruna__api/api/consultas.php'
