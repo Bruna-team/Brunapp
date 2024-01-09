@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useTheme } from 'vuetify'
-import { brunaApi } from '../funciones/api.js';
+import { brunaApi } from '../funciones/api.ts';
 import router from '../router';
 
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
@@ -25,7 +25,7 @@ watch(temaLight, () => {
 
 function cerrarSesion() {
   brunaApi({ s: 'salir' }, '')
-  .then(r => {
+  .then((r:any) => {
     if (r.status === 200) {
       router.push('LogIn')
     }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { brunaApi } from '../funciones/api.js';
+import { brunaApi } from '../funciones/api.ts';
 import router from '../router';
 
 const loading  = ref(false)
@@ -54,7 +54,7 @@ async function validar (event:any) {
 // }
 function iniciarSesion() {
   brunaApi({ s: 'auth' }, `usuario=${userData.value.username.value}&clave=${btoa(userData.value.password.value)}`)
-  .then((res) => {
+  .then((res:any) => {
     if (res.data.r || res.data.Seleccion === 'No existe') {
       router.push('/')
     } else {

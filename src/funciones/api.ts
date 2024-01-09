@@ -10,7 +10,7 @@ const baseURL = 'http://localhost/Bruna/Brunapi/api/consultas.php'
  * @param {object} data
  * @return {object}
  */
-function brunaApi (params, data) {
+function brunaApi (params: any, data: any) {
   return new Promise((resolve, reject) => {
     axios.request({
       baseURL,
