@@ -78,7 +78,7 @@ watch(router.currentRoute, (value) => {
       v-if="logType == 'LogIn'"
       class="d-flex flex-column align-center justify-center text-center mx-auto px-4"
       elevation="4"
-      height="300"
+      height="400"
       rounded
       max-width="800"
       width="100%"
@@ -100,6 +100,7 @@ watch(router.currentRoute, (value) => {
           @click:append-inner="seePassword = !seePassword"
           label="Contraseña"
         ></v-text-field>
+        <v-checkbox label="Recordar" title="Mantener la sesión iniciada"/>
         <v-divider class="my-2"></v-divider>
         <v-btn
           class="my-2 mx-1"
