@@ -11,7 +11,8 @@ const temaLight = ref(true)
 
 const información = ref({
   telefono: "04243333333",
-  area: "Coordinación 1",
+  correo: "mildred@gmail.com",
+  rol: "Coordinación 1",
 })
 
 localStorage.getItem("brunaTheme") == 'dark'
@@ -37,13 +38,13 @@ function cerrarSesion() {
 
 <template>
 <v-container>
-  <div class="d-flex justify-center align-center">
-    <v-avatar size="70" class="flex-fill">
-      <v-img
-        src="https://cdn.vuetifyjs.com/images/john.jpg"
-        alt="Mildred"
-      ></v-img>
-    </v-avatar>
+  <div class="d-flex justify-center align-center mb-3">
+    <div class="flex-fill text-center">
+      <v-avatar size="70" color="brown">
+        <span class="text-h5">MB</span>
+      </v-avatar>
+      <span class="text-h4 text-center ml-3 my-3">Mildred Benítez</span>
+    </div>
     <v-btn append-icon="mdi-logout">
       Cerrar sesión
     </v-btn>
@@ -53,14 +54,13 @@ function cerrarSesion() {
       @confirmar="(e) => { e ? cerrarSesion() : '' }"
     />
   </div>
-  <p class="text-h4 text-center my-3">Mildred</p>
   <v-divider></v-divider>
-  <v-switch v-model="temaLight" inset :label="temaLight ? 'Tema claro' : 'Tema oscuro'"/>
+  <v-switch class="float-right" v-model="temaLight" inset :label="temaLight ? 'Tema claro' : 'Tema oscuro'"/>
   <v-list>
     <v-list-item
-      v-for="info in información"
+      v-for="(info, value) in información"
       :key="info"
-      :title="info"
+      :title="value.charAt(0).toUpperCase() + value.slice(1)"
       :subtitle="info"
     ></v-list-item>
   </v-list>
