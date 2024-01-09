@@ -5,6 +5,7 @@ import router from '../router';
 
 const loading  = ref(false)
 const seePassword  = ref(false)
+const recSesion  = ref(false)
 const logType  = ref(router.currentRoute.value.name)
 
 const segurityCode  = ref('')
@@ -53,7 +54,7 @@ async function validar (event:any) {
 //   })
 // }
 function iniciarSesion() {
-  brunaApi({ s: 'auth' }, `usuario=${userData.value.username.value}&clave=${btoa(userData.value.password.value)}`)
+  brunaApi({ s: 'auth' }, `usuario=${userData.value.username.value}&clave=${btoa(userData.value.password.value)}&rec=${recSesion.value}`)
   .then((res:any) => {
     if (res.data.r || res.data.Seleccion === 'No existe') {
       router.push('/')
@@ -100,7 +101,7 @@ watch(router.currentRoute, (value) => {
           @click:append-inner="seePassword = !seePassword"
           label="Contraseña"
         ></v-text-field>
-        <v-checkbox label="Recordar" title="Mantener la sesión iniciada"/>
+        <v-checkbox label="Recordar" title="Mantener la sesión iniciada" v-model="recSesion"/>
         <v-divider class="my-2"></v-divider>
         <v-btn
           class="my-2 mx-1"
