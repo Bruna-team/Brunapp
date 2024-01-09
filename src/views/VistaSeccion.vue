@@ -4,8 +4,10 @@ import { CalendarView, CalendarViewHeader } from "vue-simple-calendar";
 import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
+import AgregarEstudiante from '../components/AgregarEstudiante.vue';
 import { ref } from "vue";
 import { useDisplay } from 'vuetify'
+import router from "../router";
 
 const { mobile } = useDisplay()
 
@@ -127,6 +129,7 @@ const selecionado = ref({
 })
 const studentDrawer = ref( mobile.value ? false : true)
 
+const edit = ref(false)
 const periodo = ref("month")
 const Lunes = ref(1)
 // const newItemTitle= ref('')
@@ -170,23 +173,36 @@ function setShowDate(d: any) {
 <v-bottom-navigation v-if="mobile">
   <v-btn @click="studentDrawer = !studentDrawer">
     <v-icon icon="mdi-account-school-outline" />
-    Estudiantes
+    Lista de estudiantes
   </v-btn>
 </v-bottom-navigation>
 <section class="mb-15">
   <v-container>
+    <section class="d-flex">
+      <v-btn
+        prepend-icon="mdi-arrow-left"
+        text="Regresar"
+        @click="router.push('/')"
+      ></v-btn>
+      <v-spacer></v-spacer>
+      <AgregarEstudiante
+        :año="'1'"
+        :seccion="'A'"
+        :mencion="'Telemática'"
+      />
+    </section>
     <template v-if="selecionado">
       <v-card variant="tonal" class="ma-3 pa-2">
         <v-card-item class="pa-0">
           <v-row class="pa-3">
-            <v-col cols="auto" class="d-none d-md-block">
+            <v-col cols="auto" class="d-none d-sm-block">
               <v-badge icon="mdi-gender-female" color="pink">
                 <v-avatar color="brown">
                   <span class="text-h5">CP</span>
                 </v-avatar>
               </v-badge>
             </v-col>
-            <v-col>
+            <v-col sm="8">
               <p>
                 <v-card-title class="text-h4">
                   <v-tooltip text="Número de lista">
@@ -195,6 +211,12 @@ function setShowDate(d: any) {
                     </template>
                   </v-tooltip>
                   Carla Perez
+                  <v-btn
+                    variant="text"
+                    prepend-icon="mdi-pen"
+                    text="Editar"
+                    @click="edit = !edit"
+                  />
                 </v-card-title>
                 <v-tooltip text="Cédula">
                   <template #activator="{ props }">
@@ -214,11 +236,7 @@ function setShowDate(d: any) {
                 </span>
               </p>
             </v-col>
-          </v-row>
-        </v-card-item>
-        <v-card-item>
-          <v-row>
-            <v-col cols="12" md="4">
+            <v-col cols="12" sm="4">
               <v-list lines="two">
                 <p class="ml-4 text-caption font-weight-bold text-medium-emphasis">Representantes</p>
                 <v-list-item
@@ -247,7 +265,7 @@ function setShowDate(d: any) {
                 </v-list-item>
               </v-list>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" sm="4">
               <v-list>
                 <p class="ml-4 text-caption font-weight-bold text-medium-emphasis">Estatus</p>
                 <v-list-item>
