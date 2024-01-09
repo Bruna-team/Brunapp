@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useTheme } from 'vuetify'
+import { brunaApi } from '../funciones/api.js';
 import router from '../router';
 
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
@@ -23,7 +24,14 @@ watch(temaLight, () => {
 });
 
 function cerrarSesion() {
-  router.push('LogIn')
+  brunaApi({ s: 'salir' }, '')
+  .then(r => {
+    if (r.status === 200) {
+      router.push('LogIn')
+    }
+  }).catch(() => {
+    // message: 'No se pudo cerrar la sesión',
+  })
 }
 </script>
 
