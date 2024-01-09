@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import router from "./router";
-import App from './App.vue'
+import App from "./App.vue";
 
 // Vuetify
 import "vuetify/styles";
@@ -10,7 +10,7 @@ import * as directives from "vuetify/directives";
 import '@mdi/font/css/materialdesignicons.css'
 
 // Themes
-import { lightTheme, darkTheme } from './themes/Bruna'
+import { lightTheme, darkTheme } from "./themes/Bruna"
 
 const vuetify = createVuetify({
   icons: {
