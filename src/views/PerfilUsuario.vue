@@ -55,7 +55,7 @@ function cerrarSesion() {
         <span class="d-none d-md-inline">Cerrar sesión</span>
         <VentanaConfirmar
         :message="'desea cerrar sesión'"
-        :icon="'mdi-logout'"
+        icon="mdi-logout"
         @confirmar="(e) => { e ? cerrarSesion() : '' }"
         />
       </v-btn>
@@ -90,7 +90,7 @@ function cerrarSesion() {
     <v-list-item
       v-else
       v-for="(info, value) in usuario.información"
-      :key="info"
+      :key="'i'+info"
     >
       <v-text-field
         :label="value.charAt(0).toUpperCase() + value.slice(1)"
