@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 const props = defineProps({
   show: Boolean,
   mensaje: String,
 })
-defineEmits(['confirmar'])
+defineEmits(['cerrar'])
 
 const snackbar = computed(()=>{return props.show})
 const mensaje = computed(()=>{return props.mensaje})
@@ -20,7 +20,7 @@ const mensaje = computed(()=>{return props.mensaje})
   <template v-slot:actions>
     <v-btn
       variant="text"
-      @click="emit('cerrar')"
+      @click="$emit('cerrar')"
     >
       Close
     </v-btn>
