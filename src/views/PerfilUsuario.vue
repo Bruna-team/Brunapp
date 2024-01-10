@@ -90,7 +90,7 @@ function cerrarSesion() {
     <v-list-item
       v-else
       v-for="(info, value) in usuario.información"
-      :key="value"
+      :key="info"
     >
       <v-text-field
         :label="value.charAt(0).toUpperCase() + value.slice(1)"
