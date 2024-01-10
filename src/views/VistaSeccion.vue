@@ -178,12 +178,16 @@ function setShowDate(d: any) {
 </v-bottom-navigation>
 <section class="mb-15">
   <v-container>
-    <section class="d-flex">
+    <section class="d-flex flex-wrap">
       <v-btn
+        variant="text"
         prepend-icon="mdi-arrow-left"
-        text="Regresar"
         @click="router.push('/')"
-      ></v-btn>
+      >
+        <span class="d-none d-md-inline">
+          Regresar
+        </span>
+      </v-btn>
       <v-spacer></v-spacer>
       <AgregarEstudiante
         :año="'1'"
