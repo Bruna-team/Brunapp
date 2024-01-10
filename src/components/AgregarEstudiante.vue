@@ -33,9 +33,10 @@ const lastNameRules = [
   <template #activator="{ props }">
     <v-btn
       v-bind="props"
-      prepend-icon="mdi-plus"
-      text="Agregar estudiante"
-    />
+      append-icon="mdi-account-school-outline"
+    >
+      Agregar
+    </v-btn>
   </template>
 
   <template #default="{ isActive }">

@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Megrim&display=swap");
+
+/* estilos personalizados en la tipografía */
 a {
   text-decoration: none;
   color: initial;
@@ -14,6 +16,8 @@ a {
   font-weight: bold;
   letter-spacing: .2rem;
 }
+
+/* Iconos personalizados */
 i.logo::before {
   display: block;
   width: 100%;
@@ -25,10 +29,43 @@ i.logo {
   top: -2.3rem;
   left: 10rem;
 }
-div.v-row.v-row--no-gutters > div > div > div.v-input__details {
-  display: none;
-}
+
+/* Clases del nav personalizadas*/
 .nav-link {
   padding: 1.5rem 2rem;
   font-size: 1.2rem;
+}
+
+/* Checkbox personalizado para editar */
+.custom-checkbox-edit.checked {
+  .v-input__prepend {
+    background-color: rgb(var(--v-theme-primario-claro));
+  }
+  .v-input__control .v-label {
+    background-color: rgb(var(--v-theme-primario-claro));
+  }
+}
+.custom-checkbox-edit {
+  padding: 2px;
+  margin: 0 5px;
+  .v-input__prepend {
+    border-radius: .6rem 0 0 .6rem;
+    margin: 0;
+    padding-right: .3rem;
+    transition: background-color 1s ease;
+  }
+  .v-input__control .v-label {
+    border-radius: 0 .6rem .6rem 0;
+    opacity: 1;
+    padding: 0 .3rem 0 .3rem;
+    transition: background-color 1s ease;
+  }
+  .v-selection-control__wrapper {
+    display: none;
+  }
+}
+
+/* Clases personalizadas rápidas */
+.items-end {
+  justify-items: end;
 }

@@ -8,11 +8,15 @@ import VentanaConfirmar from '../components/VentanaConfirmar.vue';
 
 const theme = useTheme()
 const temaLight = ref(true)
+const edit = ref(false)
 
-const información = ref({
-  telefono: "04243333333",
-  correo: "mildred@gmail.com",
-  rol: "Coordinación 1",
+const usuario = ref({
+  nombre: 'Mildred Benitez',
+  información: {
+    telefono: "04243333333",
+    correo: "mildred@gmail.com",
+    rol: "Coordinación 1",
+  }
 })
 
 localStorage.getItem("brunaTheme") == 'dark'
@@ -39,30 +43,85 @@ function cerrarSesion() {
 <template>
 <v-container>
   <div class="d-flex justify-center align-center mb-3">
-    <div class="flex-fill text-center">
+    <template v-if="!edit">
       <v-avatar size="70" color="brown">
         <span class="text-h5">MB</span>
       </v-avatar>
-      <span class="text-h4 text-center ml-3 my-3">Mildred Benítez</span>
-    </div>
-    <v-btn append-icon="mdi-logout">
-      Cerrar sesión
-    </v-btn>
-    <VentanaConfirmar
-      :message="'desea cerrar sesión'"
-      :icon="'mdi-logout'"
-      @confirmar="(e) => { e ? cerrarSesion() : '' }"
-    />
+      <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.nombre }}</span>
+      <v-btn
+        variant="text"
+        append-icon="mdi-logout"
+        >
+        <span class="d-none d-md-inline">Cerrar sesión</span>
+        <VentanaConfirmar
+        :message="'desea cerrar sesión'"
+        :icon="'mdi-logout'"
+        @confirmar="(e) => { e ? cerrarSesion() : '' }"
+        />
+      </v-btn>
+    </template>
+    <v-text-field v-else label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre y apellido completo" />
   </div>
   <v-divider></v-divider>
-  <v-switch class="float-right" v-model="temaLight" inset :label="temaLight ? 'Tema claro' : 'Tema oscuro'"/>
+  <div class="d-flex">
+    <v-switch
+      v-model="temaLight"
+      hide-details
+      inset
+      :label="temaLight ? 'Tema oscuro' : 'Tema claro'"
+      :class="temaLight ? 'icon-moon' : 'icon-sun'"
+    />
+    <v-checkbox
+      v-model="edit"
+      hide-details
+      :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
+      :label="edit ? 'Guardar' : 'Editar'"
+      :class="['custom-checkbox-edit flex-0-0', {'checked': edit}]"
+    />
+  </div>
   <v-list>
     <v-list-item
-      v-for="(info, value) in información"
+      v-if="!edit"
+      v-for="(info, value) in usuario.información"
       :key="info"
       :title="value.charAt(0).toUpperCase() + value.slice(1)"
       :subtitle="info"
     ></v-list-item>
+    <v-list-item
+      v-else
+      v-for="(info, value) in usuario.información"
+      :key="value"
+    >
+      <v-text-field
+        :label="value.charAt(0).toUpperCase() + value.slice(1)"
+        variant="underlined"
+        v-model="usuario.información[value]"
+      />
+    </v-list-item>
   </v-list>
 </v-container>
 </template>
+<style>
+.v-switch__thumb::before {
+  display: inline-block;
+  font: normal normal normal 24px/1 "Material Design Icons";
+  font-size: inherit;
+  text-rendering: auto;
+  line-height: inherit;
+  -webkit-font-smoothing: antialiased;
+}
+.icon-moon {
+  .v-switch__thumb::before {
+    content: "\F0599";
+  }
+}
+.icon-sun {
+  .v-switch__thumb {
+    transform: none;
+  }
+  .v-switch__thumb::before {
+    content: "\F0594";
+  }
+
+}
+</style>
