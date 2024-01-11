@@ -15,13 +15,14 @@ onMounted(() => {
 
 const usuario = ref({
   nombre: '',
+  apellido: '',
   informacion: {
     cédula: "",
     dirección: "",
     teléfono: "",
     correo: "",
-    rol: "",
-  }
+  },
+  rol: ""
 })
 const iniciales = ref('')
 
@@ -39,17 +40,33 @@ function cargaInicial() {
   .then((res:any) => {
     if (res.data) {
       res.data.forEach((d:any) => {
-        usuario.value.nombre = d.nom_per + ' ' + d.ape_per
+        usuario.value.nombre = d.nom_per
+        usuario.value.apellido = d.ape_per
         usuario.value.informacion.teléfono = d.tel_per
         usuario.value.informacion.cédula = d.ced_per
         usuario.value.informacion.dirección = d.dir_per
         usuario.value.informacion.correo = d.ema_per
-        usuario.value.informacion.rol = d.nom_car
+        usuario.value.rol = d.nom_car
         iniciales.value = d.nom_per.substring(0,1)+d.ape_per.substring(0,1)
       });
     }
   }).catch(() => {
     // message: 'Hubo un error cargando los datos',
+  })
+}
+
+function guardarCambios() {
+  let data = "nom=" + usuario.value.nombre + '&ape=' + usuario.value.apellido
+  data += "&tel=" + usuario.value.informacion.teléfono + '&ced=' + usuario.value.informacion.cédula
+  data += "&dir=" + usuario.value.informacion.dirección + '&ema=' + usuario.value.informacion.correo
+  brunaApi({ s: 'editarPerfil' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      iniciales.value = usuario.value.nombre.substring(0,1)+usuario.value.apellido .substring(0,1)
+      edit.value = !edit.value
+    }
+  }).catch(() => {
+    // message: 'Hubo un error actualizando los datos',
   })
 }
 
@@ -73,6 +90,7 @@ function cerrarSesion() {
         <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
       </v-avatar>
       <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.nombre }}</span>
+      <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.apellido }}</span>
       <v-btn
         variant="text"
         append-icon="mdi-logout"
@@ -85,7 +103,8 @@ function cerrarSesion() {
         />
       </v-btn>
     </template>
-    <v-text-field v-else label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre y apellido completo" />
+    <v-text-field v-if="edit" label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre" />
+    <v-text-field v-if="edit" label="Apellido" v-model="usuario.apellido" variant="underlined" hint="Escribe tu apellido" />
   </div>
   <v-divider></v-divider>
   <div class="d-flex align-center">
@@ -101,7 +120,7 @@ function cerrarSesion() {
       :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
       :text="edit ? 'Guardar' : 'Editar'"
       :color="edit ? 'secundario' : ''"
-      @click="edit = !edit"
+      @click="edit ? guardarCambios() : edit=!edit"
     />
   </div>
   <v-list>
@@ -122,6 +141,10 @@ function cerrarSesion() {
         v-model="usuario.informacion[value]"
       />
     </v-list-item>
+    <v-list-item
+      title="Rol"
+      :subtitle="usuario.rol"
+    ></v-list-item>
   </v-list>
 </v-container>
 </template>
