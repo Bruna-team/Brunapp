@@ -1,10 +1,9 @@
 import axios from 'axios'
 import router from '../router'
-console.log(process.env.NODE_ENV)
-// const baseURL = 'http://localhost/Bruna/Brunapi/api/consultas.php'
-const baseURL = process.env.NODE_ENV === 'production'
-  ? 'mysql://root:-4Ha16GeBaafcda1-aDbBaEb-6Eg4C-A@monorail.proxy.rlwy.net:14256/railway'
-  : 'http://localhost/Bruna/Brunapi/api/consultas.php'
+const baseURL = 'http://localhost/Bruna/Brunapi/api/consultas.php'
+// const baseURL = process.env.NODE_ENV === 'production'
+//   ? ''
+//   : 'http://localhost/Bruna/Brunapi/api/consultas.php'
 
 /**
  * @param {object} params
