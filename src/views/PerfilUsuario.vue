@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useTheme } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
 import router from '../router';
@@ -9,15 +9,21 @@ import VentanaConfirmar from '../components/VentanaConfirmar.vue';
 const theme = useTheme()
 const temaLight = ref(true)
 const edit = ref(false)
+onMounted(() => {
+	cargaInicial();
+});
 
 const usuario = ref({
-  nombre: 'Mildred Benitez',
-  información: {
-    telefono: "04243333333",
-    correo: "mildred@gmail.com",
-    rol: "Coordinación 1",
+  nombre: '',
+  informacion: {
+    cédula: "",
+    dirección: "",
+    teléfono: "",
+    correo: "",
+    rol: "",
   }
 })
+const iniciales = ref('')
 
 localStorage.getItem("brunaTheme") == 'dark'
 ? temaLight.value = false
@@ -27,6 +33,25 @@ watch(temaLight, () => {
   theme.global.name.value = theme.global.current.value.dark ? 'lightTheme' : 'darkTheme'
   localStorage.setItem("brunaTheme", theme.global.current.value.dark ? 'darkTheme' : 'lightTheme')
 });
+
+function cargaInicial() {
+  brunaApi({ s: 'perfil' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      res.data.forEach((d:any) => {
+        usuario.value.nombre = d.nom_per + ' ' + d.ape_per
+        usuario.value.informacion.teléfono = d.tel_per
+        usuario.value.informacion.cédula = d.ced_per
+        usuario.value.informacion.dirección = d.dir_per
+        usuario.value.informacion.correo = d.ema_per
+        usuario.value.informacion.rol = d.nom_car
+        iniciales.value = d.nom_per.substring(0,1)+d.ape_per.substring(0,1)
+      });
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+}
 
 function cerrarSesion() {
   brunaApi({ s: 'salir' }, '')
@@ -45,7 +70,7 @@ function cerrarSesion() {
   <div class="d-flex justify-center align-center mb-3">
     <template v-if="!edit">
       <v-avatar size="70" color="brown">
-        <span class="text-h5">MB</span>
+        <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
       </v-avatar>
       <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.nombre }}</span>
       <v-btn
@@ -82,19 +107,19 @@ function cerrarSesion() {
   <v-list>
     <v-list-item
       v-if="!edit"
-      v-for="(info, value) in usuario.información"
+      v-for="(info, value) in usuario.informacion"
       :key="info"
       :title="value.charAt(0).toUpperCase() + value.slice(1)"
       :subtitle="info"
     ></v-list-item>
     <v-list-item
       v-else
-      v-for="(info, value) in usuario.información"
+      v-for="(info, value) in usuario.informacion"
       :key="'i'+info"
     >
       <v-text-field
         :label="value.charAt(0).toUpperCase() + value.slice(1)"
-        v-model="usuario.información[value]"
+        v-model="usuario.informacion[value]"
       />
     </v-list-item>
   </v-list>
