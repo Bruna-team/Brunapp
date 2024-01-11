@@ -36,36 +36,71 @@ i.logo {
   font-size: 1.2rem;
 }
 
-/* Checkbox personalizado para editar */
-.custom-checkbox-edit.checked {
-  .v-input__prepend {
-    background-color: rgb(var(--v-theme-primario-claro));
-  }
-  .v-input__control .v-label {
-    background-color: rgb(var(--v-theme-primario-claro));
-  }
-}
-.custom-checkbox-edit {
-  padding: 2px;
-  margin: 0 5px;
-  .v-input__prepend {
-    border-radius: .6rem 0 0 .6rem;
-    margin: 0;
-    padding-right: .3rem;
-    transition: background-color 1s ease;
-  }
-  .v-input__control .v-label {
-    border-radius: 0 .6rem .6rem 0;
-    opacity: 1;
-    padding: 0 .3rem 0 .3rem;
-    transition: background-color 1s ease;
-  }
-  .v-selection-control__wrapper {
-    display: none;
-  }
-}
-
 /* Clases personalizadas rápidas */
 .items-end {
   justify-items: end;
+}
+
+/* Estilos personalizados del calendario */
+.calendar {
+  min-height: 80vh !important;
+  border-radius: .3rem;
+  .cv-header {
+    flex-direction: column;
+    @media (min-width: 600px) {
+      flex-direction: row;
+    }
+  }
+  .cv-header, .cv-header-nav *, .cv-weeks {
+    border: none;
+  }
+  .cv-header .periodLabel {
+    text-transform: capitalize;
+  }
+  .cv-header-nav button {
+    border: none;
+    border-radius: .3rem;
+  }
+  .cv-header-nav button:hover {
+    background-color: rgb(var(--v-theme-muted));
+  }
+  .cv-day {
+    display: block;
+    text-align: center;
+  }
+}
+.v-theme--darkTheme {
+  .calendar {
+    .cv-header, .cv-header-nav *, .cv-weeks, .cv-header-days {
+      border: none;
+      background-color: transparent;
+    }
+    .cv-header-day {
+      border: none;
+      background-color: rgb(var(--v-theme-muted));
+    }
+    .cv-day {
+      border: 1px;
+      border-style: solid;
+      border-color: rgb(var(--v-theme-muted));
+    }
+    .cv-day.today {
+      background-color: rgb(var(--v-theme-primario-claro));
+    }
+    .cv-day.future {
+      background-color: #2f2f2f;
+    }
+    .cv-day.past, .cv-day.outsideOfMonth {
+      background-color: rgb(var(--v-theme-dark));
+    }
+  }
+}
+.inasistente {
+  background-color: rgb(var(--v-theme-absentee));
+}
+.pase-justificado {
+  background-color: rgb(var(--v-theme-justified));
+}
+.reposo {
+  background-color: rgb(var(--v-theme-repose));
 }

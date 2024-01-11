@@ -7,6 +7,11 @@ const props = defineProps({
   año: String,
   seccion: String,
   mencion: String,
+  variant: {
+    type: Boolean,
+    default: false
+  },
+  classBtn: String
 })
 defineEmits(['confirmar'])
 
@@ -34,6 +39,8 @@ const lastNameRules = [
     <v-btn
       v-bind="props"
       append-icon="mdi-account-school-outline"
+      :variant="agregar.variant ? 'text' : 'tonal'"
+      :class="agregar.classBtn"
     >
       Agregar
     </v-btn>

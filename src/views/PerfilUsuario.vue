@@ -63,20 +63,20 @@ function cerrarSesion() {
     <v-text-field v-else label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre y apellido completo" />
   </div>
   <v-divider></v-divider>
-  <div class="d-flex">
+  <div class="d-flex align-center">
     <v-switch
       v-model="temaLight"
       hide-details
       inset
-      :label="temaLight ? 'Tema oscuro' : 'Tema claro'"
+      :label="temaLight ? 'Tema claro' : 'Tema oscuro'"
       :class="temaLight ? 'icon-moon' : 'icon-sun'"
     />
-    <v-checkbox
-      v-model="edit"
-      hide-details
+    <v-btn
+      :variant="edit ? 'tonal' : 'text'"
       :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
-      :label="edit ? 'Guardar' : 'Editar'"
-      :class="['custom-checkbox-edit flex-0-0', {'checked': edit}]"
+      :text="edit ? 'Guardar' : 'Editar'"
+      :color="edit ? 'secundario' : ''"
+      @click="edit = !edit"
     />
   </div>
   <v-list>
@@ -94,7 +94,6 @@ function cerrarSesion() {
     >
       <v-text-field
         :label="value.charAt(0).toUpperCase() + value.slice(1)"
-        variant="underlined"
         v-model="usuario.información[value]"
       />
     </v-list-item>
