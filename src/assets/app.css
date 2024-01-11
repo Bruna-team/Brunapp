@@ -93,6 +93,9 @@ i.logo {
     .cv-day.past, .cv-day.outsideOfMonth {
       background-color: rgb(var(--v-theme-dark));
     }
+    .cv-item {
+      border: none;
+    }
   }
 }
 .inasistente {

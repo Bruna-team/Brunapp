@@ -4,6 +4,10 @@ const props = defineProps({
   dialog: Boolean,
   message: String,
   icon: String,
+  colorBtn: {
+    type: String,
+    default: 'error'
+  },
 })
 defineEmits(['confirmar'])
 
@@ -26,11 +30,11 @@ watch(props, (value) => {
     </v-card-title>
     <v-card-actions class="justify-center">
       <v-btn
-        color="secundario"
+        color="primario"
         @click="$emit('confirmar', false), dialog = false"
       >Cancelar</v-btn>
       <v-btn
-        color="primario"
+        :color="colorBtn"
         variant="tonal"
         :append-icon="props.icon"
         @click="$emit('confirmar', true), dialog = false"

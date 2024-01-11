@@ -5,8 +5,10 @@ import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
 import AgregarEstudiante from "../components/AgregarEstudiante.vue";
+import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+
 import router from "../router";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay()
 const studentDrawer = ref( mobile.value ? false : true)
@@ -125,78 +127,207 @@ const seleccionado = ref({
   avatar: "",
   cedula: "",
   telefono: "",
-  area: "",
   fecha: "",
 })
 // Editar estudiante
 const edit = ref(false)
 
-// Funcionalidades del calendario
+// Variables del calendario
 const calendarNav = ref(false)
-const message = ref("")
+const editItem = ref(false)
 const periodo = ref("month")
-const newItemTitle= ref('')
-const newItemType= ref('')
-const newItemStartDateTime= ref(new Date())
-const newItemStartDate= ref(new Date())
-const newItemEndDate= ref('')
+const selectedItem= ref({
+  originalItem:{
+    id:"",
+    startDate:"",
+    endDate:"",
+    title:"",
+    obs: "",
+    obsType: "",
+    classes:"",
+  },
+  startDate: new Date(0),
+  endDate: new Date(0),
+  classes: "",
+  title: "",
+  id:"",
+})
+
 const showDate = ref(new Date())
 function setShowDate(d: any) {
   showDate.value = d;
 }
+
+// Variables del scrum del calendario
+const newItemTitle= ref('')
+const newItemObservacion= ref('')
+const newItemType= ref('')
+const newItemStartDate= ref(new Date(0))
+const newItemStartDateTime= ref(new Date(0))
+const newItemEndDate = ref(new Date(0))
+
+// eliminar cuando este la funcionalidad del back
 function thisMonth(d:any, h:any, m:any) {
-  const t = new Date()
-  return new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0)
+ const t = new Date()
+ return (new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0))
 }
+const items = ref([
+  {
+    id: "e2",
+    startDate: thisMonth(2, 4, 6),
+    endDate: thisMonth(3, 4, 6),
+    title: "Inasistencia justificada",
+    obs: '',
+    obsType: '',
+    classes: ['bg-justified'],
+  },
+  {
+    id: "e3",
+    startDate: thisMonth(5, 4, 6),
+    endDate: thisMonth(7, 4, 6),
+    title: "De reposo",
+    obs: '',
+    obsType: '',
+    classes: ['bg-repose'],
+  },
+  {
+    id: "e4",
+    startDate: thisMonth(12, 4, 6),
+    title: "Inasistente",
+    obs: '',
+    obsType: '',
+    classes: ['bg-absentee'],
+  },
+  {
+    id: "e5",
+    startDate: thisMonth(22, 4, 6),
+    endDate: thisMonth(24, 4, 6),
+    title: "Justificado",
+    obs: '',
+    obsType: '',
+    classes: ['bg-justified'],
+  },
+  {
+    id: "foo",
+    startDate: thisMonth(10, 4, 6),
+    title: "Inasistente",
+    obs: '',
+    obsType: '',
+    classes: ['bg-observation'],
+  },
+])
+
+// Funcionalidades del calendario
 function onDrop(item: any, date: any) {
-  message.value = `You dropped ${item.id} on ${date.toLocaleDateString()}`
   // Determine the delta between the old start date and the date chosen,
   // and apply that delta to both the start and end date to move the item.
   const eLength = CalendarMath.dayDiff(item.startDate, date)
   item.originalItem.startDate = CalendarMath.addDays(item.startDate, eLength)
   item.originalItem.endDate = CalendarMath.addDays(item.endDate, eLength)
 }
-
 function onClickDay(d: any) {
   calendarNav.value = true
   newItemStartDate.value = d
-  message.value = `You clicked: ${d.toLocaleDateString()}`
 }
-
-const items = ref([
-  {
-    id: "e2",
-    startDate: thisMonth(15, 0, 0),
-    endDate: thisMonth(16, 16, 30),
-    title: "Single-day item with a long title",
-  },
-  {
-    id: "e3",
-    startDate: thisMonth(2, 9, 25),
-    endDate: thisMonth(6, 16, 30),
-    title: "De reposo",
-    classes: "color-repose",
-  },
-  {
-    id: "e4",
-    startDate: thisMonth(20, 0, 0),
-    title: "Inasistente",
-    classes: "color-absentee",
-  },
-  {
-    id: "e5",
-    startDate: thisMonth(12, 0, 0),
-    endDate: thisMonth(14, 0, 0),
-    title: "Justificado",
-    classes: "purple",
-    tooltip: "This spans multiple days",
-  },
-  {
-    id: "foo",
-    startDate: thisMonth(29, 0, 0),
-    title: "Inasistente",
-  },
-])
+function onClickItem(d: any) {
+  calendarNav.value = true
+  selectedItem.value = d
+}
+// Funciones del SCRUM del calendario
+function limpiarItems() {
+  newItemTitle.value = ''
+  newItemObservacion.value = ''
+  newItemType.value = ''
+  newItemStartDate.value = new Date(0)
+  newItemStartDateTime.value = new Date(0)
+  newItemEndDate.value = new Date(0)
+  selectedItem.value = {
+    originalItem:{
+      id:"",
+      startDate:"",
+      endDate:"",
+      title:"",
+      obs: "",
+      obsType: "",
+      classes:"",
+    },
+    startDate: new Date(0),
+    endDate: new Date(0),
+    classes: "",
+    title: "",
+    id:"",
+  }
+  calendarNav.value = false
+}
+function agregarItem() {
+  const validarfecha = new Date(0).toString()
+  if (newItemEndDate.value.toString() !== validarfecha) {
+    items.value.push({
+      id: "r8",
+      startDate: newItemStartDate.value,
+      endDate: newItemEndDate.value,
+      title: newItemTitle.value,
+      obs: newItemObservacion.value,
+      obsType: newItemType.value,
+      classes: [asignarClases(newItemType.value)]
+    })
+  } else {
+    items.value.push({
+      id: "r8",
+      startDate: newItemStartDate.value,
+      title: newItemTitle.value,
+      obs: newItemObservacion.value,
+      obsType: newItemType.value,
+      classes: [asignarClases(newItemType.value)]
+    })
+  }
+  limpiarItems()
+}
+function actualizarItem(item: any) {
+  items.value = items.value.map((i) => {
+    if(i.id === item.originalItem.id) {
+      return {
+        id: item.originalItem.id,
+        startDate: newItemStartDate.value,
+        endDate: newItemEndDate.value,
+        title: newItemTitle.value,
+        obs: newItemObservacion.value,
+        obsType: newItemType.value,
+        classes: [asignarClases(newItemType.value)]
+      }
+    } else {
+      return {...i}
+    }
+  })
+  limpiarItems()
+}
+function editarItem(item: any) {
+  newItemTitle.value = item.originalItem.title
+  newItemObservacion.value = item.originalItem.obs
+  newItemType.value = item.originalItem.obsType
+  newItemStartDate.value = item.originalItem.startDate
+  newItemEndDate.value = item.originalItem.endDate
+  editItem.value = true
+}
+function asignarClases(type: string) {
+  switch (type) {
+    case 'absentee':
+      return 'bg-absentee'
+    case 'justified':
+      return 'bg-absentee'
+    case 'repose':
+      return 'bg-absentee'
+    default:
+      return 'bg-observation'
+  }
+}
+function eliminarItem(item: any) {
+  items.value = items.value.filter(i => i.id != item.originalItem.id)
+  limpiarItems()
+}
+watch(calendarNav, (value) => {
+  if (!value) {limpiarItems()}
+})
 </script>
 
 <template>
@@ -256,29 +387,90 @@ const items = ref([
     location="right"
     class="sidebar-width"
   >
-    <v-sheet width="450" class="pa-2">
-      <p class="text-h5 text-center text-capitalize mb-4">
-        {{newItemStartDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
-      </p>
-      <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
-      <v-radio-group v-model="newItemType" label="Tipo de observación">
-        <v-radio label="Inasistencia" value="Inasistencia"></v-radio>
-        <v-radio label="Inasistencia justificada" value="Inasistencia justificada"></v-radio>
-        <v-radio label="Reposo" value="Reposo"></v-radio>
-        <v-radio label="Observación" value="Observación"></v-radio>
-      </v-radio-group>
-      <v-text-field
-        v-model="newItemStartDateTime"
-        label="Hora de la observación (opcional)"
-        type="time"
-      />
-      <v-text-field
-        v-model="newItemEndDate"
-        :label="(newItemType.length ? newItemType : 'Observación') + ' hasta el...'"
-        type="datetime-local"
-        persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
-      />
+    <v-sheet :width="mobile?'':'450'" class="pa-2">
+      <template v-if="selectedItem.id && !editItem">
+        <p class="text-center text-capitalize text-medium-emphasis">
+          {{selectedItem.startDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+          <template v-if="selectedItem.endDate !== selectedItem.startDate">
+            <span class="text-caption">
+              al
+            </span>
+            {{selectedItem.endDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+          </template>
+        </p>
+        <p class="text-h5 text-center">{{ selectedItem.originalItem.title }}</p>
+        <p>{{ selectedItem.originalItem.obs }}</p>
+      </template>
+      <template v-else>
+        <p class="text-h5 text-center text-capitalize mb-4">
+          {{newItemStartDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
+        </p>
+        <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
+        <v-text-field
+          v-if="editItem"
+          v-model="newItemStartDate"
+          label="Fecha y hora de la observación"
+          type="datetime-local"
+          hint="Ej: Pasó el dia... a las..."
+          persistent-hint
+          class="mb-3"
+        />
+        <v-text-field
+          v-else
+          v-model="newItemStartDateTime"
+          label="Hora de la observación (opcional)"
+          type="time"
+          hint="Ej: Pasó a las..."
+          persistent-hint
+          class="mb-3"
+        />
+        <v-radio-group v-model="newItemType" label="Tipo de observación">
+          <v-radio label="Inasistencia" value="absentee"></v-radio>
+          <v-radio label="Inasistencia justificada" value="justified"></v-radio>
+          <v-radio label="Reposo" value="repose"></v-radio>
+          <v-radio label="Observación" value="observation"></v-radio>
+        </v-radio-group>
+        <v-text-field
+          v-model="newItemEndDate"
+          label="Observación hasta el..."
+          type="datetime-local"
+          persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
+          class="mb-3"
+        />
+        <v-textarea label="Observación" v-model="newItemObservacion"/>
+      </template>
     </v-sheet>
+    <template #append>
+      <template  v-if="selectedItem.id">
+        <v-btn
+          class="flex-fill py-3"
+          variant="tonal"
+          block
+          :append-icon="editItem ? 'mdi-cancel' : 'mdi-trash-can'"
+          color="error"
+          @click="editItem ? (editItem = false, limpiarItems()) : ''"
+        >
+          <span>{{ editItem ? 'Cancelar' : 'Eliminar' }}</span>
+          <VentanaConfirmar
+            v-if="!editItem"
+            :message="'desea eliminar esta observación'"
+            icon="mdi-trash-can"
+            @confirmar="(e) => { e ? eliminarItem(selectedItem) : '' }"
+          />
+        </v-btn>
+        <v-btn
+          class="flex-fill py-3"
+          block
+          :append-icon="editItem ? 'mdi-sync' :'mdi-pen'"
+          :text="editItem ? 'Actualizar' : 'Editar'"
+          :color="editItem ? 'primario' : 'secundario-claro'"
+          @click="editItem ? actualizarItem(selectedItem) : editarItem(selectedItem)"
+        />
+      </template>
+      <template  v-else>
+        <v-btn class="py-7" color="primario-claro" block @click="agregarItem()">Agregar</v-btn>
+      </template>
+    </template>
   </v-navigation-drawer>
   <section>
     <v-container>
@@ -316,7 +508,7 @@ const items = ref([
                     </v-avatar>
                   </v-badge>
                 </v-col>
-                <v-col sm="8" class="px-0">
+                <v-col cols="auto" sm="10" class="px-0">
                   <v-card-title class="text-h4">
                     <v-tooltip text="Número de lista">
                       <template #activator="{ props }">
@@ -362,71 +554,75 @@ const items = ref([
                   />
                 </v-col>
               </template>
-              <v-divider/>
-              <v-col cols="12" sm="4" class="pa-0 px-sm-2 py-sm-0">
+              <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
                 <p class="text-caption  font-weight-bold text-medium-emphasis">Representantes</p>
-                <v-list-item
-                  v-for="n in [{nom_per:'Sergio Perez', parentesco: 'Padre', telefono: '04245555555'}, {nom_per:'Lucia Amparo', parentesco: 'Abuela', telefono: '04245555555'}]"
-                  :key="n.nom_per"
-                  :title="n.nom_per"
-                  class="px-0"
-                >
-                  <template #subtitle>
-                    <p>
-                      <span class="text-caption font-weight-bold text-medium-emphasis">
-                        Parentesco:
-                      </span>
-                      <span class="font-weight-bold letter-spacing">
-                        {{ n.parentesco }}
-                      </span>
-                    </p>
-                    <p>
-                      <span class="text-caption font-weight-bold text-medium-emphasis">
-                        Teléfono:
-                      </span>
-                      <span class="font-weight-bold letter-spacing">
-                        {{ n.telefono }}
-                      </span>
-                    </p>
-                  </template>
-                </v-list-item>
+                <v-divider/>
+                <div class="d-sm-flex">
+                  <v-list-item
+                    v-for="n in [{nom_per:'Sergio Perez', parentesco: 'Padre', telefono: '04245555555'}, {nom_per:'Lucia Amparo', parentesco: 'Abuela', telefono: '04245555555'}]"
+                    :key="n.nom_per"
+                    :title="n.nom_per"
+                    class="px-0 pr-sm-3"
+                  >
+                    <template #subtitle>
+                      <p>
+                        <span class="text-caption font-weight-bold text-medium-emphasis">
+                          Parentesco:
+                        </span>
+                        <span class="font-weight-bold letter-spacing">
+                          {{ n.parentesco }}
+                        </span>
+                      </p>
+                      <p>
+                        <span class="text-caption font-weight-bold text-medium-emphasis">
+                          Teléfono:
+                        </span>
+                        <span class="font-weight-bold letter-spacing">
+                          {{ n.telefono }}
+                        </span>
+                      </p>
+                    </template>
+                  </v-list-item>
+                </div>
               </v-col>
-              <v-divider :vertical="!mobile" class="d-sm-none d-lg-block"/>
-              <v-col cols="12" sm="4" class="pa-0 px-sm-2 py-sm-0">
+              <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
                 <p class="text-caption  font-weight-bold text-medium-emphasis">Estatus</p>
-                <v-list-item
-                  class="px-0"
-                  title="Pases"
-                >
-                  <template #subtitle>
-                    <p>
-                      <span class="text-caption font-weight-bold text-medium-emphasis">
-                        De entrada:
-                      </span>
-                      <span class="font-weight-bold letter-spacing">
-                        1
-                      </span>
-                    </p>
-                    <p>
-                      <span class="text-caption font-weight-bold text-medium-emphasis">
-                        De salida
-                      </span>
-                      <span class="font-weight-bold letter-spacing">
-                        1
-                      </span>
-                    </p>
-                  </template>
-                </v-list-item>
-                <v-list-item
-                  class="px-0"
-                  title="Salud"
-                  subtitle="En buen estado"
+                <v-divider/>
+                <div class="d-sm-flex flex-wrap align-start">
+                  <v-list-item
+                    title="Pases"
+                    class="flex-1-0 px-0 pr-sm-2"
+                  >
+                    <template #subtitle>
+                      <p>
+                        <span class="text-caption font-weight-bold text-medium-emphasis">
+                          De entrada:
+                        </span>
+                        <span class="font-weight-bold letter-spacing">
+                          1
+                        </span>
+                      </p>
+                      <p>
+                        <span class="text-caption font-weight-bold text-medium-emphasis">
+                          De salida
+                        </span>
+                        <span class="font-weight-bold letter-spacing">
+                          1
+                        </span>
+                      </p>
+                    </template>
+                  </v-list-item>
+                  <v-list-item
+                    title="Salud"
+                    subtitle="En buen estado"
+                    class="flex-1-0 px-0 pr-sm-2"
                   ></v-list-item>
                   <v-list-item
-                  title="Condiciones medicas"
-                  subtitle="Lesión en rodilla"
-                  class="px-0"
-                ></v-list-item>
+                    title="Condiciones medicas"
+                    subtitle="Lesión en rodilla"
+                    class="flex-1-0 px-0 pr-sm-2"
+                  ></v-list-item>
+                </div>
               </v-col>
             </v-row>
           </v-card-item>
@@ -448,6 +644,7 @@ const items = ref([
           :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
           @drop-on-date="onDrop"
           @click-date="onClickDay"
+          @click-item="onClickItem"
           class="calendar theme-default holiday-us-traditional holiday-us-official"
         >
           <template #header="{ headerProps }">
