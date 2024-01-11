@@ -51,12 +51,12 @@ function cerrarSesion() {
       <v-btn
         variant="text"
         append-icon="mdi-logout"
-        >
+      >
         <span class="d-none d-md-inline">Cerrar sesión</span>
         <VentanaConfirmar
-        :message="'desea cerrar sesión'"
-        icon="mdi-logout"
-        @confirmar="(e) => { e ? cerrarSesion() : '' }"
+          :message="'desea cerrar sesión'"
+          icon="mdi-logout"
+          @confirmar="(e) => { e ? cerrarSesion() : '' }"
         />
       </v-btn>
     </template>
