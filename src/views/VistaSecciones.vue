@@ -33,9 +33,9 @@ const menciones = ref([
     </v-tabs>
     <v-window v-model="mencion">
       <v-window-item
-        v-for="n in 3"
-        :key="n"
-        :value="n"
+        v-for="n in menciones"
+        :key="n.value"
+        :value="n.value"
       >
         <v-container fluid>
           <v-expansion-panels>
