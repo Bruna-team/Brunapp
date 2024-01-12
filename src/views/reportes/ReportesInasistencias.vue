@@ -112,30 +112,28 @@ const contentPrint = ref([
 ])
 </script>
 <template>
-  <v-container>
-    <v-data-table
-      :headers="headers"
-      :items="plants"
-      density="compact"
-      :sort-by="[{ key: 'pases', order: 'desc' }]"
-    >
-      <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>Inasistencias</v-toolbar-title>
-          <v-divider
-            class="mx-4"
-            inset
-            vertical
-          ></v-divider>
-          <v-spacer></v-spacer>
-          <ModalImpresion
-            :title="'Inasistencias'"
-            :subtitle="'Enero'"
-            :seccion="'primero A'"
-            :content="contentPrint"
-          />
-        </v-toolbar>
-      </template>
-    </v-data-table>
-  </v-container>
+  <v-data-table
+    :headers="headers"
+    :items="plants"
+    density="compact"
+    :sort-by="[{ key: 'pases', order: 'desc' }]"
+  >
+    <template v-slot:top>
+      <v-toolbar flat>
+        <v-toolbar-title>Inasistencias</v-toolbar-title>
+        <v-divider
+          class="mx-4"
+          inset
+          vertical
+        ></v-divider>
+        <v-spacer></v-spacer>
+        <ModalImpresion
+          :title="'Inasistencias'"
+          :subtitle="'Enero'"
+          :seccion="'primero A'"
+          :content="contentPrint"
+        />
+      </v-toolbar>
+    </template>
+  </v-data-table>
 </template>

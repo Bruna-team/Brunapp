@@ -41,7 +41,7 @@ const tabs = ref([
           </RouterLink>
         </div>
       </v-tabs>
-      <v-card-text>
+      <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <div class="grid-container--reportes">
           <div class="grid-area--slider">
             <span class="text-medium-emphasis">
@@ -64,11 +64,11 @@ const tabs = ref([
           </div>
           <div class="grid-area--secciones">
             <v-radio-group inline hide-details label="Selecciona una sección">
-              <v-radio label="Sección A" value="a"></v-radio>
-              <v-radio label="Sección B" value="b"></v-radio>
+              <v-radio label="'A'" value="a"></v-radio>
+              <v-radio label="'B'" value="b"></v-radio>
             </v-radio-group>
           </div>
-          <div class="grid-area--datetime">
+          <div v-if="tabActiva !== 'pases'" class="grid-area--datetime">
             <v-date-picker
               v-model="fechasFiltrar"
               show-adjacent-months
@@ -129,5 +129,19 @@ const tabs = ref([
 .grid-area--tabActiva {
   grid-area: tabActiva;
   grid-auto-columns: min-content;
+}
+.tabPases .grid-container--reportes {
+  @media (min-width: 600px) {
+    grid-template-areas:
+    'slider slider'
+    'menciones menciones'
+    'secciones secciones'
+    'tabActiva tabActiva';
+  }
+  @media (min-width: 960px) {
+    grid-template-areas:
+      'slider slider menciones secciones'
+      'tabActiva tabActiva tabActiva tabActiva';
+  }
 }
 </style>
