@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "pdfmake": "^0.2.9",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
     "vue-simple-calendar": "^6.3.1",

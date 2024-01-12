@@ -52,7 +52,7 @@ const drawer = ref(false)
 </v-main>
 </template>
 <style>
-a:hover {
+.v-navigation-drawer a:hover {
   transition: all .5s ease;
   box-shadow: 4px 4px 0px 0px #ffc400;
 }
