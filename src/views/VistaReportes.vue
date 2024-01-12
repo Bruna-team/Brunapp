@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import router from '../router';
+const fechasFiltrar = ref([])
 const tabActiva = ref(router.currentRoute.value.name)
 const tabs = ref([
   {
@@ -41,8 +42,8 @@ const tabs = ref([
         </div>
       </v-tabs>
       <v-card-text>
-        <v-row>
-          <v-col cols="12" md="4">
+        <div class="grid-container--reportes">
+          <div class="grid-area--slider">
             <span class="text-medium-emphasis">
               Selecciona un año
             </span>
@@ -53,34 +54,80 @@ const tabs = ref([
               show-ticks="always"
               tick-size="6"
             />
-          </v-col>
-          <v-col cols="12" sm="7" md="5">
+          </div>
+          <div class="grid-area--menciones">
             <v-radio-group inline label="Selecciona una mención" hide-details>
               <v-radio label="Telemática" value="t"></v-radio>
               <v-radio label="Administración" value="a"></v-radio>
               <v-radio label="Contabilidad" value="c"></v-radio>
             </v-radio-group>
-          </v-col>
-          <v-col cols="12" sm="4" md="3">
-            <v-radio-group
-              inline
-              hide-details
-            >
+          </div>
+          <div class="grid-area--secciones">
+            <v-radio-group inline hide-details label="Selecciona una sección">
               <v-radio label="Sección A" value="a"></v-radio>
               <v-radio label="Sección B" value="b"></v-radio>
             </v-radio-group>
-          </v-col>
-        </v-row>
-        <v-window v-model="tabActiva" >
-          <v-window-item
-            v-for="tab in tabs"
-            :key="tab.value"
-            :value="tabActiva"
-          >
-            <RouterView />
-          </v-window-item>
-        </v-window>
+          </div>
+          <div class="grid-area--datetime">
+            <v-date-picker
+              v-model="fechasFiltrar"
+              show-adjacent-months
+              multiple
+              class="flex-fill"
+            />
+          </div>
+          <div class="grid-area--tabActiva">
+            <v-window v-model="tabActiva" >
+              <v-window-item
+                v-for="tab in tabs"
+                :key="tab.value"
+                :value="tabActiva"
+              >
+                <RouterView />
+              </v-window-item>
+            </v-window>
+          </div>
+        </div>
       </v-card-text>
     </v-card>
   </v-container>
 </template>
+<style>
+.v-date-picker-header {
+  padding-bottom: 0;
+}
+.v-picker-title {
+  display: none !important;
+}
+.grid-container--reportes {
+  @media (min-width: 600px) {
+    display: grid;
+    grid-template-areas:
+    'slider slider'
+    'datetime menciones'
+    'datetime secciones'
+    'datetime secciones'
+    'tabActiva tabActiva';
+  }
+  @media (min-width: 960px) {
+    grid-template-areas:
+    'datetime slider'
+    'datetime menciones'
+    'datetime secciones'
+    'tabActiva tabActiva';
+  }
+  @media (min-width: 1280px) {
+    grid-template-areas:
+    'slider menciones secciones'
+    'datetime tabActiva tabActiva';
+  }
+}
+.grid-area--slider { grid-area: slider;}
+.grid-area--menciones { grid-area: menciones;}
+.grid-area--secciones { grid-area: secciones;}
+.grid-area--datetime { grid-area: datetime;}
+.grid-area--tabActiva {
+  grid-area: tabActiva;
+  grid-auto-columns: min-content;
+}
+</style>

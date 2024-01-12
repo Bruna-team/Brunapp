@@ -1,95 +1,139 @@
 <script setup lang="ts">
 import ModalImpresion from "../../components/ModalImpresion.vue"
-const headers = [
-  { title: 'Estudiante', align: 'start', sortable: false, key: 'name' },
-  { title: 'Inasistencias', align: 'end', key: 'light' },
-  { title: 'Justificadas', align: 'end', key: 'height' },
-  { title: 'Pases', align: 'end', key: 'petFriendly' },
-]
-const plants = [
+import {ref} from 'vue'
+const headers = ref([
+  {
+    title: 'Estudiante',
+    sortable: false,
+    key: 'name'
+  },
+  {
+    title: 'Inasistencias',
+    key: 'abstente'
+  },
+  {
+    title: 'Justificadas',
+    key: 'justified'
+  },
+  {
+    title: 'Total inasistencias',
+    key: 'tabstense'
+  },
+  {
+    title: 'Pases',
+    key: 'pases'
+  },
+])
+
+const plants = ref([
   {
     name: 'Fern',
-    light: 'Low',
-    height: '20cm',
-    petFriendly: 'Yes',
+    abstente: 3,
+    justified: 0,
+    tabstense: 3,
+    pases: 0,
   },
   {
     name: 'Snake Plant',
-    light: 'Low',
-    height: '50cm',
-    petFriendly: 'No',
+    abstente: 2,
+    justified: 1,
+    tabstense: 3,
+    pases: 1,
   },
   {
     name: 'Monstera',
-    light: 'Medium',
-    height: '60cm',
-    petFriendly: 'No',
+    abstente: 2,
+    justified: 2,
+    tabstense: 4,
+    pases: 2,
   },
   {
     name: 'Pothos',
-    light: 'Low to medium',
-    height: '40cm',
-    petFriendly: 'Yes',
+    abstente: 0,
+    justified: 0,
+    tabstense: 0,
+    pases: 0,
   },
   {
     name: 'ZZ Plant',
-    light: 'Low to medium',
-    height: '90cm',
-    petFriendly: 'Yes',
+    abstente: 2,
+    justified: 3,
+    tabstense: 5,
+    pases: 3,
   },
   {
     name: 'Spider Plant',
-    light: 'Bright, indirect',
-    height: '30cm',
-    petFriendly: 'Yes',
+    abstente: 1,
+    justified: 0,
+    tabstense: 1,
+    pases: 2,
   },
   {
     name: 'Air Plant',
-    light: 'Bright, indirect',
-    height: '15cm',
-    petFriendly: 'Yes',
+    abstente: 0,
+    justified: 1,
+    tabstense: 1,
+    pases: 1,
   },
   {
     name: 'Peperomia',
-    light: 'Bright, indirect',
-    height: '25cm',
-    petFriendly: 'Yes',
+    abstente: 0,
+    justified: 0,
+    tabstense: 0,
+    pases: 0,
   },
   {
     name: 'Aloe Vera',
-    light: 'Bright, direct',
-    height: '30cm',
-    petFriendly: 'Yes',
+    abstente: 0,
+    justified: 2,
+    tabstense: 2,
+    pases: 2,
   },
   {
     name: 'Jade Plant',
-    light: 'Bright, direct',
-    height: '40cm',
-    petFriendly: 'Yes',
+    abstente: 0,
+    justified: 0,
+    tabstense: 0,
+    pases: 0,
   },
-]
+])
+
+const contentPrint = ref([
+  {text: 'Tables', style: 'header'},
+  {
+    style: 'tableExample',
+    table: {
+      body: [
+        ['Column 1', 'Column 2', 'Column 3'],
+        ['One value goes here', 'Another one here', 'OK?']
+      ]
+    }
+  },
+])
 </script>
 <template>
   <v-container>
-    <h3>Inasistencias</h3>
     <v-data-table
       :headers="headers"
       :items="plants"
       density="compact"
-      item-key="name"
+      :sort-by="[{ key: 'pases', order: 'desc' }]"
     >
       <template v-slot:top>
-        <v-toolbar
-          flat
-        >
-          <v-toolbar-title>My CRUD</v-toolbar-title>
+        <v-toolbar flat>
+          <v-toolbar-title>Inasistencias</v-toolbar-title>
           <v-divider
             class="mx-4"
             inset
             vertical
           ></v-divider>
           <v-spacer></v-spacer>
-          <ModalImpresion />
+          <ModalImpresion
+            :title="'Inasistencias'"
+            :subtitle="'Enero'"
+            :seccion="'primero A'"
+            :content="contentPrint"
+          />
         </v-toolbar>
       </template>
     </v-data-table>
