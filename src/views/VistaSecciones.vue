@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref,onMounted} from 'vue'
 import { brunaApi } from '../funciones/api.ts';
+import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 const mencion = ref('')
 const menciones = ref([{
   id_men: '',
@@ -63,6 +64,9 @@ function organizarSecciones(data:string[]) {
 </script>
 <template>
 <v-container>
+  <AgregarEstudiante
+    :classBtn="'ml-auto mr-0'"
+  />
   <v-card>
     <v-tabs
       v-model="mencion"
