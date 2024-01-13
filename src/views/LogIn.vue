@@ -88,7 +88,7 @@ function iniciarSesion() {
     brunaApi({ s: 'auth' }, `usuario=${userData.value.cedula.value}&clave=${btoa(userData.value.password.value)}&rec=${recSesion.value}`)
     .then((res:any) => {
       if (res.data.r) {
-        router.push('LogIn')
+        router.push('/')
       } else {
         // mensaje de error
       }
