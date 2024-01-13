@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import ModalImpresion from "../../components/ModalImpresion.vue"
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
+const props = defineProps({
+  students: {type: Array, default: []},
+})
 const headers = ref([
   {
     title: 'Estudiante',
@@ -25,96 +28,40 @@ const headers = ref([
   },
 ])
 
-const plants = ref([
-  {
-    name: 'Fern',
-    abstente: 3,
-    justified: 0,
-    tabstense: 3,
-    pases: 0,
-  },
-  {
-    name: 'Snake Plant',
-    abstente: 2,
-    justified: 1,
-    tabstense: 3,
-    pases: 1,
-  },
-  {
-    name: 'Monstera',
-    abstente: 2,
-    justified: 2,
-    tabstense: 4,
-    pases: 2,
-  },
-  {
-    name: 'Pothos',
-    abstente: 0,
-    justified: 0,
-    tabstense: 0,
-    pases: 0,
-  },
-  {
-    name: 'ZZ Plant',
-    abstente: 2,
-    justified: 3,
-    tabstense: 5,
-    pases: 3,
-  },
-  {
-    name: 'Spider Plant',
-    abstente: 1,
-    justified: 0,
-    tabstense: 1,
-    pases: 2,
-  },
-  {
-    name: 'Air Plant',
-    abstente: 0,
-    justified: 1,
-    tabstense: 1,
-    pases: 1,
-  },
-  {
-    name: 'Peperomia',
-    abstente: 0,
-    justified: 0,
-    tabstense: 0,
-    pases: 0,
-  },
-  {
-    name: 'Aloe Vera',
-    abstente: 0,
-    justified: 2,
-    tabstense: 2,
-    pases: 2,
-  },
-  {
-    name: 'Jade Plant',
-    abstente: 0,
-    justified: 0,
-    tabstense: 0,
-    pases: 0,
-  },
-])
-
-const contentPrint = ref([
-  {text: 'Tables', style: 'header'},
-  {
-    style: 'tableExample',
-    table: {
-      body: [
-        ['Column 1', 'Column 2', 'Column 3'],
-        ['One value goes here', 'Another one here', 'OK?']
-      ]
+const contentPrint = computed(() => {
+  const content: any[] = []
+  const tabla: any[] = []
+  content.push({
+    text: 'Reporte de observaciones', style: 'tableTitle'
+  })
+  tabla.push([
+    {text: 'Estudiante', style: 'tableHeader'},
+    {text: 'Inasistencias', style: 'tableHeader'},
+    {text: 'Justificadas', style: 'tableHeader'},
+    {text: 'Total inasistencias', style: 'tableHeader'},
+    {text: 'Pases', style: 'tableHeader'}
+  ])
+  if (props.students?.length) {
+    for (let s = 0; s < props.students?.length; s++) {
+      // @ts-ignore
+      tabla.push([props.students[s]?.name, props.students[s]?.abstente, props.students[s]?.justified, props.students[s]?.tabstense, props.students[s]?.pases])
     }
-  },
-])
+  }
+  content.push({
+      table: {
+        headerRows: 1,
+        body: tabla,
+        widths: ['*', 70, 70, 70, 70]
+      },
+      layout: 'lightHorizontalLines'
+  })
+  return content
+})
 </script>
 <template>
   <v-data-table
     :headers="headers"
-    :items="plants"
+    :items="props.students"
     density="compact"
     :sort-by="[{ key: 'pases', order: 'desc' }]"
   >
@@ -129,7 +76,6 @@ const contentPrint = ref([
         <v-spacer></v-spacer>
         <ModalImpresion
           :title="'Inasistencias'"
-          :subtitle="'Enero'"
           :seccion="'primero A'"
           :content="contentPrint"
         />

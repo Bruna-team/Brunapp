@@ -69,3 +69,13 @@ i.logo {
 .items-end {
   justify-items: end;
 }
+
+/* Estilos personalizados del QuillEditor */
+.ql-toolbar.ql-snow {
+  border: none !important;
+  background-color: rgb(var(--v-theme-primario-claro));
+}
+.ql-snow.ql-container {
+  border: none !important;
+  border-bottom: 1px solid rgb(var(--v-theme-primario-claro)) !important;
+}

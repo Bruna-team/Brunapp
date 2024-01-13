@@ -1,24 +1,120 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import router from '../router';
+import ReportesInasistencias from './reportes/ReportesInasistencias.vue';
+import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
+import ReportesPases from './reportes/ReportesPases.vue';
 const fechasFiltrar = ref([])
-const tabActiva = ref(router.currentRoute.value.name)
+const tabActiva = ref('pases')
 const tabs = ref([
   {
     value: 'pases',
     title: 'Pases de entrada y salida',
-    url: 'pases'
   },
   {
     value: 'obs',
     title: 'Observaciones',
-    url: 'observaciones'
   },
   {
     value: 'ast',
     title: 'Inasistencias',
-    url: 'inasistencias'
   }
+])
+const año = ref([])
+const mencion = ref([])
+const seccion = ref([])
+const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
+
+const plants = ref([
+  {
+    name: 'Fern',
+    abstente: 3,
+    justified: 0,
+    tabstense: 3,
+    pases: 0,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Snake Plant',
+    abstente: 2,
+    justified: 1,
+    tabstense: 3,
+    pases: 1,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Monstera',
+    abstente: 2,
+    justified: 2,
+    tabstense: 4,
+    pases: 2,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Pothos',
+    abstente: 0,
+    justified: 0,
+    tabstense: 0,
+    pases: 0,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'ZZ Plant',
+    abstente: 2,
+    justified: 3,
+    tabstense: 5,
+    pases: 3,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Spider Plant',
+    abstente: 1,
+    justified: 0,
+    tabstense: 1,
+    pases: 2,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Air Plant',
+    abstente: 0,
+    justified: 1,
+    tabstense: 1,
+    pases: 1,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Peperomia',
+    abstente: 0,
+    justified: 0,
+    tabstense: 0,
+    pases: 0,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Aloe Vera',
+    abstente: 0,
+    justified: 2,
+    tabstense: 2,
+    pases: 2,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
+  {
+    name: 'Jade Plant',
+    abstente: 0,
+    justified: 0,
+    tabstense: 0,
+    pases: 0,
+    obs: 'AaaAaAaA',
+    date: '',
+  },
 ])
 </script>
 <template>
@@ -34,60 +130,68 @@ const tabs = ref([
           v-for="tab in tabs"
           :key="'t'+tab.value"
         >
-          <RouterLink :to="`/reportes/${tab.url}`">
-            <v-tab :value="tab.value">
-                {{ tab.title }}
-            </v-tab>
-          </RouterLink>
+          <v-tab :value="tab.value">{{ tab.title }}</v-tab>
         </div>
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
-        <div class="grid-container--reportes">
-          <div class="grid-area--slider">
-            <span class="text-medium-emphasis">
-              Selecciona un año
-            </span>
-            <v-slider
-              :ticks="{0: '1', 1: '2', 2: '3', 3: '4', 4: '5', 5: '6'}"
-              :max="5"
-              step="1"
-              show-ticks="always"
-              tick-size="6"
-            />
-          </div>
-          <div class="grid-area--menciones">
-            <v-radio-group inline label="Selecciona una mención" hide-details>
+        <v-row class="d-flex flex-wrap">
+          <v-col cols="12" md="auto" class="grid-area--slider">
+            <v-radio-group v-model="año" inline label="Selecciona un año" hide-details>
+              <v-radio label="1" value="1"></v-radio>
+              <v-radio label="2" value="2"></v-radio>
+              <v-radio label="5" value="4"></v-radio>
+            </v-radio-group>
+          </v-col>
+          <v-col cols="12" md="auto" class="grid-area--menciones">
+            <v-radio-group v-model="mencion" inline label="Selecciona una mención" hide-details>
               <v-radio label="Telemática" value="t"></v-radio>
               <v-radio label="Administración" value="a"></v-radio>
               <v-radio label="Contabilidad" value="c"></v-radio>
             </v-radio-group>
-          </div>
-          <div class="grid-area--secciones">
-            <v-radio-group inline hide-details label="Selecciona una sección">
+          </v-col>
+          <v-col cols="12" md="4" class="grid-area--secciones">
+            <v-radio-group v-model="seccion" inline hide-details label="Selecciona una sección">
               <v-radio label="'A'" value="a"></v-radio>
               <v-radio label="'B'" value="b"></v-radio>
             </v-radio-group>
-          </div>
-          <div v-if="tabActiva !== 'pases'" class="grid-area--datetime">
+          </v-col>
+          <v-col cols="12" md="auto" v-if="tabActiva !== 'pases'" class="grid-area--datetime">
             <v-date-picker
               v-model="fechasFiltrar"
               show-adjacent-months
               multiple
               class="flex-fill"
             />
-          </div>
-          <div class="grid-area--tabActiva">
+          </v-col>
+          <template v-else>
+            <v-col cols="12" md="6">
+              <v-combobox
+                label="Escribe el nombre del estudiante"
+                :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+              ></v-combobox>
+            </v-col>
+            <v-col cols="12" md="6">
+              <v-text-field
+                label="Especifica si la fecha es de hoy"
+                type="date"
+                v-model="paseFecha"
+              />
+            </v-col>
+          </template>
+          <v-col cols="12" :md="tabActiva !== 'pases' ? '' : '12'" class="grid-area--tabActiva">
             <v-window v-model="tabActiva" >
-              <v-window-item
-                v-for="tab in tabs"
-                :key="tab.value"
-                :value="tabActiva"
-              >
-                <RouterView />
+              <v-window-item value="pases">
+                <ReportesPases />
+              </v-window-item>
+              <v-window-item value="ast">
+                <ReportesInasistencias :students="plants"  />
+              </v-window-item>
+              <v-window-item value="obs">
+                <ReportesObservaciones :students="plants" />
               </v-window-item>
             </v-window>
-          </div>
-        </div>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
   </v-container>
@@ -99,7 +203,7 @@ const tabs = ref([
 .v-picker-title {
   display: none !important;
 }
-.grid-container--reportes {
+/* .grid-container--reportes {
   @media (min-width: 600px) {
     display: grid;
     grid-template-areas:
@@ -143,5 +247,5 @@ const tabs = ref([
       'slider slider menciones secciones'
       'tabActiva tabActiva tabActiva tabActiva';
   }
-}
+} */
 </style>

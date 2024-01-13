@@ -37,23 +37,6 @@ const router = createRouter({
           path: "/reportes",
           name: "reportes",
           component: () => import("../views/VistaReportes.vue"),
-          children: [
-            {
-              path: "/reportes/pases",
-              name: "pases",
-              component: () => import("../views/reportes/ReportesPases.vue"),
-            },
-            {
-              path: "/reportes/observaciones",
-              name: "observaciones",
-              component: () => import("../views/reportes/ReportesObservaciones.vue"),
-            },
-            {
-              path: "/reportes/inasistencias",
-              name: "inasistencias",
-              component: () => import("../views/reportes/ReportesInasistencias.vue"),
-            }
-          ]
         },
       ]
     },

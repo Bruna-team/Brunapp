@@ -60,9 +60,10 @@ function imprimirPdf (
         fontSize: 12,
         bold: true
       },
-      header6: {
-        fontSize: 11,
-        bold: true
+      tableTitle: {
+        fontSize: 14,
+        bold: true,
+        alignment: 'center'
       },
       parrafo1: {
         fontSize: 9
