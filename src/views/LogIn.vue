@@ -2,6 +2,8 @@
 import { ref, watch } from 'vue';
 import { brunaApi } from '../funciones/api.ts';
 import router from '../router';
+// import { capitalizar, validarEmail, validarTel } from "../funciones/funciones.ts";
+import { capitalizar } from "../funciones/funciones.ts";
 
 const loading  = ref(false)
 const seePassword  = ref(false)
@@ -14,7 +16,7 @@ const userData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El correo es necesario',
-      // (v: string) => checkApi(v)
+      // (v: string) => validarEmail(v)
     ],
   },
   rol: {
@@ -23,10 +25,38 @@ const userData = ref({
       (v: object) => !!v || 'El rol del docente es necesario',
     ],
   },
-  username: {
+  cedula: {
     value: '',
     rules: [
-      (v: string) => !!v || 'El nombre de usuario es necesario',
+      (v: string) => !!v || 'El número de cedula es necesario',
+      // (v: string) => checkApi(v)
+    ],
+  },
+  nombre: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El nombre es necesario',
+      // (v: string) => checkApi(v)
+    ],
+  },
+  apellido: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El apellido es necesario',
+      // (v: string) => checkApi(v)
+    ],
+  },
+  telefono: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El teléfono es necesario',
+      // (v: string) => validarTel(v)
+    ],
+  },
+  direccion: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La dirección es necesario',
       // (v: string) => checkApi(v)
     ],
   },
@@ -54,7 +84,24 @@ async function validar (event:any) {
 //   })
 // }
 function iniciarSesion() {
-  brunaApi({ s: 'auth' }, `usuario=${userData.value.username.value}&clave=${btoa(userData.value.password.value)}&rec=${recSesion.value}`)
+  if (userData.value.cedula.value && userData.value.password.value) {
+    brunaApi({ s: 'auth' }, `usuario=${userData.value.cedula.value}&clave=${btoa(userData.value.password.value)}&rec=${recSesion.value}`)
+    .then((res:any) => {
+      if (res.data.r) {
+        router.push('/')
+      } else {
+        // mensaje de error
+      }
+    })
+  }
+}
+function registro() {
+  let data = 'nom=' + capitalizar(userData.value.nombre.value) + '&ape=' + capitalizar(userData.value.apellido.value)
+  data += '&ced=' + userData.value.cedula.value + '&ema=' + userData.value.email.value
+  data += '&tel=' + userData.value.telefono.value + '&dir=' + userData.value.direccion.value
+  data += '&car=' + userData.value.rol.value + '&clave=' + userData.value.password.value
+  data += '&cod=' + btoa(segurityCode.value)
+  brunaApi({ s: 'register' }, data)
   .then((res:any) => {
     if (res.data.r || res.data.Seleccion === 'No existe') {
       router.push('/')
@@ -87,8 +134,8 @@ watch(router.currentRoute, (value) => {
       <h2 class="font-weight-black text-primario font-bruna mb-4">Inicia Sesión</h2>
       <v-form validate-on="submit lazy" @submit.prevent="validar">
         <v-text-field
-          v-model="userData.username.value"
-          :rules="userData.username.rules"
+          v-model="userData.cedula.value"
+          :rules="userData.cedula.rules"
           prepend-icon="mdi-account"
           label="Cédula"
           ></v-text-field>
@@ -128,7 +175,6 @@ watch(router.currentRoute, (value) => {
       v-else
       class="d-flex flex-column align-center justify-center text-center mx-auto px-4"
       elevation="4"
-      height="600"
       rounded
       max-width="800"
       width="100%"
@@ -136,16 +182,40 @@ watch(router.currentRoute, (value) => {
       <h2 class="font-weight-black text-primario font-bruna mb-4">¡Crea tu cuenta profesor!</h2>
       <v-form validate-on="submit lazy" @submit.prevent="validar">
         <v-text-field
-          v-model="userData.username.value"
-          :rules="userData.username.rules"
+          v-model="userData.nombre.value"
+          :rules="userData.nombre.rules"
+          prepend-icon="mdi-account"
+          label="Nombre"
+        ></v-text-field>
+        <v-text-field
+          v-model="userData.apellido.value"
+          :rules="userData.apellido.rules"
+          prepend-icon="mdi-account"
+          label="Apellido"
+        ></v-text-field>
+        <v-text-field
+          v-model="userData.cedula.value"
+          :rules="userData.cedula.rules"
           prepend-icon="mdi-account"
           label="Cédula"
+        ></v-text-field>
+        <v-text-field
+          v-model="userData.telefono.value"
+          :rules="userData.telefono.rules"
+          prepend-icon="mdi-email"
+          label="N° telefónico"
         ></v-text-field>
         <v-text-field
           v-model="userData.email.value"
           :rules="userData.email.rules"
           prepend-icon="mdi-email"
           label="Correo"
+        ></v-text-field>
+        <v-text-field
+          v-model="userData.direccion.value"
+          :rules="userData.direccion.rules"
+          prepend-icon="mdi-email"
+          label="Dirección"
         ></v-text-field>
         <v-text-field
           v-model="userData.password.value"
@@ -162,9 +232,9 @@ watch(router.currentRoute, (value) => {
           inline
           label="Rol de docente"
         >
-          <v-radio label="Profesor" value="one"></v-radio>
-          <v-radio label="Guía de sección" value="two"></v-radio>
-          <v-radio label="Coordinador" value="three"></v-radio>
+          <v-radio label="Profesor" value="3"></v-radio>
+          <v-radio label="Guía de sección" value="4"></v-radio>
+          <v-radio label="Coordinador" value="2"></v-radio>
         </v-radio-group>
         <v-text-field
           v-model="segurityCode"
@@ -192,6 +262,7 @@ watch(router.currentRoute, (value) => {
           variant="tonal"
           color="primario"
           type="submit"
+          @click="registro"
         >Crear Cuenta</v-btn>
       </v-form>
     </v-sheet>
