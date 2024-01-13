@@ -17,9 +17,9 @@ const usuario = ref({
   nombre: '',
   apellido: '',
   informacion: {
-    cédula: "",
+    cedula: "",
     dirección: "",
-    teléfono: "",
+    telefono: "",
     correo: "",
   },
   rol: ""
@@ -42,8 +42,8 @@ function cargaInicial() {
       res.data.forEach((d:any) => {
         usuario.value.nombre = d.nom_per
         usuario.value.apellido = d.ape_per
-        usuario.value.informacion.teléfono = d.tel_per
-        usuario.value.informacion.cédula = d.ced_per
+        usuario.value.informacion.telefono = d.tel_per
+        usuario.value.informacion.cedula = d.ced_per
         usuario.value.informacion.dirección = d.dir_per
         usuario.value.informacion.correo = d.ema_per
         usuario.value.rol = d.nom_car
@@ -57,7 +57,7 @@ function cargaInicial() {
 
 function guardarCambios() {
   let data = "nom=" + usuario.value.nombre + '&ape=' + usuario.value.apellido
-  data += "&tel=" + usuario.value.informacion.teléfono + '&ced=' + usuario.value.informacion.cédula
+  data += "&tel=" + usuario.value.informacion.telefono + '&ced=' + usuario.value.informacion.cedula
   data += "&dir=" + usuario.value.informacion.dirección + '&ema=' + usuario.value.informacion.correo
   brunaApi({ s: 'editarPerfil' }, data)
   .then((res:any) => {
@@ -84,8 +84,8 @@ function cerrarSesion() {
 
 <template>
 <v-container>
-  <div class="d-flex justify-center align-center mb-3">
-    <template v-if="!edit">
+  <template v-if="!edit">
+    <div class="d-flex justify-center align-center mb-3">
       <v-avatar size="70" color="brown">
         <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
       </v-avatar>
@@ -102,10 +102,18 @@ function cerrarSesion() {
           @confirmar="(e) => { e ? cerrarSesion() : '' }"
         />
       </v-btn>
-    </template>
-    <v-text-field v-if="edit" label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre" />
-    <v-text-field v-if="edit" label="Apellido" v-model="usuario.apellido" variant="underlined" hint="Escribe tu apellido" />
-  </div>
+    </div>
+  </template>
+  <template v-else>
+    <v-row>
+      <v-col>
+        <v-text-field label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre" />
+      </v-col>
+      <v-col>
+        <v-text-field label="Apellido" v-model="usuario.apellido" variant="underlined" hint="Escribe tu apellido" />
+      </v-col>
+    </v-row>
+  </template>
   <v-divider></v-divider>
   <div class="d-flex align-center">
     <v-switch
@@ -131,16 +139,32 @@ function cerrarSesion() {
       :title="value.charAt(0).toUpperCase() + value.slice(1)"
       :subtitle="info"
     ></v-list-item>
-    <v-list-item
-      v-else
-      v-for="(info, value) in usuario.informacion"
-      :key="'i'+info"
-    >
-      <v-text-field
-        :label="value.charAt(0).toUpperCase() + value.slice(1)"
-        v-model="usuario.informacion[value]"
-      />
-    </v-list-item>
+    <template v-else>
+      <v-list-item>
+        <v-text-field
+          label="Cédula"
+          v-model="usuario.informacion.cedula"
+        />
+      </v-list-item>
+      <v-list-item>
+        <v-text-field
+          label="Dirección"
+          v-model="usuario.informacion.dirección"
+        />
+      </v-list-item>
+      <v-list-item>
+        <v-text-field
+          label="telefono"
+          v-model="usuario.informacion.telefono"
+        />
+      </v-list-item>
+      <v-list-item>
+        <v-text-field
+          label="Correo"
+          v-model="usuario.informacion.correo"
+        />
+      </v-list-item>
+    </template>
     <v-list-item
       title="Rol"
       :subtitle="usuario.rol"
