@@ -73,7 +73,7 @@ function guardarCambios() {
 function cerrarSesion() {
   brunaApi({ s: 'salir' }, '')
   .then((r:any) => {
-    if (r.status === 200) {
+    if (r.data.r) {
       router.push('LogIn')
     }
   }).catch(() => {
