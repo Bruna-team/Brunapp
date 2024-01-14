@@ -58,7 +58,7 @@ function organizarSecciones(data:string[]) {
       dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
         id_ano: d.id_ano,
         sec_nom: d.sec_ano,
-        semanero: d.pnom_per + d.pape_per,
+        semanero: d.pnom_alum + ' ' + d.pape_alum,
         num_sec: d.num_est
       }
     }
@@ -102,7 +102,7 @@ function organizarSecciones(data:string[]) {
               </v-expansion-panel-title>
               <v-row no-gutters>
                 <v-col v-for="s in n.ano[i].sec" :keys="`${s.num_sec}${s.sec_nom}`">
-                  <RouterLink :to="'/seccion'">
+                  <RouterLink :to="`/seccion/${s.id_ano}`">
                     <v-expansion-panel-text>
                       <v-card width="300">
                         <v-card-item>
