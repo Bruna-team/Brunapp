@@ -89,8 +89,7 @@ function cerrarSesion() {
       <v-avatar size="70" color="brown">
         <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
       </v-avatar>
-      <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.nombre }}</span>
-      <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.apellido }}</span>
+      <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.nombre }} {{ usuario.apellido }}</span>
       <v-btn
         variant="text"
         append-icon="mdi-logout"
