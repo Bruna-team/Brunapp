@@ -17,109 +17,12 @@ const studentDrawer = ref( mobile.value ? false : true)
 // Consulta de estudiantes
 const estudiantes = ref([
   {
-    id: "12",
-    nombre: "Carla Perez",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "12",
-    nombre: "Antonio Jose Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "13",
-    nombre: "Maria Jose Alvarez",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
-  },
-  {
-    id: "14",
-    nombre: "Luis Camilo Castellano",
-    cedula: "23322323",
-    telefono: "04243333333",
-    area: "Coordinación 1",
+    ced_alum: "",
+    id_estd: "",
+    pape_alum: "",
+    pnom_alum: "",
+    sape_alum: "",
+    snom_alum: "",
   },
 ])
 const seleccionado = ref({
@@ -127,8 +30,17 @@ const seleccionado = ref({
   nombre: "",
   avatar: "",
   cedula: "",
-  telefono: "",
   fecha: "",
+  obs: "",
+  men: "",
+  men_abre: "",
+  representante: {
+    nombre: '',
+    paren: '',
+    tel: '',
+    telRe: '',
+    dir: ''
+  }
 })
 onMounted(() => {
 	cargaInicial();
@@ -337,10 +249,41 @@ function cargaInicial() {
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
   .then((res:any) => {
     if (res.data) {
-      // organizarSeccion(res.data)
+      organizarDatos(res.data)
+      estudiantes.value = res.data.estd
     }
   }).catch(() => {
     // message: 'Hubo un error cargando los datos',
+  })
+}
+function buscarEstudiante(id:string) {
+  brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec + "&estd=" + id)
+  .then((res:any) => {
+    if (res.data) {
+      organizarDatos(res.data)
+      estudiantes.value = res.data.estd
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+}
+
+function organizarDatos(data:any) {
+  seleccionado.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
+  seleccionado.value.cedula = data.alum[0].ced_alum
+  seleccionado.value.fecha = data.alum[0].fec_nac_alum
+  seleccionado.value.obs = data.alum[0].obs_alum
+  seleccionado.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
+  seleccionado.value.men = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
+  seleccionado.value.representante.nombre = data.alum[0].nom_rep + ' ' + data.alum[0].ape_rep
+  seleccionado.value.representante.paren = data.alum[0].paren_alum
+  seleccionado.value.representante.tel = data.alum[0].tel_rep
+  seleccionado.value.representante.telRe = data.alum[0].tel_re_rep
+  seleccionado.value.representante.dir = data.alum[0].dir_rep
+  data.estd.forEach((d:any) => {
+    if (d.id_estd == data.alum[0].id_estd) {
+      seleccionado.value.id = data.estd.indexOf(d) + 1
+    }
   })
 }
 </script>
@@ -359,9 +302,9 @@ function cargaInicial() {
       </template>
       <template #title>
         <span class="d-inline-block">
-          1 "A" T
+          {{  seleccionado.men_abre }}
           <span class="text-caption d-block">
-            Primero "A" de Telemática
+          {{  seleccionado.men }}
           </span>
         </span>
       </template>
@@ -376,15 +319,15 @@ function cargaInicial() {
     <v-list lines="one" density="compact" nav>
       <v-list-item
         v-for="estudiante in estudiantes"
-        :key="estudiante.id"
-        :title="estudiante.nombre"
-        :subtitle="estudiante.cedula"
+        :key="estudiante.id_estd"
+        :title="`${estudiante.pnom_alum} ${estudiante.snom_alum} ${estudiante.pape_alum} ${estudiante.sape_alum}`"
+        :subtitle="estudiante.ced_alum"
         class="my-3"
-        >
-        <!-- @click="seleccionado = estudiante" -->
+        @click="buscarEstudiante(estudiante.id_estd)"
+      >
         <template #prepend>
           <v-avatar color="brown">
-            <span class="text-h5">{{estudiante.id}}</span>
+            <span class="text-h5">{{estudiantes.indexOf(estudiante) + 1}}</span>
           </v-avatar>
         </template>
       </v-list-item>
@@ -527,7 +470,7 @@ function cargaInicial() {
                   <v-card-title class="text-h4">
                     <v-tooltip text="Número de lista">
                       <template #activator="{ props }">
-                        <span v-bind="props" class="text-primario">28</span>
+                        <span v-bind="props" class="text-primario">{{ seleccionado.id }}</span>
                       </template>
                     </v-tooltip>
                     {{ seleccionado.nombre }}
@@ -570,13 +513,11 @@ function cargaInicial() {
                 </v-col>
               </template>
               <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
-                <p class="text-caption  font-weight-bold text-medium-emphasis">Representantes</p>
+                <p class="text-caption  font-weight-bold text-medium-emphasis">Representante</p>
                 <v-divider/>
                 <div class="d-sm-flex">
                   <v-list-item
-                    v-for="n in [{nom_per:'Sergio Perez', parentesco: 'Padre', telefono: '04245555555'}, {nom_per:'Lucia Amparo', parentesco: 'Abuela', telefono: '04245555555'}]"
-                    :key="n.nom_per"
-                    :title="n.nom_per"
+                    :title="seleccionado.representante.nombre"
                     class="px-0 pr-sm-3"
                   >
                     <template #subtitle>
@@ -585,7 +526,7 @@ function cargaInicial() {
                           Parentesco:
                         </span>
                         <span class="font-weight-bold letter-spacing">
-                          {{ n.parentesco }}
+                          {{ seleccionado.representante.paren }}
                         </span>
                       </p>
                       <p>
@@ -593,7 +534,23 @@ function cargaInicial() {
                           Teléfono:
                         </span>
                         <span class="font-weight-bold letter-spacing">
-                          {{ n.telefono }}
+                          {{ seleccionado.representante.tel }}
+                        </span>
+                      </p>
+                      <p v-if="seleccionado.representante.telRe">
+                        <span class="text-caption font-weight-bold text-medium-emphasis">
+                          Teléfonode repuesto:
+                        </span>
+                        <span class="font-weight-bold letter-spacing">
+                          {{ seleccionado.representante.telRe }}
+                        </span>
+                      </p>
+                      <p>
+                        <span class="text-caption font-weight-bold text-medium-emphasis">
+                          Dirección:
+                        </span>
+                        <span class="font-weight-bold letter-spacing">
+                          {{ seleccionado.representante.dir }}
                         </span>
                       </p>
                     </template>
@@ -628,13 +585,8 @@ function cargaInicial() {
                     </template>
                   </v-list-item>
                   <v-list-item
-                    title="Salud"
-                    subtitle="En buen estado"
-                    class="flex-1-0 px-0 pr-sm-2"
-                  ></v-list-item>
-                  <v-list-item
-                    title="Condiciones medicas"
-                    subtitle="Lesión en rodilla"
+                    title="Observaciones"
+                    :subtitle="seleccionado.obs"
                     class="flex-1-0 px-0 pr-sm-2"
                   ></v-list-item>
                 </div>
