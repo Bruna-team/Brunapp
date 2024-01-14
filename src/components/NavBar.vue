@@ -29,19 +29,19 @@ const drawer = ref(false)
       <v-icon icon="mdi-chair-school" />
       Secciones
     </RouterLink>
-    <RouterLink to="maestros" class="ma-2 nav-link">
+    <RouterLink to="/maestros" class="ma-2 nav-link">
       <v-icon icon="mdi-human-male-board" />
       Maestros
     </RouterLink>
-    <RouterLink to="reportes" class="ma-2 nav-link">
+    <RouterLink to="/reportes" class="ma-2 nav-link">
       <v-icon icon="mdi-file-chart" />
       Reportes
     </RouterLink>
-    <RouterLink to="diario" class="ma-2 nav-link">
+    <RouterLink to="/diario" class="ma-2 nav-link">
       <v-icon icon="mdi-notebook" />
       Diario
     </RouterLink>
-    <RouterLink to="usuario" class="ma-2 nav-link">
+    <RouterLink to="/usuario" class="ma-2 nav-link">
       <v-icon icon="mdi-account" />
       Perfil
     </RouterLink>
