@@ -6,9 +6,10 @@ import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
 import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+import { brunaApi } from '../funciones/api.ts';
 
 import router from "../router";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay()
 const studentDrawer = ref( mobile.value ? false : true)
@@ -129,6 +130,9 @@ const seleccionado = ref({
   telefono: "",
   fecha: "",
 })
+onMounted(() => {
+	cargaInicial();
+});
 // Editar estudiante
 const edit = ref(false)
 
@@ -328,6 +332,17 @@ function eliminarItem(item: any) {
 watch(calendarNav, (value) => {
   if (!value) {limpiarItems()}
 })
+
+function cargaInicial() {
+  brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
+  .then((res:any) => {
+    if (res.data) {
+      // organizarSeccion(res.data)
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+}
 </script>
 
 <template>

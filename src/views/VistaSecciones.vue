@@ -9,9 +9,11 @@ const menciones = ref([{
   ano: [
     {
       id_ano: '',
+      nom_ano: '',
       num_ano: '',
       sec: [
         {
+          id_ano: '',
           sec_nom: '',
           semanero: '',
           num_sec: ''
@@ -44,17 +46,19 @@ function organizarSecciones(data:string[]) {
         ano: {}
       }
     }
-    if(!dataMen[d.id_men].ano[d.num_ano]) {
-      dataMen[d.id_men].ano[d.num_ano] = {
+    if(!dataMen[d.id_men].ano[d.nom_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano] = {
         id_ano: d.id_ano,
+        nom_ano: d.nom_ano,
         num_ano: d.num_ano,
         sec: {}
       }
     }
-    if(!dataMen[d.id_men].ano[d.num_ano].sec[d.sec_ano]) {
-      dataMen[d.id_men].ano[d.num_ano].sec[d.sec_ano] = {
+    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
+        id_ano: d.id_ano,
         sec_nom: d.sec_ano,
-        semanero: d.pnom_per + d.pape_per,
+        semanero: d.pnom_alum + ' ' + d.pape_alum,
         num_sec: d.num_est
       }
     }
@@ -65,7 +69,9 @@ function organizarSecciones(data:string[]) {
 <template>
 <v-container>
   <AgregarEstudiante
+    :menciones="menciones"
     :classBtn="'ml-auto mr-0'"
+    @recargar="cargaInicial"
   />
   <v-card>
     <v-tabs
@@ -91,12 +97,12 @@ function organizarSecciones(data:string[]) {
             <v-expansion-panel>
               <v-expansion-panel-title>
                 <v-row no-gutters>
-                  <v-col cols="12" class="text-center"> {{ ano.num_ano }} año</v-col>
+                  <v-col cols="12" class="text-center"> {{ ano.nom_ano }} año</v-col>
                 </v-row>
               </v-expansion-panel-title>
               <v-row no-gutters>
                 <v-col v-for="s in n.ano[i].sec" :keys="`${s.num_sec}${s.sec_nom}`">
-                  <RouterLink :to="'/seccion'">
+                  <RouterLink :to="`/seccion/${s.id_ano}`">
                     <v-expansion-panel-text>
                       <v-card width="300">
                         <v-card-item>

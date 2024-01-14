@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^7.3.67",
+    "@types/node": "^20.10.8",
     "@vitejs/plugin-vue": "^4.4.0",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
