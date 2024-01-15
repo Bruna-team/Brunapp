@@ -72,7 +72,8 @@ function organizarSecciones(data:string[]) {
 <template>
 <v-container>
   <AlertaMensaje :mensaje="alertaMsj" />
-  <v-skeleton-loader :loading="tabsLoading" type="table-heading, article, paragraph">
+  <v-skeleton-loader v-if="tabsLoading" type="table-heading, article, paragraph" />
+  <template v-else>
     <v-card>
       <v-tabs
         v-model="mencion"
@@ -80,19 +81,19 @@ function organizarSecciones(data:string[]) {
         show-arrows
         bg-color="secundario"
       >
-      <v-tab
-        v-for="(m) in menciones"
-        :key="m.id_men"
-        >
-        {{ m.men }}
-      </v-tab>
-      <AgregarEstudiante
-        :menciones="menciones"
-        :classBtn="'ml-2'"
-        @recargar="cargaInicial"
-        @alerta="alertaMsj = $event"
-      />
-    </v-tabs>
+        <v-tab
+          v-for="(m) in menciones"
+          :key="m.id_men"
+          >
+          {{ m.men }}
+        </v-tab>
+        <AgregarEstudiante
+          :menciones="menciones"
+          :classBtn="'ml-2'"
+          @recargar="cargaInicial"
+          @alerta="alertaMsj = $event"
+        />
+      </v-tabs>
       <v-window v-model="mencion">
         <v-window-item
           v-for="n in menciones"
@@ -106,7 +107,7 @@ function organizarSecciones(data:string[]) {
               cols="12" sm="6"
               class="pa-0"
             >
-              <v-card class="ma-3">
+              <v-card :class="['ma-3', {'d-flex flex-wrap align-center': Object.values(n.ano[i].sec).length==1}]">
                 <v-card-title>
                   <v-icon :icon="`mdi-numeric-${ano.num_ano}-circle`"/>
                   {{ ano.nom_ano }} año
@@ -129,7 +130,7 @@ function organizarSecciones(data:string[]) {
         </v-window-item>
       </v-window>
     </v-card>
-  </v-skeleton-loader>
+  </template>
 </v-container>
 </template>
 <style>
