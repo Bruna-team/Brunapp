@@ -159,6 +159,7 @@ function guardarAlumno() {
   data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
   data +=  '&paren=' +  alumno.value.paren.value + '&idAno=' + alumno.value.sec.value
+  data += '&obs=' + alumno.value.obs.value
   if (representante.value.id) {
     data += '&idRe=' +  representante.value.id
   } else {
