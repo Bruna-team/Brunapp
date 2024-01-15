@@ -2,8 +2,10 @@
 import {ref,onMounted} from 'vue'
 import { brunaApi } from '../funciones/api.ts';
 import AgregarEstudiante from '../components/AgregarEstudiante.vue'
-const mencion = ref('')
-const menciones = ref([{
+import AlertaMensaje from '../components/AlertaMensaje.vue';
+const mencion = ref<string>('')
+const alertaMsj = ref<string>('')
+const menciones = ref<any[]>([{
   id_men: '',
   men: '',
   ano: [
@@ -25,7 +27,6 @@ const menciones = ref([{
 onMounted(() => {
 	cargaInicial();
 });
-
 function cargaInicial() {
   brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
@@ -72,7 +73,9 @@ function organizarSecciones(data:string[]) {
     :menciones="menciones"
     :classBtn="'ml-auto mr-0'"
     @recargar="cargaInicial"
+    @alerta="alertaMsj = $event"
   />
+  <AlertaMensaje :mensaje="alertaMsj"></AlertaMensaje>
   <v-card>
     <v-tabs
       v-model="mencion"

@@ -285,3 +285,4 @@ watch(router.currentRoute, (value) => {
   opacity: 0;
 }
 </style>
+../funciones y constantes/api.ts../funciones y constantes/funciones.ts

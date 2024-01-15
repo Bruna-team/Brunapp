@@ -652,4 +652,4 @@ function organizarDatos(data:any) {
     }
   }
 }
-</style>
+</style>../funciones y constantes/api.ts
