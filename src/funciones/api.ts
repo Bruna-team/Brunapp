@@ -19,7 +19,7 @@ function brunaApi (params: any, data: any) {
       withCredentials: true
     })
       .then((respuesta) => {
-        if (typeof respuesta.data === 'string' && respuesta.data.indexOf('<!--log-->') === 0) {
+        if (respuesta.data.e === 'Invalido') {
           router.push('LogIn')
         }
         return resolve(respuesta)

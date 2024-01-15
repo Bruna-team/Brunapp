@@ -103,7 +103,7 @@ function registro() {
   data += '&cod=' + btoa(segurityCode.value)
   brunaApi({ s: 'register' }, data)
   .then((res:any) => {
-    if (res.data.r || res.data.Seleccion === 'No existe') {
+    if (res.data.r) {
       router.push('/')
     } else {
       // mensaje de error
@@ -285,3 +285,4 @@ watch(router.currentRoute, (value) => {
   opacity: 0;
 }
 </style>
+../funciones y constantes/api.ts../funciones y constantes/funciones.ts

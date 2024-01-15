@@ -1,29 +1,36 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
+import { ref, watch } from 'vue'
 const props = defineProps({
-  show: Boolean,
+  type: String,
   mensaje: String,
 })
 defineEmits(['cerrar'])
 
-const snackbar = computed(()=>{return props.show})
-const mensaje = computed(()=>{return props.mensaje})
+const show = ref(false)
+const mensaje = computed(()=> props.mensaje || '')
 
+watch(mensaje, (value: String)=> {
+  show.value = !!value
+})
 </script>
 <template>
-<v-snackbar
-  v-model="snackbar"
-  :timeout="2000"
->
-  {{ mensaje }}
-
-  <template v-slot:actions>
-    <v-btn
-      variant="text"
-      @click="$emit('cerrar')"
+  <Teleport to="body">
+    <v-snackbar
+      v-model="show"
+      :close-on-content-click="true"
+      location="top right"
+      multi-line
     >
-      Close
-    </v-btn>
-  </template>
-</v-snackbar>
+      {{ mensaje }}
+      <template v-slot:actions>
+        <v-btn
+          variant="text"
+          @click="$emit('cerrar')"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </Teleport>
 </template>
