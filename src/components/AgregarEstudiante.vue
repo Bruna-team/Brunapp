@@ -10,9 +10,8 @@ const props = defineProps({
   dataAcademica: {
     type: Object,
     default: {
-      año: '',
-      seccion: '',
-      mencion: '',
+      ano: '',
+      id_ano: ''
     }
   },
   variant: {
@@ -24,19 +23,20 @@ const props = defineProps({
     default: ''
   },
   menciones: {
-    type: [Object],
-    default: ref<any[]>()
+    type: Object,
+    default: {}
   }
 })
 const agregar = computed(()=>{return props.dataAcademica})
 const steps = computed(()=>{
-  if(Object.values(props.dataAcademica)[0].length) return [{title:'Datos del estudiante', value:1}, {title:'Datos del representante', value:2}]
+  if(props.dataAcademica.id_ano) return [{title:'Datos del estudiante', value:1}, {title:'Datos del representante', value:2}]
   return [{title:'Información estudiantil', value:0}, {title:'Datos del estudiante', value:1}, {title:'Datos del representante', value:2}]
 })
 const step = ref(steps.value.length == 2 ? 1 : 0)
 const loading = ref(false)
 const dialog = ref(false)
 const form = ref()
+const disabled = ref(false)
 const cedRe = ref({
   value: '',
   rules: [
@@ -130,19 +130,19 @@ const alumno = ref({
     value: '',
   },
   men: {
-    value: ref<any>(''),
+    value: props.dataAcademica.id_ano || '',
     rules: [
       (v: string) => !!v || 'La mención es necesaria',
     ],
   },
   ano: {
-    value: ref<any>(),
+    value: props.dataAcademica.id_ano || '',
     rules: [
       (v: string) => !!v || 'El año que cursa es necesario',
     ],
   },
   sec: {
-    value: ref<any>(''),
+    value: props.dataAcademica.id_ano || '',
     rules: [
       (v: string) => !!v || 'La sección es necesaria',
     ],
@@ -182,10 +182,18 @@ function guardarAlumno() {
   })
 }
 watch(()=>cedRe.value.value, ()=>{
+  disabled.value = false
+  representante.value.id = ''
+  representante.value.nomRe.value = ''
+  representante.value.apeRe.value = ''
+  representante.value.tel.value = ''
+  representante.value.dir.value = ''
+  representante.value.telRe.value = ''
   if (cedRe.value.value.length < 8) return
   brunaApi({ s: 'buscarRepresentante' }, 'ced=' + cedRe.value.value)
   .then((res:any) => {
-    if (res.data) {
+    if (res.data[0].id_rep) {
+      disabled.value = true
       representante.value.id = res.data[0].id_rep
       representante.value.nomRe.value = res.data[0].nom_rep
       representante.value.apeRe.value = res.data[0].ape_rep
@@ -214,9 +222,8 @@ watch(()=>cedRe.value.value, ()=>{
     <v-card>
       <v-toolbar dark>
       <v-toolbar-title>
-        {{ agregar.año && agregar.seccion
-          ? `Agrega un estudiante para la seccion ${agregar.seccion}
-          año ${agregar.año} mención ${agregar.mencion}`
+        {{ agregar.ano && agregar.id_ano
+          ? `Agrega un estudiante para ${agregar.ano}`
           : 'Agrega un estudiante'}}
         </v-toolbar-title>
         <v-toolbar-items>
@@ -364,6 +371,7 @@ watch(()=>cedRe.value.value, ()=>{
                           v-model="representante.nomRe.value"
                           label="Nombre"
                           :rules="representante.nomRe.rules"
+                          :disabled="disabled"
                         />
                       </v-col>
                       <v-col cols="12" sm="4">
@@ -371,6 +379,7 @@ watch(()=>cedRe.value.value, ()=>{
                           v-model="representante.apeRe.value"
                           label="Apellido"
                           :rules="representante.apeRe.rules"
+                          :disabled="disabled"
                         />
                       </v-col>
                       <v-col cols="12" sm="4">
@@ -385,6 +394,7 @@ watch(()=>cedRe.value.value, ()=>{
                           v-model="representante.tel.value"
                           label="Teléfono"
                           :rules="representante.tel.rules"
+                          :disabled="disabled"
                         />
                       </v-col>
                       <v-col cols="12" sm="4">
@@ -392,6 +402,7 @@ watch(()=>cedRe.value.value, ()=>{
                           v-model="representante.telRe.value"
                           label="Teléfono repuesto"
                           :rules="representante.telRe.rules"
+                          :disabled="disabled"
                         />
                       </v-col>
                       <v-col cols="12" sm="4">
@@ -399,6 +410,7 @@ watch(()=>cedRe.value.value, ()=>{
                           v-model="representante.dir.value"
                           label="Dirección"
                           :rules="representante.dir.rules"
+                          :disabled="disabled"
                         />
                       </v-col>
                     </v-row>

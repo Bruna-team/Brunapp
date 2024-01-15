@@ -15,6 +15,12 @@ const { mobile } = useDisplay()
 const studentDrawer = ref( mobile.value ? false : true)
 
 // Consulta de estudiantes
+const menciones = ref({
+  ano: '',
+  seccion: '',
+  mencion: '',
+  id_ano: ''
+})
 const estudiantes = ref([
   {
     ced_alum: "",
@@ -285,6 +291,8 @@ function organizarDatos(data:any) {
       seleccionado.value.id = data.estd.indexOf(d) + 1
     }
   })
+  menciones.value.ano = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
+  menciones.value.id_ano = data.alum[0].id_ano
 }
 </script>
 
@@ -309,14 +317,13 @@ function organizarDatos(data:any) {
         </span>
       </template>
       <AgregarEstudiante
-        :año="'1'"
-        :seccion="'A'"
-        :mencion="'Telemática'"
+        :data-academica="menciones"
         :variant="true"
         :classBtn="'float-right float-lg-none mt-2 mt-lg-1'"
+        @recargar="cargaInicial"
       />
     </v-list-item>
-    <v-list lines="one" density="compact" nav>
+    <v-list v-if="estudiantes[0].id_estd" lines="one" density="compact" nav>
       <v-list-item
         v-for="estudiante in estudiantes"
         :key="estudiante.id_estd"
@@ -333,7 +340,7 @@ function organizarDatos(data:any) {
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
-  <v-bottom-navigation v-if="mobile">
+  <v-bottom-navigation v-if="mobile && estudiantes[0].id_estd">
     <v-btn @click="studentDrawer = !studentDrawer">
       <v-icon icon="mdi-account-school-outline" />
       Lista de estudiantes
@@ -452,7 +459,7 @@ function organizarDatos(data:any) {
           @click="edit = !edit"
         />
       </section>
-      <template v-if="seleccionado">
+      <template v-if="seleccionado.id">
         <v-card variant="tonal" class="ma-3 pa-2">
           <v-card-item class="pa-0">
             <v-row class="pa-3">
@@ -622,7 +629,7 @@ function organizarDatos(data:any) {
       <template v-else>
         <v-sheet rounded="xl" class="text-center mt-3 pb-2 mx-auto" width="40vw">
           <v-icon icon="mdi-account-school-outline" class="text-primario-claro large-icon"/>
-          <p class="text-h6">Selecciona un estudiante para ver su información</p>
+          <p class="text-h6">No hay estudiantes registrados</p>
         </v-sheet>
       </template>
     </v-container>

@@ -3,7 +3,7 @@ import {ref,onMounted} from 'vue'
 import { brunaApi } from '../funciones/api.ts';
 import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
-const mencion = ref<string>('')
+const mencion = ref(0)
 const alertaMsj = ref<string>('')
 const tabsLoading = ref<boolean>(true)
 const menciones = ref<any[]>([{
@@ -120,7 +120,7 @@ function organizarSecciones(data:string[]) {
                   >
                   <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
                     <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
-                      <p class="text-caption">Semanero: {{ s.semanero }}</p>
+                      <p v-if="!s.semanero.includes('null')" class="text-caption">Semanero: {{ s.semanero }}</p>
                     </v-list-item>
                   </RouterLink>
                 </v-sheet>
