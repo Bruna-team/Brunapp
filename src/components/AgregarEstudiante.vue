@@ -19,7 +19,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  classBtn: String,
+  classBtn: {
+    type: String,
+    default: ''
+  },
   menciones: {
     type: [Object],
     default: ref<any[]>()
@@ -201,8 +204,8 @@ watch(()=>cedRe.value.value, ()=>{
     <v-btn
       v-bind="props"
       append-icon="mdi-account-school-outline"
-      :variant="agregar.variant ? 'text' : 'tonal'"
-      :class="agregar.classBtn"
+      :variant="props.variant ? 'text' : 'tonal'"
+      :class="props.classBtn"
     >
       Agregar
     </v-btn>

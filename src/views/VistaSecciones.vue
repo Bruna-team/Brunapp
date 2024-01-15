@@ -5,6 +5,7 @@ import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 const mencion = ref<string>('')
 const alertaMsj = ref<string>('')
+const tabsLoading = ref<boolean>(true)
 const menciones = ref<any[]>([{
   id_men: '',
   men: '',
@@ -34,7 +35,7 @@ function cargaInicial() {
       organizarSecciones(res.data)
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
 function organizarSecciones(data:string[]) {
@@ -64,65 +65,78 @@ function organizarSecciones(data:string[]) {
       }
     }
   })
+  tabsLoading.value = false
   menciones.value = dataMen
 }
 </script>
 <template>
 <v-container>
-  <AgregarEstudiante
-    :menciones="menciones"
-    :classBtn="'ml-auto mr-0'"
-    @recargar="cargaInicial"
-    @alerta="alertaMsj = $event"
-  />
-  <AlertaMensaje :mensaje="alertaMsj"></AlertaMensaje>
-  <v-card>
-    <v-tabs
-      v-model="mencion"
-      fixed-tabs
-      bg-color="secundario"
-    >
+  <AlertaMensaje :mensaje="alertaMsj" />
+  <v-skeleton-loader :loading="tabsLoading" type="table-heading, article, paragraph">
+    <v-card>
+      <v-tabs
+        v-model="mencion"
+        fixed-tabs
+        show-arrows
+        bg-color="secundario"
+      >
       <v-tab
         v-for="(m) in menciones"
         :key="m.id_men"
-      >
+        >
         {{ m.men }}
       </v-tab>
+      <AgregarEstudiante
+        :menciones="menciones"
+        :classBtn="'ml-2'"
+        @recargar="cargaInicial"
+        @alerta="alertaMsj = $event"
+      />
     </v-tabs>
-    <v-window v-model="mencion">
-      <v-window-item
-        v-for="n in menciones"
-        :key="n.id_men"
-        :value="n.id_men"
-      >
-        <v-container fluid>
-          <v-expansion-panels v-for="(ano, i) in n.ano" :keys="ano.id_ano">
-            <v-expansion-panel>
-              <v-expansion-panel-title>
-                <v-row no-gutters>
-                  <v-col cols="12" class="text-center"> {{ ano.nom_ano }} año</v-col>
-                </v-row>
-              </v-expansion-panel-title>
-              <v-row no-gutters>
-                <v-col v-for="s in n.ano[i].sec" :keys="`${s.num_sec}${s.sec_nom}`">
-                  <RouterLink :to="`/seccion/${s.id_ano}`">
-                    <v-expansion-panel-text>
-                      <v-card width="300">
-                        <v-card-item>
-                          <v-card-title>Sección {{ s.sec_nom }}</v-card-title>
-                          <v-card-subtitle>{{ s.num_sec }} alumnos</v-card-subtitle>
-                        </v-card-item>
-                        <v-card-text> Semanero: {{ s.semanero }} </v-card-text>
-                      </v-card>
-                    </v-expansion-panel-text>
+      <v-window v-model="mencion">
+        <v-window-item
+          v-for="n in menciones"
+          :key="n.id_men"
+          :value="n.id_men"
+        >
+          <v-row no-gutters>
+            <v-col
+              v-for="(ano, i) in n.ano"
+              :keys="ano.id_ano"
+              cols="12" sm="6"
+              class="pa-0"
+            >
+              <v-card class="ma-3">
+                <v-card-title>
+                  <v-icon :icon="`mdi-numeric-${ano.num_ano}-circle`"/>
+                  {{ ano.nom_ano }} año
+                </v-card-title>
+                <v-sheet class="d-flex flex-wrap pb-3 pl-2 justify-space-around">
+                  <RouterLink
+                    v-for="s in n.ano[i].sec"
+                    :keys="`${s.num_sec}${s.sec_nom}`"
+                    :to="`/seccion/${s.id_ano}`"
+                  >
+                  <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
+                    <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
+                      <p class="text-caption">Semanero: {{ s.semanero }}</p>
+                    </v-list-item>
                   </RouterLink>
-                </v-col>
-              </v-row>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </v-container>
-      </v-window-item>
-    </v-window>
-  </v-card>
+                </v-sheet>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-window-item>
+      </v-window>
+    </v-card>
+  </v-skeleton-loader>
 </v-container>
 </template>
+<style>
+.v-slide-group__content {
+  align-items: center;
+}
+.v-list-item__prepend {
+  display: inline;
+}
+</style>
