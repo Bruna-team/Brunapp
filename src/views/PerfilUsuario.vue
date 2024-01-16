@@ -32,7 +32,7 @@ const usuario = ref({
     ],
   },
   informacion: {
-    cedula: {
+    cédula: {
     value: '',
     rules: [
         (v: string) => !!v || 'La cédula es necesaria',
@@ -46,7 +46,7 @@ const usuario = ref({
         (v: string) => !!v || 'La dirección es necesaria',
       ],
     },
-    telefono: {
+    teléfono: {
     value: '',
     rules: [
         (v: string) => !!v || 'El teléfono es necesario',
@@ -90,8 +90,8 @@ function cargaInicial() {
       res.data.forEach((d:any) => {
         usuario.value.nombre.value = d.nom_per
         usuario.value.apellido.value = d.ape_per
-        usuario.value.informacion.telefono.value = d.tel_per
-        usuario.value.informacion.cedula.value = d.ced_per
+        usuario.value.informacion.teléfono.value = d.tel_per
+        usuario.value.informacion.cédula.value = d.ced_per
         usuario.value.informacion.dirección.value = d.dir_per
         usuario.value.informacion.correo.value = d.ema_per
         usuario.value.rol = d.nom_car
@@ -105,7 +105,7 @@ function cargaInicial() {
 
 function guardarCambios() {
   let data = "nom=" + capitalizar(usuario.value.nombre.value) + '&ape=' + capitalizar(usuario.value.apellido.value)
-  data += "&tel=" + usuario.value.informacion.telefono.value + '&ced=' + usuario.value.informacion.cedula.value
+  data += "&tel=" + usuario.value.informacion.teléfono.value + '&ced=' + usuario.value.informacion.cédula.value
   data += "&dir=" + usuario.value.informacion.dirección.value + '&ema=' + usuario.value.informacion.correo.value
   brunaApi({ s: 'editarPerfil' }, data)
   .then((res:any) => {
@@ -194,8 +194,8 @@ function cerrarSesion() {
       <v-list-item>
         <v-text-field
           label="Cédula"
-          v-model="usuario.informacion.cedula.value"
-          :rules="usuario.informacion.cedula.rules"
+          v-model="usuario.informacion.cédula.value"
+          :rules="usuario.informacion.cédula.rules"
           prefix="V-"
           hint="Ej: V-12345678"
         />
@@ -210,8 +210,8 @@ function cerrarSesion() {
       <v-list-item>
         <v-text-field
           label="Teléfono"
-          v-model="usuario.informacion.telefono.value"
-          :rules="usuario.informacion.telefono.rules"
+          v-model="usuario.informacion.teléfono.value"
+          :rules="usuario.informacion.teléfono.rules"
           hint="Ej: 04121234567"
         />
       </v-list-item>
