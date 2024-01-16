@@ -9,7 +9,7 @@ const router = createRouter({
       component: () => import("../components/NavBar.vue"),
       children: [
         {
-          path: "/seccion",
+          path: "/seccion/:sec?",
           name: "seccion",
           component: () => import("../views/VistaSeccion.vue"),
         },

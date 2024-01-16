@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useTheme } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
 import router from '../router';
@@ -9,15 +9,22 @@ import VentanaConfirmar from '../components/VentanaConfirmar.vue';
 const theme = useTheme()
 const temaLight = ref(true)
 const edit = ref(false)
+onMounted(() => {
+	cargaInicial();
+});
 
 const usuario = ref({
-  nombre: 'Mildred Benitez',
-  información: {
-    telefono: "04243333333",
-    correo: "mildred@gmail.com",
-    rol: "Coordinación 1",
-  }
+  nombre: '',
+  apellido: '',
+  informacion: {
+    cedula: "",
+    dirección: "",
+    telefono: "",
+    correo: "",
+  },
+  rol: ""
 })
+const iniciales = ref('')
 
 localStorage.getItem("brunaTheme") == 'dark'
 ? temaLight.value = false
@@ -28,10 +35,45 @@ watch(temaLight, () => {
   localStorage.setItem("brunaTheme", theme.global.current.value.dark ? 'darkTheme' : 'lightTheme')
 });
 
+function cargaInicial() {
+  brunaApi({ s: 'perfil' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      res.data.forEach((d:any) => {
+        usuario.value.nombre = d.nom_per
+        usuario.value.apellido = d.ape_per
+        usuario.value.informacion.telefono = d.tel_per
+        usuario.value.informacion.cedula = d.ced_per
+        usuario.value.informacion.dirección = d.dir_per
+        usuario.value.informacion.correo = d.ema_per
+        usuario.value.rol = d.nom_car
+        iniciales.value = d.nom_per.substring(0,1)+d.ape_per.substring(0,1)
+      });
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+}
+
+function guardarCambios() {
+  let data = "nom=" + usuario.value.nombre + '&ape=' + usuario.value.apellido
+  data += "&tel=" + usuario.value.informacion.telefono + '&ced=' + usuario.value.informacion.cedula
+  data += "&dir=" + usuario.value.informacion.dirección + '&ema=' + usuario.value.informacion.correo
+  brunaApi({ s: 'editarPerfil' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      iniciales.value = usuario.value.nombre.substring(0,1)+usuario.value.apellido .substring(0,1)
+      edit.value = !edit.value
+    }
+  }).catch(() => {
+    // message: 'Hubo un error actualizando los datos',
+  })
+}
+
 function cerrarSesion() {
   brunaApi({ s: 'salir' }, '')
   .then((r:any) => {
-    if (r.status === 200) {
+    if (r.data.r) {
       router.push('LogIn')
     }
   }).catch(() => {
@@ -42,62 +84,92 @@ function cerrarSesion() {
 
 <template>
 <v-container>
-  <div class="d-flex justify-center align-center mb-3">
-    <template v-if="!edit">
-      <v-avatar size="70" color="brown">
-        <span class="text-h5">MB</span>
-      </v-avatar>
-      <span class="text-h4 flex-fill text-center ml-3 my-3">{{ usuario.nombre }}</span>
+  <template v-if="!edit">
+    <div class="d-flex justify-center align-center mb-3">
+      <span class="text-h5 text-sm-h4 flex-fill text-center ml-md-3 my-md-3">
+        <v-avatar size="70" color="brown">
+          <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
+        </v-avatar>
+        {{ usuario.nombre }} {{ usuario.apellido }}
+      </span>
       <v-btn
         variant="text"
         append-icon="mdi-logout"
-        >
+      >
         <span class="d-none d-md-inline">Cerrar sesión</span>
         <VentanaConfirmar
-        :message="'desea cerrar sesión'"
-        icon="mdi-logout"
-        @confirmar="(e) => { e ? cerrarSesion() : '' }"
+          :message="'desea cerrar sesión'"
+          icon="mdi-logout"
+          @confirmar="(e) => { e ? cerrarSesion() : '' }"
         />
       </v-btn>
-    </template>
-    <v-text-field v-else label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre y apellido completo" />
-  </div>
+    </div>
+  </template>
+  <template v-else>
+    <v-row>
+      <v-col>
+        <v-text-field label="Nombre" v-model="usuario.nombre" variant="underlined" hint="Escribe tu nombre" />
+      </v-col>
+      <v-col>
+        <v-text-field label="Apellido" v-model="usuario.apellido" variant="underlined" hint="Escribe tu apellido" />
+      </v-col>
+    </v-row>
+  </template>
   <v-divider></v-divider>
-  <div class="d-flex">
+  <div class="d-flex align-center">
     <v-switch
       v-model="temaLight"
       hide-details
       inset
-      :label="temaLight ? 'Tema oscuro' : 'Tema claro'"
+      :label="temaLight ? 'Tema claro' : 'Tema oscuro'"
       :class="temaLight ? 'icon-moon' : 'icon-sun'"
     />
-    <v-checkbox
-      v-model="edit"
-      hide-details
+    <v-btn
+      :variant="edit ? 'tonal' : 'text'"
       :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
-      :label="edit ? 'Guardar' : 'Editar'"
-      :class="['custom-checkbox-edit flex-0-0', {'checked': edit}]"
+      :text="edit ? 'Guardar' : 'Editar'"
+      :color="edit ? 'secundario' : ''"
+      @click="edit ? guardarCambios() : edit=!edit"
     />
   </div>
   <v-list>
     <v-list-item
       v-if="!edit"
-      v-for="(info, value) in usuario.información"
+      v-for="(info, value) in usuario.informacion"
       :key="info"
       :title="value.charAt(0).toUpperCase() + value.slice(1)"
       :subtitle="info"
     ></v-list-item>
+    <template v-else>
+      <v-list-item>
+        <v-text-field
+          label="Cédula"
+          v-model="usuario.informacion.cedula"
+        />
+      </v-list-item>
+      <v-list-item>
+        <v-text-field
+          label="Dirección"
+          v-model="usuario.informacion.dirección"
+        />
+      </v-list-item>
+      <v-list-item>
+        <v-text-field
+          label="telefono"
+          v-model="usuario.informacion.telefono"
+        />
+      </v-list-item>
+      <v-list-item>
+        <v-text-field
+          label="Correo"
+          v-model="usuario.informacion.correo"
+        />
+      </v-list-item>
+    </template>
     <v-list-item
-      v-else
-      v-for="(info, value) in usuario.información"
-      :key="'i'+info"
-    >
-      <v-text-field
-        :label="value.charAt(0).toUpperCase() + value.slice(1)"
-        variant="underlined"
-        v-model="usuario.información[value]"
-      />
-    </v-list-item>
+      title="Rol"
+      :subtitle="usuario.rol"
+    ></v-list-item>
   </v-list>
 </v-container>
 </template>
@@ -124,4 +196,4 @@ function cerrarSesion() {
   }
 
 }
-</style>
+</style>../funciones y constantes/api.ts

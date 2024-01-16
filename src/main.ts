@@ -26,9 +26,9 @@ const vuetify = createVuetify({
   components,
   directives,
 });
-import './assets/app.css'
 
 const app = createApp(App);
+import './assets/app.css'
 
 app.use(router);
 app.use(vuetify);
