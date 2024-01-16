@@ -66,7 +66,7 @@ const representante = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
-      (v: string) => /^(0412|0414|0416|0424|0426)\d{7}$/.test(v)  || 'El numero de teléfono parese ser incorrecto',
+      (v: string) => /^(0412|0414|0416|0424|0426|0271|0272)\d{7}$/.test(v)  || 'El numero de teléfono parese ser incorrecto',
     ],
   },
   telRe: {

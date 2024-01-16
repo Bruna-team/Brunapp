@@ -50,7 +50,7 @@ const usuario = ref({
     value: '',
     rules: [
         (v: string) => !!v || 'El teléfono es necesario',
-        (v: string) => /^\d{10,11}$/.test(v)  || 'El teléfono no es válido',
+        (v: string) => /^(0412|0414|0416|0424|0426|0271|0272)\d{7}$/.test(v)  || 'El número de teléfono párese ser incorrecto',
       ],
     },
     correo: {
