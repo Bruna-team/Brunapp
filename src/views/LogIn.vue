@@ -68,7 +68,7 @@ const regData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
-      (v: string) => /^(0412|0414|0416|0424|0426|0271|0272)\d{7}$/.test(v)  || 'El número de teléfono párese ser incorrecto',
+      (v: string) => /^(0412|0414|0416|0424|0426|0271|0272)\d{7}$/.test(v)  || 'El número de teléfono parece ser incorrecto',
     ],
   },
   direccion: {
