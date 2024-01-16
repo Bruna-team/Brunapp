@@ -45,7 +45,7 @@ const regData = ref({
   cedula: {
     value: '',
     rules: [
-      (v: string) => !!v || 'La cédula es necesaria',
+      (v: string) => !!v || 'El número de cedula es necesario',
       (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
       (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
     ],
@@ -54,19 +54,21 @@ const regData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El nombre es necesario',
+      (v: string) => v.length>3 || 'El nombre es muy corto',
     ],
   },
   apellido: {
     value: '',
     rules: [
       (v: string) => !!v || 'El apellido es necesario',
+      (v: string) => v.length>3 || 'El apellido es muy corto',
     ],
   },
   telefono: {
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
-      (v: string) => /^\d{10,11}$/.test(v)  || 'El teléfono no es válido',
+      (v: string) => /^(0412|0414|0416|0424|0426)\d{7}$/.test(v)  || 'El número de teléfono párese ser incorrecto',
     ],
   },
   direccion: {
@@ -79,6 +81,7 @@ const regData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'La contraseña es necesaria',
+      (v: string) => /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(v)  || 'La contraseña puede ser mejor.',
     ]
   }
 });
@@ -153,8 +156,8 @@ watch(router.currentRoute, (value) => {
           prepend-icon="mdi-account"
           label="Cédula"
           prefix="V-"
-          ></v-text-field>
-          <v-text-field
+        ></v-text-field>
+        <v-text-field
           v-model="logData.password.value"
           prepend-icon="mdi-lock"
           :rules="logData.password.rules"
@@ -162,7 +165,7 @@ watch(router.currentRoute, (value) => {
           :type="seePassword ? 'text' : 'password'"
           @click:append-inner="seePassword = !seePassword"
           label="Contraseña"
-        ></v-text-field>
+        />
         <v-checkbox label="Recordar" title="Mantener la sesión iniciada" v-model="recSesion"/>
         <v-divider class="my-2"></v-divider>
         <v-btn
@@ -213,14 +216,14 @@ watch(router.currentRoute, (value) => {
           :rules="regData.cedula.rules"
           prefix="V-"
           hint="Ej: V-12345678"
-          prepend-icon="mdi-account"
+          prepend-icon="mdi-id-card"
           label="Cédula"
         ></v-text-field>
         <v-text-field
           v-model="regData.telefono.value"
           :rules="regData.telefono.rules"
           hint="Ej: 04121234567"
-          prepend-icon="mdi-email"
+          prepend-icon="mdi-phone"
           label="N° telefónico"
         ></v-text-field>
         <v-text-field
@@ -233,7 +236,7 @@ watch(router.currentRoute, (value) => {
         <v-text-field
           v-model="regData.direccion.value"
           :rules="regData.direccion.rules"
-          prepend-icon="mdi-email"
+          prepend-icon="mdi-map-marker"
           label="Dirección"
         ></v-text-field>
         <v-text-field
@@ -242,6 +245,7 @@ watch(router.currentRoute, (value) => {
           :rules="regData.password.rules"
           :append-inner-icon="seePassword ? 'mdi-eye' : 'mdi-eye-off'"
           :type="seePassword ? 'text' : 'password'"
+          hint="Debe tener una letra mayúscula, un numero y un signo"
           @click:append-inner="seePassword = !seePassword"
           label="Contraseña"
         ></v-text-field>
