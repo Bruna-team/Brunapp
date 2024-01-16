@@ -2,6 +2,7 @@
 import { ref, computed, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
+import { capitalizar } from "../funciones/funciones.ts";
 const { mobile } = useDisplay()
 const emit = defineEmits([
 	'recargar', 'alerta'
@@ -63,6 +64,7 @@ const representante = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
+      (v: string) => /^\d{10,11}$/.test(v)  || 'El teléfono no es válido',
     ],
   },
   telRe: {
@@ -158,15 +160,15 @@ async function validacion () {
   loading.value = false
 }
 function guardarAlumno() {
-  let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
-  data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
+  let data =  'pnom=' +  capitalizar(alumno.value.pnom.value) + '&snom=' +  capitalizar(alumno.value.snom.value)
+  data +=  '&pape=' +  capitalizar(alumno.value.pape.value) + '&sape=' +  capitalizar(alumno.value.sape.value)
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
-  data +=  '&paren=' +  alumno.value.paren.value + '&idAno=' + alumno.value.sec.value
+  data +=  '&paren=' +  capitalizar(alumno.value.paren.value) + '&idAno=' + alumno.value.sec.value
   data += '&obs=' + alumno.value.obs.value
   if (representante.value.id) {
     data += '&idRe=' +  representante.value.id
   } else {
-    data += '&nomRe=' + representante.value.nomRe.value + '&apeRe=' + representante.value.apeRe.value
+    data += '&nomRe=' + capitalizar(representante.value.nomRe.value) + '&apeRe=' + capitalizar(representante.value.apeRe.value)
     data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
     data += '&sTelRe=' + representante.value.telRe.value + '&dirRe=' + representante.value.dir.value
   }
