@@ -29,42 +29,42 @@ const userData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El número de cedula es necesario',
-      // (v: string) => checkApi(v)
+      (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
+      (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
     ],
   },
   nombre: {
     value: '',
     rules: [
       (v: string) => !!v || 'El nombre es necesario',
-      // (v: string) => checkApi(v)
+      (v: string) => v.length>3 || 'El nombre es muy corto',
     ],
   },
   apellido: {
     value: '',
     rules: [
       (v: string) => !!v || 'El apellido es necesario',
-      // (v: string) => checkApi(v)
+      (v: string) => v.length>3 || 'El apellido es muy corto',
     ],
   },
   telefono: {
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
-      // (v: string) => validarTel(v)
+      (v: string) => /^(0412|0414|0416|0424|0426)\d{7}$/.test(v)  || 'El numero de teléfono párese ser incorrecto',
     ],
   },
   direccion: {
     value: '',
     rules: [
       (v: string) => !!v || 'La dirección es necesario',
-      // (v: string) => checkApi(v)
     ],
   },
   password: {
     value: '',
     rules: [
       (v: string) => !!v || 'La contraseña es necesaria',
-      // (v: string) => checkApi(v),
+      (v: string) => /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/.test(v)  || 'La contraseña puede ser mejor.',
     ]
   }
 });
@@ -75,14 +75,6 @@ async function validar (event:any) {
   loading.value = false
   alert(JSON.stringify(results, null, 2))
 }
-// async function checkApi (userName:string) {
-//   return new Promise(resolve => {
-//     setTimeout(() => {
-//       if (userName === 'johnleider') return resolve('User name already taken. Please try another one.')
-//       return resolve(true)
-//     }, 1000)
-//   })
-// }
 function iniciarSesion() {
   if (userData.value.cedula.value && userData.value.password.value) {
     brunaApi({ s: 'auth' }, `usuario=${userData.value.cedula.value}&clave=${btoa(userData.value.password.value)}&rec=${recSesion.value}`)
@@ -132,14 +124,14 @@ watch(router.currentRoute, (value) => {
       width="100%"
     >
       <h2 class="font-weight-black text-primario font-bruna mb-4">Inicia Sesión</h2>
-      <v-form validate-on="submit lazy" @submit.prevent="validar">
+      <v-form @submit.prevent="validar">
         <v-text-field
           v-model="userData.cedula.value"
           :rules="userData.cedula.rules"
           prepend-icon="mdi-account"
           label="Cédula"
-          ></v-text-field>
-          <v-text-field
+        />
+        <v-text-field
           v-model="userData.password.value"
           prepend-icon="mdi-lock"
           :rules="userData.password.rules"
@@ -147,7 +139,7 @@ watch(router.currentRoute, (value) => {
           :type="seePassword ? 'text' : 'password'"
           @click:append-inner="seePassword = !seePassword"
           label="Contraseña"
-        ></v-text-field>
+        />
         <v-checkbox label="Recordar" title="Mantener la sesión iniciada" v-model="recSesion"/>
         <v-divider class="my-2"></v-divider>
         <v-btn
@@ -180,7 +172,7 @@ watch(router.currentRoute, (value) => {
       width="100%"
     >
       <h2 class="font-weight-black text-primario font-bruna mb-4">¡Crea tu cuenta profesor!</h2>
-      <v-form validate-on="submit lazy" @submit.prevent="validar">
+      <v-form @submit.prevent="validar">
         <v-text-field
           v-model="userData.nombre.value"
           :rules="userData.nombre.rules"
@@ -196,13 +188,15 @@ watch(router.currentRoute, (value) => {
         <v-text-field
           v-model="userData.cedula.value"
           :rules="userData.cedula.rules"
-          prepend-icon="mdi-account"
+          prepend-icon="mdi-id-card"
+          prefix="V-"
           label="Cédula"
         ></v-text-field>
         <v-text-field
           v-model="userData.telefono.value"
           :rules="userData.telefono.rules"
-          prepend-icon="mdi-email"
+          prepend-icon="mdi-phone"
+          hint="Debe empezar con '04' seguido del código telefónico"
           label="N° telefónico"
         ></v-text-field>
         <v-text-field
@@ -214,7 +208,7 @@ watch(router.currentRoute, (value) => {
         <v-text-field
           v-model="userData.direccion.value"
           :rules="userData.direccion.rules"
-          prepend-icon="mdi-email"
+          prepend-icon="mdi-map-marker"
           label="Dirección"
         ></v-text-field>
         <v-text-field
@@ -223,6 +217,7 @@ watch(router.currentRoute, (value) => {
           :rules="userData.password.rules"
           :append-inner-icon="seePassword ? 'mdi-eye' : 'mdi-eye-off'"
           :type="seePassword ? 'text' : 'password'"
+          hint="Debe tener una letra mayúscula, un numero y un signo"
           @click:append-inner="seePassword = !seePassword"
           label="Contraseña"
         ></v-text-field>

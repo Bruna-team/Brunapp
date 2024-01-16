@@ -51,18 +51,21 @@ const representante = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El nombre es necesario',
+      (v: string) => v.length>3 || 'El nombre es muy corto',
     ],
   },
   apeRe: {
     value: '',
     rules: [
       (v: string) => !!v || 'El apellido es necesario',
+      (v: string) => v.length>3 || 'El apellido es muy corto',
     ],
   },
   tel: {
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
+      (v: string) => /^(0412|0414|0416|0424|0426)\d{7}$/.test(v)  || 'El numero de teléfono parese ser incorrecto',
     ],
   },
   telRe: {
