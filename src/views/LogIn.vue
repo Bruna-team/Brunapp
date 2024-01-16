@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue';
 import { brunaApi } from '../funciones/api.ts';
 import router from '../router';
-// import { capitalizar, validarEmail, validarTel } from "../funciones/funciones.ts";
 import { capitalizar } from "../funciones/funciones.ts";
 
 const loading  = ref(false)
@@ -16,7 +15,8 @@ const userData = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El correo es necesario',
-      // (v: string) => validarEmail(v)
+      (v: string) => /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(v)
+           || 'El correo no parece ser correcto.',
     ],
   },
   rol: {
