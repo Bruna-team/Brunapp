@@ -6,6 +6,7 @@ import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
 import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
 
 import router from "../router";
@@ -13,6 +14,7 @@ import { ref, watch, onMounted } from "vue";
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay()
 const studentDrawer = ref( mobile.value ? false : true)
+const alertaMsj = ref<string>('')
 
 // Consulta de estudiantes
 const menciones = ref({
@@ -31,23 +33,108 @@ const estudiantes = ref([
     snom_alum: "",
   },
 ])
-const seleccionado = ref({
-  id: "",
-  nombre: "",
-  avatar: "",
-  cedula: "",
-  fecha: "",
-  obs: "",
-  men: "",
-  men_abre: "",
-  representante: {
-    nombre: '',
-    paren: '',
-    tel: '',
-    telRe: '',
-    dir: ''
+const representante = ref({
+  id: '',
+  nombre: '',
+  nomRe: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El nombre es necesario',
+    ],
+  },
+  apeRe: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El apellido es necesario',
+    ],
+  },
+  tel: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El teléfono es necesario',
+    ],
+  },
+  telRe: {
+    value: '',
+    rules: [],
+  },
+  dir: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La dirección es necesaria',
+    ],
   }
 })
+const alumno = ref({
+  id: '',
+  num: '',
+  nombre: '',
+  pnom: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El nombre es necesario',
+      (v: string) => v.length>3 || 'El nombre es muy corto',
+    ],
+  },
+  snom: {
+    value: '',
+    rules: [],
+  },
+  pape: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El apellido es necesario',
+      (v: string) => v.length>3 || 'El apellido es muy corto',
+    ],
+  },
+  sape: {
+    value: '',
+    rules: [],
+  },
+  paren: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El parentesco es necesario',
+    ],
+  },
+  ced: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La cédula es necesaria',
+      (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
+      (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
+    ],
+  },
+  fec: {
+    value: '',
+    rules: [
+      (v: string) => {
+        let fecha = new Date(v)
+        let hoy = new Date()
+        let edad = hoy.getFullYear() - fecha.getFullYear()
+        fecha.setFullYear(hoy.getFullYear())
+        hoy < fecha ? edad-- : ''
+        return edad>=10 && edad<=18 || 'La fecha de nacimiento no es valida, debe ser mayor de 10 años y menor de 18'
+      },
+    ],
+  },
+  obs: {
+    value: '',
+  },
+  men: '',
+  men_abre: ''
+})
+const cedRe = ref({
+  value: '',
+  rules: [
+      (v: string) => !!v || 'La cédula es necesaria',
+      (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
+      (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
+  ]
+});
+const loading = ref(false)
+const form = ref()
+const disabled = ref(false)
 onMounted(() => {
 	cargaInicial();
 });
@@ -74,6 +161,15 @@ const selectedItem= ref({
   title: "",
   id:"",
 })
+
+async function validar () {
+  loading.value = true
+  const { valid } = await form.value.validate()
+  if (valid) {
+    editarAlumno()
+  }
+  loading.value = false
+}
 
 const showDate = ref(new Date())
 function setShowDate(d: any) {
@@ -270,34 +366,92 @@ function buscarEstudiante(id:string) {
       estudiantes.value = res.data.estd
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
 
 function organizarDatos(data:any) {
-  seleccionado.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
-  seleccionado.value.cedula = data.alum[0].ced_alum
-  seleccionado.value.fecha = data.alum[0].fec_nac_alum
-  seleccionado.value.obs = data.alum[0].obs_alum
-  seleccionado.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
-  seleccionado.value.men = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
-  seleccionado.value.representante.nombre = data.alum[0].nom_rep + ' ' + data.alum[0].ape_rep
-  seleccionado.value.representante.paren = data.alum[0].paren_alum
-  seleccionado.value.representante.tel = data.alum[0].tel_rep
-  seleccionado.value.representante.telRe = data.alum[0].tel_re_rep
-  seleccionado.value.representante.dir = data.alum[0].dir_rep
+  alumno.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
+  alumno.value.id = data.alum[0].id_alum
+  alumno.value.pnom.value = data.alum[0].pnom_alum
+  alumno.value.snom.value = data.alum[0].snom_alum
+  alumno.value.pape.value = data.alum[0].pape_alum
+  alumno.value.sape.value = data.alum[0].sape_alum
+  alumno.value.ced.value = data.alum[0].ced_alum
+  alumno.value.fec.value = data.alum[0].fec_nac_alum
+  alumno.value.obs.value = data.alum[0].obs_alum
+  alumno.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
+  alumno.value.men = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
+  representante.value.nombre = data.alum[0].nom_rep + ' ' + data.alum[0].ape_rep
+  representante.value.id = data.alum[0].id_rep
+  cedRe.value.value = data.alum[0].ced_rep
+  representante.value.nomRe.value = data.alum[0].nom_rep
+  representante.value.apeRe.value = data.alum[0].ape_rep
+  alumno.value.paren.value = data.alum[0].paren_alum
+  representante.value.tel.value = data.alum[0].tel_rep
+  representante.value.telRe.value = data.alum[0].tel_re_rep
+  representante.value.dir.value = data.alum[0].dir_rep
   data.estd.forEach((d:any) => {
     if (d.id_estd == data.alum[0].id_estd) {
-      seleccionado.value.id = data.estd.indexOf(d) + 1
+      alumno.value.num = data.estd.indexOf(d) + 1
     }
   })
   menciones.value.ano = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
   menciones.value.id_ano = data.alum[0].id_ano
 }
+
+function editarAlumno() {
+  let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
+  data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
+  data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
+  data +=  '&paren=' +  alumno.value.paren.value + '&id=' + alumno.value.id
+  data += '&obs=' + alumno.value.obs.value + '&idRe=' +  representante.value.id
+  data += '&nomRe=' + representante.value.nomRe.value + '&apeRe=' + representante.value.apeRe.value
+  data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
+  data += '&sTelRe=' + representante.value.telRe.value + '&dirRe=' + representante.value.dir.value
+
+  brunaApi({ s: 'editarAlum' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = "Datos actualizados"
+      edit.value = !edit.value
+    } else {
+      alertaMsj.value = "Hubo un error actualizano los datos: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error actualizano los datos"
+  })
+}
+
+watch(()=>cedRe.value.value, ()=>{
+  disabled.value = false
+  representante.value.id = ''
+  representante.value.nomRe.value = ''
+  representante.value.apeRe.value = ''
+  representante.value.tel.value = ''
+  representante.value.dir.value = ''
+  representante.value.telRe.value = ''
+  if (cedRe.value.value.length < 8) return
+  brunaApi({ s: 'buscarRepresentante' }, 'ced=' + cedRe.value.value)
+  .then((res:any) => {
+    if (res.data[0].id_rep) {
+      disabled.value = true
+      representante.value.id = res.data[0].id_rep
+      representante.value.nomRe.value = res.data[0].nom_rep
+      representante.value.apeRe.value = res.data[0].ape_rep
+      representante.value.tel.value = res.data[0].tel_rep
+      representante.value.dir.value = res.data[0].dir_rep
+      representante.value.telRe.value = res.data[0].tel_re_rep || ''
+    }
+  }).catch(() => {
+    // message: 'Hubo un error actualizando los datos',
+  })
+})
 </script>
 
 <template>
 <v-card>
+  <AlertaMensaje :mensaje="alertaMsj" />
   <v-navigation-drawer
     v-model="studentDrawer"
     floating
@@ -310,9 +464,9 @@ function organizarDatos(data:any) {
       </template>
       <template #title>
         <span class="d-inline-block">
-          {{  seleccionado.men_abre }}
+          {{  alumno.men_abre }}
           <span class="text-caption d-block">
-          {{  seleccionado.men }}
+          {{  alumno.men }}
           </span>
         </span>
       </template>
@@ -451,15 +605,24 @@ function organizarDatos(data:any) {
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="seleccionado"
+          v-if="alumno"
           :variant="edit ? 'tonal' : 'text'"
-          :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
-          :text="edit ? 'Guardar' : 'Editar'"
-          :color="edit ? 'secundario' : ''"
+          :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
+          :text="edit ? 'Cancelar' : 'Editar'"
+          :color="edit ? 'error' : ''"
           @click="edit = !edit"
         />
+        <v-btn
+          v-if="edit"
+          :loading="loading"
+          variant="tonal"
+          prepend-icon="mdi-sync"
+          text="Guardar"
+          color="secundario"
+          @click="validar"
+        />
       </section>
-      <template v-if="seleccionado.id">
+      <template v-if="alumno.num">
         <v-card variant="tonal" class="ma-3 pa-2">
           <v-card-item class="pa-0">
             <v-row class="pa-3">
@@ -468,7 +631,7 @@ function organizarDatos(data:any) {
                   <v-badge icon="mdi-gender-female" color="pink">
                     <v-avatar color="brown">
                       <span class="text-h5">
-                        {{ seleccionado.nombre.split(" ").map(parte => parte.charAt(0)).join('').toUpperCase() }}
+                        {{ alumno.nombre.split(" ").map(parte => parte.charAt(0)).join('').toUpperCase() }}
                       </span>
                     </v-avatar>
                   </v-badge>
@@ -477,54 +640,82 @@ function organizarDatos(data:any) {
                   <v-card-title class="text-h4">
                     <v-tooltip text="Número de lista">
                       <template #activator="{ props }">
-                        <span v-bind="props" class="text-primario">{{ seleccionado.id }}</span>
+                        <span v-bind="props" class="text-primario">{{ alumno.num }}</span>
                       </template>
                     </v-tooltip>
-                    {{ seleccionado.nombre }}
+                    {{ alumno.nombre }}
                   </v-card-title>
                   <p>
                     <span class="text-caption font-weight-bold text-medium-emphasis">
                       C.I.
                     </span>
-                    <span class="font-weight-bold letter-spacing">{{ seleccionado.cedula }}</span>
+                    <span class="font-weight-bold letter-spacing">{{ alumno.ced.value }}</span>
                   </p>
                   <p>
                     <span class="text-caption font-weight-bold text-medium-emphasis">
                       Fecha de nacimiento
                     </span>
                     <span class="font-weight-bold letter-spacing">
-                      {{ seleccionado.fecha }}
+                      {{ alumno.fec.value }}
                     </span>
                   </p>
                 </v-col>
               </template>
               <template v-else>
-                <v-col cols="12">
-                  <v-text-field
-                    label="Nombres y apellidos"
-                    v-model="seleccionado.nombre"
-                  />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    label="Cédula"
-                    v-model="seleccionado.cedula"
-                  />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    type="date"
-                    label="Fecha de nacimiento"
-                    v-model="seleccionado.fecha"
-                  />
-                </v-col>
+                <v-form ref="form">
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      label="Primer nombre"
+                      v-model="alumno.pnom.value"
+                      :rules="alumno.pnom.rules"
+                    />
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      label="Segundo nombre"
+                      v-model="alumno.snom.value"
+                      :rules="alumno.snom.rules"
+                    />
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      label="Primer apellido"
+                      v-model="alumno.pape.value"
+                      :rules="alumno.pape.rules"
+                      />
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      label="Segundo apellido"
+                      v-model="alumno.sape.value"
+                      :rules="alumno.sape.rules"
+                    />
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      label="Cédula"
+                      v-model="alumno.ced.value"
+                      hint="Ej: V-12345678"
+                      prefix="V-"
+                      :rules="alumno.ced.rules"
+                    />
+                  </v-col>
+                  <v-col cols="12" sm="6">
+                    <v-text-field
+                      type="date"
+                      label="Fecha de nacimiento"
+                      v-model="alumno.fec.value"
+                      :rules="alumno.fec.rules"
+                    />
+                  </v-col>
+                </v-form>
               </template>
               <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
                 <p class="text-caption  font-weight-bold text-medium-emphasis">Representante</p>
                 <v-divider/>
-                <div class="d-sm-flex">
+                <div class="d-sm-flex" v-if="!edit">
                   <v-list-item
-                    :title="seleccionado.representante.nombre"
+                    :title="representante.nombre"
                     class="px-0 pr-sm-3"
                   >
                     <template #subtitle>
@@ -533,7 +724,7 @@ function organizarDatos(data:any) {
                           Parentesco:
                         </span>
                         <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.paren }}
+                          {{ alumno.paren.value }}
                         </span>
                       </p>
                       <p>
@@ -541,15 +732,15 @@ function organizarDatos(data:any) {
                           Teléfono:
                         </span>
                         <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.tel }}
+                          {{ representante.tel.value }}
                         </span>
                       </p>
-                      <p v-if="seleccionado.representante.telRe">
+                      <p v-if="representante.telRe.value">
                         <span class="text-caption font-weight-bold text-medium-emphasis">
                           Teléfonode repuesto:
                         </span>
                         <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.telRe }}
+                          {{ representante.telRe.value }}
                         </span>
                       </p>
                       <p>
@@ -557,11 +748,69 @@ function organizarDatos(data:any) {
                           Dirección:
                         </span>
                         <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.dir }}
+                          {{ representante.dir.value }}
                         </span>
                       </p>
                     </template>
                   </v-list-item>
+                </div>
+                <div class="d-sm-flex" v-else>
+                  <v-form ref="form">
+                  <v-list-item class="px-0 pr-sm-3">
+                    <template #subtitle>
+                        <v-text-field
+                          label="Cédula"
+                          v-model="cedRe.value"
+                          hint="Ej: V-12345678"
+                          prefix="V-"
+                          :rules="cedRe.rules"
+                        />
+                        <v-text-field
+                          label="Nombre del representante"
+                          v-model="representante.nomRe.value"
+                          :rules="representante.nomRe.rules"
+                          :disabled="disabled"
+                        />
+                        <v-text-field
+                          label="Apellido del representante"
+                          v-model="representante.apeRe.value"
+                          :rules="representante.apeRe.rules"
+                          :disabled="disabled"
+                        />
+                        <p>
+                          <v-text-field
+                            label="Parentesco"
+                            v-model="alumno.paren.value"
+                            :rules="alumno.paren.rules"
+                          />
+                        </p>
+                        <p>
+                          <v-text-field
+                            label="Teléfono"
+                            v-model="representante.tel.value"
+                            :rules="representante.tel.rules"
+                            :disabled="disabled"
+                          />
+                        </p>
+                        <p>
+                          <v-text-field
+                            label="Teléfono de repuesto"
+                            v-model="representante.telRe.value"
+                            :rules="representante.telRe.rules"
+                            :disabled="disabled"
+                          />
+                        </p>
+                        <p>
+                          <v-text-field
+                            label="Dirección"
+                            v-model="representante.dir.value"
+                            :rules="representante.dir.rules"
+                            :disabled="disabled"
+                          />
+                        </p>
+                      </template>
+                    </v-list-item>
+                  </v-form>
                 </div>
               </v-col>
               <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
@@ -592,10 +841,16 @@ function organizarDatos(data:any) {
                     </template>
                   </v-list-item>
                   <v-list-item
+                    v-if="!edit"
                     title="Observaciones"
-                    :subtitle="seleccionado.obs"
+                    :subtitle="alumno.obs.value"
                     class="flex-1-0 px-0 pr-sm-2"
                   ></v-list-item>
+                  <v-text-field
+                    v-else
+                    label="Observaciones"
+                    v-model="alumno.obs.value"
+                  />
                 </div>
               </v-col>
             </v-row>
