@@ -106,7 +106,7 @@ function iniciarSesion() {
       if (res.data.r) {
         router.push('/')
       } else {
-        alertaMsj.value = "Hubo un error: " + res.data.e
+        alertaMsj.value = "Hubo un error: " + (res.data.e || 'Usuario no registrado')
       }
     })
   }
@@ -134,7 +134,7 @@ watch(router.currentRoute, (value) => {
 </script>
 <template>
 <v-container>
-  <AlertaMensaje :mensaje="alertaMsj" />
+  <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
   <Transition
     name="slide-fade"
     mode="out-in"
