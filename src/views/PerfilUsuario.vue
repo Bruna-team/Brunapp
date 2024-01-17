@@ -23,12 +23,14 @@ const usuario = ref({
     value: '',
     rules: [
       (v: string) => !!v || 'El nombre es necesario',
+      (v: string) => v.length>3 || 'El nombre es muy corto',
     ],
   },
   apellido: {
     value: '',
     rules: [
       (v: string) => !!v || 'El apellido es necesario',
+      (v: string) => v.length>3 || 'El apellido es muy corto',
     ],
   },
   informacion: {
@@ -57,7 +59,8 @@ const usuario = ref({
     value: '',
       rules: [
         (v: string) => !!v || 'El correo es necesario',
-        (v: string) => /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(v) || 'El correo no es válido',
+        (v: string) => /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(v)
+                        || 'El correo no es válido',
       ],
     },
   },
@@ -132,7 +135,7 @@ function cerrarSesion() {
 
 <template>
 <v-container>
-  <AlertaMensaje :mensaje="alertaMsj" />
+  <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <template v-if="!edit">
     <div class="d-flex justify-center align-center mb-3">
       <span class="text-h5 text-sm-h4 flex-fill text-center ml-md-3 my-md-3">
@@ -154,15 +157,17 @@ function cerrarSesion() {
       </v-btn>
     </div>
   </template>
-  <template ref="form" v-else>
-    <v-row>
-      <v-col>
-        <v-text-field label="Nombre" v-model="usuario.nombre.value" :rules="usuario.nombre.rules" variant="underlined" hint="Escribe tu nombre" />
-      </v-col>
-      <v-col>
-        <v-text-field label="Apellido" v-model="usuario.apellido.value" :rules="usuario.apellido.rules" variant="underlined" hint="Escribe tu apellido" />
-      </v-col>
-    </v-row>
+  <template v-else>
+    <v-form ref="form">
+      <v-row>
+        <v-col>
+          <v-text-field label="Nombre" v-model="usuario.nombre.value" :rules="usuario.nombre.rules" variant="underlined" hint="Escribe tu nombre" />
+        </v-col>
+        <v-col>
+          <v-text-field label="Apellido" v-model="usuario.apellido.value" :rules="usuario.apellido.rules" variant="underlined" hint="Escribe tu apellido" />
+        </v-col>
+      </v-row>
+    </v-form>
   </template>
   <v-divider></v-divider>
   <div class="d-flex align-center">
@@ -182,47 +187,49 @@ function cerrarSesion() {
       @click="edit ? validar() : edit=!edit"
     />
   </div>
-  <v-list ref="form">
+  <v-list>
     <v-list-item
       v-if="!edit"
       v-for="(info, value) in usuario.informacion"
       :key="info.value"
       :title="value.charAt(0).toUpperCase() + value.slice(1)"
       :subtitle="info.value"
-      ></v-list-item>
+    ></v-list-item>
     <template v-else>
-      <v-list-item>
-        <v-text-field
-          label="Cédula"
-          v-model="usuario.informacion.cédula.value"
-          :rules="usuario.informacion.cédula.rules"
-          prefix="V-"
-          hint="Ej: V-12345678"
-        />
-      </v-list-item>
-      <v-list-item>
-        <v-text-field
-          label="Dirección"
-          v-model="usuario.informacion.dirección.value"
-          :rules="usuario.informacion.dirección.rules"
-        />
-      </v-list-item>
-      <v-list-item>
-        <v-text-field
-          label="Teléfono"
-          v-model="usuario.informacion.teléfono.value"
-          :rules="usuario.informacion.teléfono.rules"
-          hint="Ej: 04121234567"
-        />
-      </v-list-item>
-      <v-list-item>
-        <v-text-field
-          label="Correo"
-          v-model="usuario.informacion.correo.value"
-          :rules="usuario.informacion.correo.rules"
-          hint="Ej: ejemplo@gmail.com"
-        />
-      </v-list-item>
+      <v-form ref="form">
+        <v-list-item>
+          <v-text-field
+            label="Cédula"
+            v-model="usuario.informacion.cédula.value"
+            :rules="usuario.informacion.cédula.rules"
+            prefix="V-"
+            hint="Ej: V-12345678"
+          />
+        </v-list-item>
+        <v-list-item>
+          <v-text-field
+            label="Dirección"
+            v-model="usuario.informacion.dirección.value"
+            :rules="usuario.informacion.dirección.rules"
+          />
+        </v-list-item>
+        <v-list-item>
+          <v-text-field
+            label="Teléfono"
+            v-model="usuario.informacion.teléfono.value"
+            :rules="usuario.informacion.teléfono.rules"
+            hint="Ej: 04121234567"
+          />
+        </v-list-item>
+        <v-list-item>
+          <v-text-field
+            label="Correo"
+            v-model="usuario.informacion.correo.value"
+            :rules="usuario.informacion.correo.rules"
+            hint="Ej: ejemplo@gmail.com"
+          />
+        </v-list-item>
+      </v-form>
     </template>
     <v-list-item
       title="Rol"
