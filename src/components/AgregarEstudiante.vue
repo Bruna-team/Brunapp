@@ -46,7 +46,7 @@ const cedRe = ref({
       (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
   ]
 });
-const representante = ref({
+const representante = ref<any>({
   id: '',
   nomRe: {
     value: '',
@@ -80,7 +80,7 @@ const representante = ref({
     ],
   }
 })
-const alumno = ref({
+const alumno = ref<any>({
   pnom: {
     value: '',
     rules: [
@@ -179,11 +179,22 @@ function guardarAlumno() {
     if (res.data.r) {
       emit('alerta', res.data.e)
       emit('recargar')
-      dialog.value=false
+      limpiarDatos()
     }
   }).catch(() => {
     emit('alerta', 'Hubo un error agregando el alumno')
   })
+}
+function limpiarDatos() {
+  dialog.value = false
+  step.value = steps.value.length == 2 ? 1 : 0
+  for (let key in alumno.value) {
+    alumno.value[key].value = '';
+  }
+  for (let key in representante.value) {
+    representante.value[key].value = '';
+  }
+  cedRe.value.value = ''
 }
 watch(()=>cedRe.value.value, ()=>{
   disabled.value = false
