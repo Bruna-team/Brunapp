@@ -13,7 +13,25 @@ function capitalizar (string: string) {
    return string
  }
 }
+/**
+ * @param {date} string
+ * @param {type} string
+ * @return {string}
+ */
+function formatoFechaYHora (date: string, type: string) {
+  const fecha = `${new Date(date).getFullYear()}-${String(new Date(date).getMonth()+1).padStart(2, '0')}-${String(new Date(date).getDate()).padStart(2, '0')}`
+  const hora = new Date(date).toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'})
+  switch (type) {
+    case 'fecha':
+      return fecha
+    case 'hora':
+      return fecha
+    default:
+      return fecha+'T'+hora
+  }
+}
 
 export {
   capitalizar,
+  formatoFechaYHora,
 };

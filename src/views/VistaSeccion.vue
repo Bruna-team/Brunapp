@@ -8,6 +8,7 @@ import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { formatoFechaYHora } from '../funciones/funciones.ts';
 
 import router from "../router";
 import { ref, watch, onMounted } from "vue";
@@ -145,22 +146,6 @@ const edit = ref(false)
 const calendarNav = ref(false)
 const editItem = ref(false)
 const periodo = ref("month")
-const selectedItem= ref({
-  originalItem:{
-    id:"",
-    startDate:"",
-    endDate:"",
-    title:"",
-    obs: "",
-    obsType: "",
-    classes:"",
-  },
-  startDate: new Date(0),
-  endDate: new Date(0),
-  classes: "",
-  title: "",
-  id:"",
-})
 
 async function validar () {
   loading.value = true
@@ -177,12 +162,29 @@ function setShowDate(d: any) {
 }
 
 // Variables del scrum del calendario
+const selectedItem= ref({
+  originalItem:{
+    id:"",
+    startDate:"",
+    endDate:"",
+    title:"",
+    obs: "",
+    obsType: "",
+    classes:"",
+  },
+  startDate: '',
+  endDate: '',
+  classes: "",
+  title: "",
+  id:"",
+})
+const selectedDate= ref('')
 const newItemTitle= ref('')
 const newItemObservacion= ref('')
 const newItemType= ref('')
-const newItemStartDate= ref(new Date(0))
-const newItemStartDateTime= ref(new Date(0))
-const newItemEndDate = ref(new Date(0))
+const newItemStartDate= ref('')
+const newItemStartDateTime= ref('')
+const newItemEndDate = ref('')
 
 // eliminar cuando este la funcionalidad del back
 function thisMonth(d:any, h:any, m:any) {
@@ -245,7 +247,8 @@ function onDrop(item: any, date: any) {
 }
 function onClickDay(d: any) {
   calendarNav.value = true
-  newItemStartDate.value = d
+  selectedDate.value = d
+  newItemStartDate.value = formatoFechaYHora(d, 'fecha')
 }
 function onClickItem(d: any) {
   calendarNav.value = true
@@ -253,12 +256,14 @@ function onClickItem(d: any) {
 }
 // Funciones del SCRUM del calendario
 function limpiarItems() {
+  editItem.value = false
+  calendarNav.value = false
   newItemTitle.value = ''
   newItemObservacion.value = ''
   newItemType.value = ''
-  newItemStartDate.value = new Date(0)
-  newItemStartDateTime.value = new Date(0)
-  newItemEndDate.value = new Date(0)
+  newItemStartDate.value = ''
+  newItemStartDateTime.value = ''
+  newItemEndDate.value = ''
   selectedItem.value = {
     originalItem:{
       id:"",
@@ -269,36 +274,23 @@ function limpiarItems() {
       obsType: "",
       classes:"",
     },
-    startDate: new Date(0),
-    endDate: new Date(0),
+    startDate: '',
+    endDate: '',
     classes: "",
     title: "",
     id:"",
   }
-  calendarNav.value = false
 }
 function agregarItem() {
-  const validarfecha = new Date(0).toString()
-  if (newItemEndDate.value.toString() !== validarfecha) {
-    items.value.push({
-      id: "r8",
-      startDate: newItemStartDate.value,
-      endDate: newItemEndDate.value,
-      title: newItemTitle.value,
-      obs: newItemObservacion.value,
-      obsType: newItemType.value,
-      classes: [asignarClases(newItemType.value)]
-    })
-  } else {
-    items.value.push({
-      id: "r8",
-      startDate: newItemStartDate.value,
-      title: newItemTitle.value,
-      obs: newItemObservacion.value,
-      obsType: newItemType.value,
-      classes: [asignarClases(newItemType.value)]
-    })
-  }
+  items.value.push({
+    id: "r8",
+    startDate: new Date(newItemStartDate.value.toString() + ' ' + newItemStartDateTime.value),
+    endDate: newItemEndDate.value.length ? new Date(newItemEndDate.value.toString()) : new Date(newItemStartDate.value.toString()+' '+newItemStartDateTime.value),
+    title: newItemTitle.value,
+    obs: newItemObservacion.value,
+    obsType: newItemType.value,
+    classes: [asignarClases(newItemType.value)]
+  })
   limpiarItems()
 }
 function actualizarItem(item: any) {
@@ -306,8 +298,8 @@ function actualizarItem(item: any) {
     if(i.id === item.originalItem.id) {
       return {
         id: item.originalItem.id,
-        startDate: newItemStartDate.value,
-        endDate: newItemEndDate.value,
+        startDate: new Date(newItemStartDate.value.toString()),
+        endDate: new Date(newItemEndDate.value.toString()),
         title: newItemTitle.value,
         obs: newItemObservacion.value,
         obsType: newItemType.value,
@@ -323,8 +315,8 @@ function editarItem(item: any) {
   newItemTitle.value = item.originalItem.title
   newItemObservacion.value = item.originalItem.obs
   newItemType.value = item.originalItem.obsType
-  newItemStartDate.value = item.originalItem.startDate
-  newItemEndDate.value = item.originalItem.endDate
+  newItemStartDate.value = formatoFechaYHora(item.originalItem.startDate, 'fechaYhora')
+  newItemEndDate.value = formatoFechaYHora(item.originalItem.endDate, 'fechaYhora')
   editItem.value = true
 }
 function asignarClases(type: string) {
@@ -346,7 +338,6 @@ function eliminarItem(item: any) {
 watch(calendarNav, (value) => {
   if (!value) {limpiarItems()}
 })
-
 function cargaInicial() {
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
   .then((res:any) => {
@@ -369,7 +360,6 @@ function buscarEstudiante(id:string) {
     alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
-
 function organizarDatos(data:any) {
   alumno.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
   alumno.value.id = data.alum[0].id_alum
@@ -399,7 +389,6 @@ function organizarDatos(data:any) {
   menciones.value.ano = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
   menciones.value.id_ano = data.alum[0].id_ano
 }
-
 function editarAlumno() {
   let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
   data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
@@ -422,7 +411,6 @@ function editarAlumno() {
     alertaMsj.value = "Hubo un error actualizano los datos"
   })
 }
-
 watch(()=>cedRe.value.value, ()=>{
   disabled.value = false
   representante.value.id = ''
@@ -457,19 +445,18 @@ watch(()=>cedRe.value.value, ()=>{
     floating
     :location="mobile ? 'bottom' : 'left'"
     :class="mobile ? 'h-75' : ''"
+    touchless
   >
     <v-list-item class="text-center item-text-inline item-sticky px-0">
       <template v-if="mobile" #prepend>
         <v-btn variant="text" icon="mdi-arrow-down" class="d-inline" @click="studentDrawer = false"/>
       </template>
-      <template #title>
-        <span class="d-inline-block">
-          {{  alumno.men_abre }}
-          <span class="text-caption d-block">
-          {{  alumno.men }}
-          </span>
+      <span class="d-inline-block">
+        {{  alumno.men_abre }}
+        <span class="text-caption d-block">
+        {{  alumno.men }}
         </span>
-      </template>
+      </span>
       <AgregarEstudiante
         :data-academica="menciones"
         :variant="true"
@@ -481,7 +468,10 @@ watch(()=>cedRe.value.value, ()=>{
       <v-list-item
         v-for="estudiante in estudiantes"
         :key="estudiante.id_estd"
-        :title="`${estudiante.pnom_alum} ${estudiante.snom_alum} ${estudiante.pape_alum} ${estudiante.sape_alum}`"
+        :title="`${estudiante.pnom_alum}
+                ${estudiante.snom_alum !== 'undefined' ? estudiante.snom_alum : ''}
+                ${estudiante.pape_alum}
+                ${estudiante.sape_alum !== 'undefined' ? estudiante.sape_alum : ''}`"
         :subtitle="estudiante.ced_alum"
         class="my-3"
         @click="buscarEstudiante(estudiante.id_estd)"
@@ -506,15 +496,16 @@ watch(()=>cedRe.value.value, ()=>{
     location="right"
     class="sidebar-width"
   >
-    <v-sheet :width="mobile?'':'450'" class="pa-2">
+    <v-sheet class="pa-2">
+      <v-btn variant="plain" prepend-icon="mdi-close" text="Cerrar" block @click="calendarNav = !calendarNav" />
       <template v-if="selectedItem.id && !editItem">
         <p class="text-center text-capitalize text-medium-emphasis">
-          {{selectedItem.startDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
-          <template v-if="selectedItem.endDate !== selectedItem.startDate">
+          {{new Date(selectedItem.startDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+          <template v-if="selectedItem.endDate.toString() !== selectedItem.startDate.toString()">
             <span class="text-caption">
               al
             </span>
-            {{selectedItem.endDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+            {{new Date(selectedItem.endDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
           </template>
         </p>
         <p class="text-h5 text-center">{{ selectedItem.originalItem.title }}</p>
@@ -522,7 +513,7 @@ watch(()=>cedRe.value.value, ()=>{
       </template>
       <template v-else>
         <p class="text-h5 text-center text-capitalize mb-4">
-          {{newItemStartDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
+          {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
         </p>
         <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
         <v-text-field
@@ -592,14 +583,14 @@ watch(()=>cedRe.value.value, ()=>{
     </template>
   </v-navigation-drawer>
   <section>
-    <v-container>
+    <v-container class="px-0">
       <section class="d-flex flex-wrap">
         <v-btn
           variant="text"
           prepend-icon="mdi-arrow-left"
           @click="router.push('/')"
         >
-          <span class="d-none d-md-inline">
+          <span class="d-none d-sm-inline">
             Regresar
           </span>
         </v-btn>
@@ -625,7 +616,7 @@ watch(()=>cedRe.value.value, ()=>{
         />
       </section>
       <template v-if="alumno.num">
-        <v-card variant="tonal" class="ma-3 pa-2">
+        <v-card variant="tonal" class="ma-1 ma-sm-3 pa-2">
           <v-card-item class="pa-0">
             <template v-if="!edit">
               <v-row class="pa-3">
@@ -900,6 +891,7 @@ watch(()=>cedRe.value.value, ()=>{
 
 <style>
 .v-navigation-drawer--temporary.sidebar-width {
+  min-width: 300px;
   width: fit-content !important;
 }
 .item-sticky {
@@ -920,4 +912,4 @@ watch(()=>cedRe.value.value, ()=>{
     }
   }
 }
-</style>../funciones y constantes/api.ts
+</style>

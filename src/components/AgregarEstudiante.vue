@@ -227,8 +227,8 @@ watch(()=>cedRe.value.value, ()=>{
     <v-btn
       v-bind="props"
       append-icon="mdi-account-school-outline"
-      :variant="props.variant ? 'text' : 'tonal'"
-      :class="props.classBtn"
+      :variant="variant ? 'text' : 'tonal'"
+      :class="classBtn"
     >
       Agregar
     </v-btn>
