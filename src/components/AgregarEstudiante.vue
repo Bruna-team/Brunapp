@@ -47,7 +47,7 @@ const cedRe = ref({
   ]
 });
 const representante = ref<any>({
-  id: '',
+  id: {value: ''},
   nomRe: {
     value: '',
     rules: [
@@ -167,8 +167,8 @@ function guardarAlumno() {
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
   data +=  '&paren=' +  capitalizar(alumno.value.paren.value) + '&idAno=' + alumno.value.sec.value
   data += '&obs=' + alumno.value.obs.value
-  if (representante.value.id) {
-    data += '&idRe=' +  representante.value.id
+  if (representante.value.id.value) {
+    data += '&idRe=' +  representante.value.id.value
   } else {
     data += '&nomRe=' + capitalizar(representante.value.nomRe.value) + '&apeRe=' + capitalizar(representante.value.apeRe.value)
     data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
@@ -178,8 +178,8 @@ function guardarAlumno() {
   .then((res:any) => {
     if (res.data.r) {
       emit('alerta', res.data.e)
-      emit('recargar')
       limpiarDatos()
+      emit('recargar')
     }
   }).catch(() => {
     emit('alerta', 'Hubo un error agregando el alumno')
@@ -198,7 +198,7 @@ function limpiarDatos() {
 }
 watch(()=>cedRe.value.value, ()=>{
   disabled.value = false
-  representante.value.id = ''
+  representante.value.id.value = ''
   representante.value.nomRe.value = ''
   representante.value.apeRe.value = ''
   representante.value.tel.value = ''
@@ -209,7 +209,7 @@ watch(()=>cedRe.value.value, ()=>{
   .then((res:any) => {
     if (res.data[0].id_rep) {
       disabled.value = true
-      representante.value.id = res.data[0].id_rep
+      representante.value.id.value = res.data[0].id_rep
       representante.value.nomRe.value = res.data[0].nom_rep
       representante.value.apeRe.value = res.data[0].ape_rep
       representante.value.tel.value = res.data[0].tel_rep
@@ -217,7 +217,7 @@ watch(()=>cedRe.value.value, ()=>{
       representante.value.telRe.value = res.data[0].tel_re_rep || ''
     }
   }).catch(() => {
-    // message: 'Hubo un error actualizando los datos',
+    emit('alerta', 'No se encontró un representante con esos datos.')
   })
 })
 </script>
