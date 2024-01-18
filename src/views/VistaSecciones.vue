@@ -71,7 +71,7 @@ function organizarSecciones(data:string[]) {
 </script>
 <template>
 <v-container>
-  <AlertaMensaje :mensaje="alertaMsj" />
+  <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <v-skeleton-loader v-if="tabsLoading" type="table-heading, article, paragraph" />
   <template v-else>
     <v-card>

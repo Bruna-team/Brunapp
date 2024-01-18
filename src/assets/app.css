@@ -16,6 +16,11 @@ a {
   font-weight: bold;
   letter-spacing: .2rem;
 }
+.text-wrap {
+  white-space: break-spaces;
+  text-overflow: clip;
+  overflow: auto;
+}
 
 /* Iconos personalizados */
 i.logo::before {
