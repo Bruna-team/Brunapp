@@ -179,12 +179,20 @@ function cerrarSesion() {
       :class="temaLight ? 'icon-moon' : 'icon-sun'"
     />
     <v-btn
-      :loading="loading"
       :variant="edit ? 'tonal' : 'text'"
-      :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
-      :text="edit ? 'Guardar' : 'Editar'"
-      :color="edit ? 'secundario' : ''"
-      @click="edit ? validar() : edit=!edit"
+      :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
+      :text="edit ? 'Cancelar' : 'Editar'"
+      :color="edit ? 'error' : ''"
+      @click="edit = !edit"
+    />
+    <v-btn
+      v-if="edit"
+      :loading="loading"
+      variant="tonal"
+      prepend-icon="mdi-sync"
+      text="Guardar"
+      color="secundario"
+      @click="validar"
     />
   </div>
   <v-list>
