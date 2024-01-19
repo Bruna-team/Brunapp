@@ -68,6 +68,7 @@ const representante = ref({
 })
 const alumno = ref({
   id: '',
+  estd: '',
   num: '',
   nombre: '',
   pnom: {
@@ -191,55 +192,16 @@ const newItemStartDate= ref('')
 const newItemStartDateTime= ref('')
 const newItemEndDate = ref('')
 
-// eliminar cuando este la funcionalidad del back
-function thisMonth(d:any, h:any, m:any) {
- const t = new Date()
- return (new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0))
-}
 const items = ref([
   {
-    id: "e2",
-    startDate: thisMonth(2, 4, 6),
-    endDate: thisMonth(3, 4, 6),
-    title: "Inasistencia justificada",
+    id: "",
+    startDate: "",
+    endDate: "",
+    title: "",
     obs: '',
     obsType: '',
-    classes: ['bg-justified'],
-  },
-  {
-    id: "e3",
-    startDate: thisMonth(5, 4, 6),
-    endDate: thisMonth(7, 4, 6),
-    title: "De reposo",
-    obs: '',
-    obsType: '',
-    classes: ['bg-repose'],
-  },
-  {
-    id: "e4",
-    startDate: thisMonth(12, 4, 6),
-    title: "Inasistente",
-    obs: '',
-    obsType: '',
-    classes: ['bg-absentee'],
-  },
-  {
-    id: "e5",
-    startDate: thisMonth(22, 4, 6),
-    endDate: thisMonth(24, 4, 6),
-    title: "Justificado",
-    obs: '',
-    obsType: '',
-    classes: ['bg-justified'],
-  },
-  {
-    id: "foo",
-    startDate: thisMonth(10, 4, 6),
-    title: "Inasistente",
-    obs: '',
-    obsType: '',
-    classes: ['bg-observation'],
-  },
+    classes: [],
+  }
 ])
 
 // Funcionalidades del calendario
@@ -287,16 +249,22 @@ function limpiarItems() {
   }
 }
 function agregarItem() {
-  items.value.push({
-    id: "r8",
-    startDate: new Date(newItemStartDate.value.toString() + ' ' + newItemStartDateTime.value),
-    endDate: newItemEndDate.value.length ? new Date(newItemEndDate.value.toString()) : new Date(newItemStartDate.value.toString()+' '+newItemStartDateTime.value),
-    title: newItemTitle.value,
-    obs: newItemObservacion.value,
-    obsType: newItemType.value,
-    classes: [asignarClases(newItemType.value)]
+  let data = "estd=" + alumno.value.estd + '&mot=' + newItemType.value + '&fec=' + newItemStartDate.value
+  data += '&hor=' + newItemStartDateTime.value + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
+  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+
+  brunaApi({ s: 'crearObservacion' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = "Observación guardada"
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = "Hubo un error guardando la observación"
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando la observación"
   })
-  limpiarItems()
 }
 function actualizarItem(item: any) {
   items.value = items.value.map((i) => {
@@ -326,12 +294,10 @@ function editarItem(item: any) {
 }
 function asignarClases(type: string) {
   switch (type) {
-    case 'absentee':
-      return 'bg-absentee'
-    case 'justified':
-      return 'bg-absentee'
-    case 'repose':
-      return 'bg-absentee'
+    case '1':
+      return 'bg-justified'
+    case '2':
+      return 'bg-repose'
     default:
       return 'bg-observation'
   }
@@ -376,6 +342,7 @@ function buscarEstudiante(id:string) {
 function organizarDatos(data:any) {
   alumno.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
   alumno.value.id = data.alum[0].id_alum
+  alumno.value.estd = data.alum[0].id_estd
   alumno.value.pnom.value = data.alum[0].pnom_alum
   alumno.value.snom.value = data.alum[0].snom_alum
   alumno.value.pape.value = data.alum[0].pape_alum
@@ -401,6 +368,22 @@ function organizarDatos(data:any) {
   })
   menciones.value.ano = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
   menciones.value.id_ano = data.alum[0].id_ano
+
+  if(data.cal) {
+    const item:any = []
+    data.cal.forEach((c:any) => {
+      item.push({
+        id: c.id_obs,
+        startDate: new Date(c.fec_obs.toString() + ' ' + c.hor_obs),
+        endDate: c.fec_fin_obs.length ? new Date(c.fec_fin_obs.toString()) : new Date(c.fec_obs.toString()+' '+c.hor_obs),
+        title: c.nom_obs,
+        obs: c.nota_obs,
+        obsType: c.id_mo_obs,
+        classes: [asignarClases(c.id_mo_obs)]
+      })
+    });
+    items.value = item
+  }
 }
 function editarAlumno() {
   let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
@@ -530,7 +513,7 @@ watch(()=>cedRe.value.value, ()=>{
         </p>
         <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
         <v-text-field
-v-if="editItem"
+          v-if="editItem"
           v-model="newItemStartDate"
           label="Fecha y hora de la observación"
           type="datetime-local"
@@ -538,7 +521,7 @@ v-if="editItem"
           persistent-hint
           class="mb-3"
         />
-<v-text-field
+        <v-text-field
           v-else
           v-model="newItemStartDateTime"
           label="Hora de la observación (opcional)"
