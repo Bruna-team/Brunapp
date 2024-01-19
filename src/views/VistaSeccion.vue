@@ -284,8 +284,8 @@ function limpiarItems() {
 function agregarItem() {
   items.value.push({
     id: "r8",
-    startDate: new Date(newItemStartDate.value.toString() + ' ' + newItemStartDateTime.value),
-    endDate: newItemEndDate.value.length ? new Date(newItemEndDate.value.toString()) : new Date(newItemStartDate.value.toString()+' '+newItemStartDateTime.value),
+    startDate: new Date(newItemStartDate.value+' '+newItemStartDateTime.value),
+    endDate: newItemEndDate.value.length ? new Date(newItemEndDate.value) : new Date(newItemStartDate.value+' '+newItemStartDateTime.value),
     title: newItemTitle.value,
     obs: newItemObservacion.value,
     obsType: newItemType.value,
@@ -298,8 +298,8 @@ function actualizarItem(item: any) {
     if(i.id === item.originalItem.id) {
       return {
         id: item.originalItem.id,
-        startDate: new Date(newItemStartDate.value.toString()),
-        endDate: new Date(newItemEndDate.value.toString()),
+        startDate: new Date(newItemStartDate.value),
+        endDate: new Date(newItemEndDate.value),
         title: newItemTitle.value,
         obs: newItemObservacion.value,
         obsType: newItemType.value,
