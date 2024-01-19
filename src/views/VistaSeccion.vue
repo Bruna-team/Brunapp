@@ -267,22 +267,23 @@ function agregarItem() {
   })
 }
 function actualizarItem(item: any) {
-  items.value = items.value.map((i) => {
-    if(i.id === item.originalItem.id) {
-      return {
-        id: item.originalItem.id,
-        startDate: new Date(newItemStartDate.value),
-        endDate: new Date(newItemEndDate.value),
-        title: newItemTitle.value,
-        obs: newItemObservacion.value,
-        obsType: newItemType.value,
-        classes: [asignarClases(newItemType.value)]
-      }
+  const hor = newItemStartDate.value.split('T')
+  let data = 'mot=' + newItemType.value + '&fec=' + hor[0] + '&id=' + item.originalItem.id
+  data += '&hor=' + hor[1] + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
+  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+
+  brunaApi({ s: 'editarObservacion' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
     } else {
-      return {...i}
+      alertaMsj.value = res.data.e
     }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error editando la observación"
   })
-  limpiarItems()
 }
 function editarItem(item: any) {
   newItemTitle.value = item.originalItem.title
