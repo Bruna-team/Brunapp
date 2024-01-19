@@ -249,6 +249,7 @@ function limpiarItems() {
   }
 }
 function agregarItem() {
+<<<<<<< HEAD
   let data = "estd=" + alumno.value.estd + '&mot=' + newItemType.value + '&fec=' + newItemStartDate.value
   data += '&hor=' + newItemStartDateTime.value + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
   data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
@@ -264,6 +265,16 @@ function agregarItem() {
     }
   }).catch(() => {
     alertaMsj.value = "Hubo un error guardando la observación"
+=======
+  items.value.push({
+    id: "r8",
+    startDate: new Date(newItemStartDate.value+' '+newItemStartDateTime.value),
+    endDate: newItemEndDate.value.length ? new Date(newItemEndDate.value) : new Date(newItemStartDate.value+' '+newItemStartDateTime.value),
+    title: newItemTitle.value,
+    obs: newItemObservacion.value,
+    obsType: newItemType.value,
+    classes: [asignarClases(newItemType.value)]
+>>>>>>> 0e78472e3b010a94b1bc2b420960c629c83c99c0
   })
 }
 function actualizarItem(item: any) {
@@ -271,8 +282,8 @@ function actualizarItem(item: any) {
     if(i.id === item.originalItem.id) {
       return {
         id: item.originalItem.id,
-        startDate: new Date(newItemStartDate.value.toString()),
-        endDate: new Date(newItemEndDate.value.toString()),
+        startDate: new Date(newItemStartDate.value),
+        endDate: new Date(newItemEndDate.value),
         title: newItemTitle.value,
         obs: newItemObservacion.value,
         obsType: newItemType.value,

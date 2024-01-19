@@ -14,20 +14,20 @@ function capitalizar (string: string) {
  }
 }
 /**
- * @param {date} string
+ * @param {date} Date
  * @param {type} string
  * @return {string}
  */
-function formatoFechaYHora (date: string, type: string) {
-  const fecha = `${new Date(date).getFullYear()}-${String(new Date(date).getMonth()+1).padStart(2, '0')}-${String(new Date(date).getDate()).padStart(2, '0')}`
-  const hora = new Date(date).toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'})
+function formatoFechaYHora (date: Date, type: string) {
+  const fecha = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  const hora = `${String(date.getHours()).padStart(2, '0')}:${String(date.getDate()).padStart(2, '0')}`
   switch (type) {
     case 'fecha':
       return fecha
     case 'hora':
-      return fecha
+      return hora
     default:
-      return fecha+'T'+hora
+      return `${fecha}T${hora}`
   }
 }
 
