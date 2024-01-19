@@ -142,6 +142,11 @@ onMounted(() => {
 const edit = ref(false)
 
 // Variables del calendario
+const motivos = ref([{
+  id_mo: '',
+  tipo_mo: '',
+  eli_mo: ''
+}])
 const calendarNav = ref(false)
 const editItem = ref(false)
 const periodo = ref("month")
@@ -357,6 +362,14 @@ function cargaInicial() {
   }).catch(() => {
     // message: 'Hubo un error cargando los datos',
   })
+  brunaApi({ s: 'motivos' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      motivos.value = res.data
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
 }
 function buscarEstudiante(id:string) {
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec + "&estd=" + id)
@@ -526,7 +539,7 @@ watch(()=>cedRe.value.value, ()=>{
         </p>
         <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
         <v-text-field
-          v-if="editItem"
+v-if="editItem"
           v-model="newItemStartDate"
           label="Fecha y hora de la observación"
           type="datetime-local"
@@ -534,7 +547,7 @@ watch(()=>cedRe.value.value, ()=>{
           persistent-hint
           class="mb-3"
         />
-        <v-text-field
+<v-text-field
           v-else
           v-model="newItemStartDateTime"
           label="Hora de la observación (opcional)"
@@ -544,10 +557,7 @@ watch(()=>cedRe.value.value, ()=>{
           class="mb-3"
         />
         <v-radio-group v-model="newItemType" label="Tipo de observación">
-          <v-radio label="Inasistencia" value="absentee"></v-radio>
-          <v-radio label="Inasistencia justificada" value="justified"></v-radio>
-          <v-radio label="Reposo" value="repose"></v-radio>
-          <v-radio label="Observación" value="observation"></v-radio>
+          <v-radio v-for="m in motivos" :keys="m.id_mo" :label="m.tipo_mo" :value="m.id_mo"></v-radio>
         </v-radio-group>
         <v-text-field
           v-model="newItemEndDate"
