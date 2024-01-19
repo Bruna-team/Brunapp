@@ -303,8 +303,18 @@ function asignarClases(type: string) {
   }
 }
 function eliminarItem(item: any) {
-  items.value = items.value.filter(i => i.id != item.originalItem.id)
-  limpiarItems()
+  brunaApi({ s: 'eliminarObservacion' }, 'obs=' + item.originalItem.id)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando la observación"
+  })
 }
 watch(calendarNav, (value) => {
   if (!value) {limpiarItems()}
