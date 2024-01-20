@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { ref, watch } from 'vue'
 const props = defineProps({
   type: String,
   mensaje: String,
 })
-defineEmits(['cerrar'])
+const emit = defineEmits(['limpiarMsj'])
 
 const show = ref(false)
-const mensaje = computed(()=> props.mensaje || '')
+const mensaje = ref<string | undefined>('')
 
-watch(mensaje, (value: String)=> {
-  show.value = !!value
+watch(props, (value)=> {
+  mensaje.value = value.mensaje
+  show.value = !!value.mensaje
+  setTimeout(() => {
+    mensaje.value= ''
+    show.value = false
+    emit('limpiarMsj')
+  }, 2000);
 })
 </script>
 <template>
@@ -26,7 +31,7 @@ watch(mensaje, (value: String)=> {
       <template v-slot:actions>
         <v-btn
           variant="text"
-          @click="$emit('cerrar')"
+          @click="$emit('limpiarMsj')"
         >
           Close
         </v-btn>
