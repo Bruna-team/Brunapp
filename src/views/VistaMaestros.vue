@@ -96,6 +96,7 @@ const materias = ref([
           </v-card-text>
           <v-card-actions class="justify-center">
             <configurar-maestro :materias="materias" />
+            <configurar-maestro :materias="materias" :asignar-rol="true" />
           </v-card-actions>
         </v-card>
       </v-col>
