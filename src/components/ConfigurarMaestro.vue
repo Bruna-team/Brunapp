@@ -33,7 +33,12 @@ const jornadas= ref(1)
 <template>
 <v-dialog max-width="850" close-on-back scrollable :fullscreen="!smAndUp">
   <template v-slot:activator="{ props }">
-    <v-btn v-bind="props" color="secundario" :text="asignarRol ? 'Asignar rol' : 'Configurar'"> </v-btn>
+    <v-btn
+      v-bind="props"
+      color="secundario"
+      :prepend-icon="asignarRol ? 'mdi-account-convert' : 'mdi-account-file-text'"
+      :text="asignarRol ? 'Asignar rol' : 'Configurar'"
+    />
   </template>
 
   <template v-slot:default="{ isActive }">
