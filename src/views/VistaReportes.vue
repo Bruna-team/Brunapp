@@ -155,22 +155,30 @@ const plants = ref([
               <v-radio label="'B'" value="b"></v-radio>
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="auto" v-if="tabActiva !== 'pases'" class="grid-area--datetime">
-            <v-date-picker
-              v-model="fechasFiltrar"
-              show-adjacent-months
-              multiple
-              class="flex-fill"
-            />
-          </v-col>
+          <template v-if="tabActiva !== 'pases'">
+            <v-col cols="12" md="auto" class="grid-area--datetime">
+              <v-date-picker
+                v-model="fechasFiltrar"
+                show-adjacent-months
+                multiple
+                class="flex-fill"
+              />
+            </v-col>
+          </template>
           <template v-else>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="4">
               <v-combobox
                 label="Escribe el nombre del estudiante"
                 :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
               ></v-combobox>
             </v-col>
-            <v-col cols="12" md="6">
+            <!-- <v-col cols="12" md="4">
+              <v-combobox
+                label="Materia"
+                :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+              ></v-combobox>
+            </v-col> -->
+            <v-col cols="12" md="4">
               <v-text-field
                 label="Especifica si la fecha es de hoy"
                 type="date"

@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import BlotFormatter from 'quill-blot-formatter'
-import ModalImpresion from "../../components/ModalImpresion.vue"
+import ModalImpresion from '../../components/ModalImpresion.vue'
+import AlertaMensaje from '../../components/AlertaMensaje.vue'
+import QuillEditorComponentVue from '../../components/QuillEditorComponent.vue';
 
-const content = ref('<h1>Hello world</h1>')
-const modules = ref({
- name: 'blotFormatter',
- module: BlotFormatter,
- options: {}
-})
-
+const alertaMsj = ref('')
+const content = ref('')
 </script>
 <template>
+  <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
   <v-toolbar flat>
     <v-toolbar-title>Configura el formato de pase que deseas generar</v-toolbar-title>
     <v-divider
@@ -23,22 +18,10 @@ const modules = ref({
     ></v-divider>
     <v-spacer></v-spacer>
     <ModalImpresion
-    :quill="true"
-    :content="content ? content : []"
-    :classBtn="'float-right'"
+      :quill="true"
+      :content="content ? content : []"
+      :classBtn="'float-right'"
     />
   </v-toolbar>
-  <QuillEditor
-    v-model:content="content"
-    :modules="modules"
-    theme="snow"
-    toolbar="full"
-    content-type="html"
-    class="quill-height"
-  />
+  <QuillEditorComponentVue @content="content=$event" />
 </template>
-<style>
-.quill-height {
-  min-height: min-content;
-}
-</style>

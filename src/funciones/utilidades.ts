@@ -117,9 +117,15 @@ function pdfmakeImgStack(ret: any) {
   });
   return contentWImageInStack;
 }
+/**
+ * Convierte las unidades de cm a pt
+ * @param {Number} mm Unidad en milímetros
+ * @return {*} milímetros convertidos a puntos
+ */
 function conversorDeUnidad(mm: number) {
   const cm = mm / 10
-  const pts = cm / 2.54 * 72 // Fórmula que convierte de cm a pt
+  const pts = cm / 2.54 * 72
   return pts
 }
+
 export {imprimirPdf}
