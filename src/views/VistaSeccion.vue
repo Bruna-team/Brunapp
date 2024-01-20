@@ -6,13 +6,16 @@ import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
 import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { formatoFechaYHora } from '../funciones/funciones.ts';
 
 import router from "../router";
 import { ref, watch, onMounted } from "vue";
 import { useDisplay } from 'vuetify'
 const { mobile } = useDisplay()
 const studentDrawer = ref( mobile.value ? false : true)
+const alertaMsj = ref<string>('')
 
 // Consulta de estudiantes
 const menciones = ref({
@@ -31,23 +34,109 @@ const estudiantes = ref([
     snom_alum: "",
   },
 ])
-const seleccionado = ref({
-  id: "",
-  nombre: "",
-  avatar: "",
-  cedula: "",
-  fecha: "",
-  obs: "",
-  men: "",
-  men_abre: "",
-  representante: {
-    nombre: '',
-    paren: '',
-    tel: '',
-    telRe: '',
-    dir: ''
+const representante = ref({
+  id: '',
+  nombre: '',
+  nomRe: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El nombre es necesario',
+    ],
+  },
+  apeRe: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El apellido es necesario',
+    ],
+  },
+  tel: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El teléfono es necesario',
+    ],
+  },
+  telRe: {
+    value: '',
+    rules: [],
+  },
+  dir: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La dirección es necesaria',
+    ],
   }
 })
+const alumno = ref({
+  id: '',
+  estd: '',
+  num: '',
+  nombre: '',
+  pnom: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El nombre es necesario',
+      (v: string) => v.length>3 || 'El nombre es muy corto',
+    ],
+  },
+  snom: {
+    value: '',
+    rules: [],
+  },
+  pape: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El apellido es necesario',
+      (v: string) => v.length>3 || 'El apellido es muy corto',
+    ],
+  },
+  sape: {
+    value: '',
+    rules: [],
+  },
+  paren: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El parentesco es necesario',
+    ],
+  },
+  ced: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La cédula es necesaria',
+      (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
+      (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
+    ],
+  },
+  fec: {
+    value: '',
+    rules: [
+      (v: string) => {
+        let fecha = new Date(v)
+        let hoy = new Date()
+        let edad = hoy.getFullYear() - fecha.getFullYear()
+        fecha.setFullYear(hoy.getFullYear())
+        hoy < fecha ? edad-- : ''
+        return edad>=10 && edad<=18 || 'La fecha de nacimiento no es valida, debe ser mayor de 10 años y menor de 18'
+      },
+    ],
+  },
+  obs: {
+    value: '',
+  },
+  men: '',
+  men_abre: ''
+})
+const cedRe = ref({
+  value: '',
+  rules: [
+      (v: string) => !!v || 'La cédula es necesaria',
+      (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
+      (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
+  ]
+});
+const loading = ref(false)
+const form = ref()
+const disabled = ref(false)
 onMounted(() => {
 	cargaInicial();
 });
@@ -55,9 +144,30 @@ onMounted(() => {
 const edit = ref(false)
 
 // Variables del calendario
+const motivos = ref([{
+  id_mo: '',
+  tipo_mo: '',
+  eli_mo: ''
+}])
 const calendarNav = ref(false)
 const editItem = ref(false)
 const periodo = ref("month")
+
+async function validar () {
+  loading.value = true
+  const { valid } = await form.value.validate()
+  if (valid) {
+    editarAlumno()
+  }
+  loading.value = false
+}
+
+const showDate = ref(new Date())
+function setShowDate(d: any) {
+  showDate.value = d;
+}
+
+// Variables del scrum del calendario
 const selectedItem= ref({
   originalItem:{
     id:"",
@@ -68,75 +178,30 @@ const selectedItem= ref({
     obsType: "",
     classes:"",
   },
-  startDate: new Date(0),
-  endDate: new Date(0),
+  startDate: '',
+  endDate: '',
   classes: "",
   title: "",
   id:"",
 })
-
-const showDate = ref(new Date())
-function setShowDate(d: any) {
-  showDate.value = d;
-}
-
-// Variables del scrum del calendario
+const selectedDate= ref('')
 const newItemTitle= ref('')
 const newItemObservacion= ref('')
 const newItemType= ref('')
-const newItemStartDate= ref(new Date(0))
-const newItemStartDateTime= ref(new Date(0))
-const newItemEndDate = ref(new Date(0))
+const newItemStartDate= ref('')
+const newItemStartDateTime= ref('')
+const newItemEndDate = ref('')
 
-// eliminar cuando este la funcionalidad del back
-function thisMonth(d:any, h:any, m:any) {
- const t = new Date()
- return (new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0))
-}
 const items = ref([
   {
-    id: "e2",
-    startDate: thisMonth(2, 4, 6),
-    endDate: thisMonth(3, 4, 6),
-    title: "Inasistencia justificada",
+    id: "",
+    startDate: "",
+    endDate: "",
+    title: "",
     obs: '',
     obsType: '',
-    classes: ['bg-justified'],
-  },
-  {
-    id: "e3",
-    startDate: thisMonth(5, 4, 6),
-    endDate: thisMonth(7, 4, 6),
-    title: "De reposo",
-    obs: '',
-    obsType: '',
-    classes: ['bg-repose'],
-  },
-  {
-    id: "e4",
-    startDate: thisMonth(12, 4, 6),
-    title: "Inasistente",
-    obs: '',
-    obsType: '',
-    classes: ['bg-absentee'],
-  },
-  {
-    id: "e5",
-    startDate: thisMonth(22, 4, 6),
-    endDate: thisMonth(24, 4, 6),
-    title: "Justificado",
-    obs: '',
-    obsType: '',
-    classes: ['bg-justified'],
-  },
-  {
-    id: "foo",
-    startDate: thisMonth(10, 4, 6),
-    title: "Inasistente",
-    obs: '',
-    obsType: '',
-    classes: ['bg-observation'],
-  },
+    classes: [],
+  }
 ])
 
 // Funcionalidades del calendario
@@ -149,7 +214,8 @@ function onDrop(item: any, date: any) {
 }
 function onClickDay(d: any) {
   calendarNav.value = true
-  newItemStartDate.value = d
+  selectedDate.value = d
+  newItemStartDate.value = formatoFechaYHora(d, 'fecha')
 }
 function onClickItem(d: any) {
   calendarNav.value = true
@@ -157,12 +223,14 @@ function onClickItem(d: any) {
 }
 // Funciones del SCRUM del calendario
 function limpiarItems() {
+  editItem.value = false
+  calendarNav.value = false
   newItemTitle.value = ''
   newItemObservacion.value = ''
   newItemType.value = ''
-  newItemStartDate.value = new Date(0)
-  newItemStartDateTime.value = new Date(0)
-  newItemEndDate.value = new Date(0)
+  newItemStartDate.value = ''
+  newItemStartDateTime.value = ''
+  newItemEndDate.value = ''
   selectedItem.value = {
     originalItem:{
       id:"",
@@ -173,90 +241,99 @@ function limpiarItems() {
       obsType: "",
       classes:"",
     },
-    startDate: new Date(0),
-    endDate: new Date(0),
+    startDate: '',
+    endDate: '',
     classes: "",
     title: "",
     id:"",
   }
-  calendarNav.value = false
 }
 function agregarItem() {
-  const validarfecha = new Date(0).toString()
-  if (newItemEndDate.value.toString() !== validarfecha) {
-    items.value.push({
-      id: "r8",
-      startDate: newItemStartDate.value,
-      endDate: newItemEndDate.value,
-      title: newItemTitle.value,
-      obs: newItemObservacion.value,
-      obsType: newItemType.value,
-      classes: [asignarClases(newItemType.value)]
-    })
-  } else {
-    items.value.push({
-      id: "r8",
-      startDate: newItemStartDate.value,
-      title: newItemTitle.value,
-      obs: newItemObservacion.value,
-      obsType: newItemType.value,
-      classes: [asignarClases(newItemType.value)]
-    })
-  }
-  limpiarItems()
+  let data = "estd=" + alumno.value.estd + '&mot=' + newItemType.value + '&fec=' + newItemStartDate.value
+  data += '&hor=' + newItemStartDateTime.value + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
+  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+
+  brunaApi({ s: 'crearObservacion' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = "Observación guardada"
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = "Hubo un error guardando la observación"
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando la observación"
+  })
 }
 function actualizarItem(item: any) {
-  items.value = items.value.map((i) => {
-    if(i.id === item.originalItem.id) {
-      return {
-        id: item.originalItem.id,
-        startDate: newItemStartDate.value,
-        endDate: newItemEndDate.value,
-        title: newItemTitle.value,
-        obs: newItemObservacion.value,
-        obsType: newItemType.value,
-        classes: [asignarClases(newItemType.value)]
-      }
+  const hor = newItemStartDate.value.split('T')
+  let data = 'mot=' + newItemType.value + '&fec=' + hor[0] + '&id=' + item.originalItem.id
+  data += '&hor=' + hor[1] + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
+  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+
+  brunaApi({ s: 'editarObservacion' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
     } else {
-      return {...i}
+      alertaMsj.value = res.data.e
     }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error editando la observación"
   })
-  limpiarItems()
 }
 function editarItem(item: any) {
   newItemTitle.value = item.originalItem.title
   newItemObservacion.value = item.originalItem.obs
   newItemType.value = item.originalItem.obsType
-  newItemStartDate.value = item.originalItem.startDate
-  newItemEndDate.value = item.originalItem.endDate
+  newItemStartDate.value = formatoFechaYHora(item.originalItem.startDate, 'fechaYhora')
+  newItemEndDate.value = formatoFechaYHora(item.originalItem.endDate, 'fechaYhora')
   editItem.value = true
 }
 function asignarClases(type: string) {
   switch (type) {
-    case 'absentee':
-      return 'bg-absentee'
-    case 'justified':
-      return 'bg-absentee'
-    case 'repose':
-      return 'bg-absentee'
+    case '1':
+      return 'bg-justified'
+    case '2':
+      return 'bg-repose'
     default:
       return 'bg-observation'
   }
 }
 function eliminarItem(item: any) {
-  items.value = items.value.filter(i => i.id != item.originalItem.id)
-  limpiarItems()
+  brunaApi({ s: 'eliminarObservacion' }, 'obs=' + item.originalItem.id)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando la observación"
+  })
 }
 watch(calendarNav, (value) => {
   if (!value) {limpiarItems()}
 })
-
 function cargaInicial() {
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
   .then((res:any) => {
     if (res.data) {
       organizarDatos(res.data)
       estudiantes.value = res.data.estd
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+  brunaApi({ s: 'motivos' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      motivos.value = res.data
     }
   }).catch(() => {
     // message: 'Hubo un error cargando los datos',
@@ -270,52 +347,125 @@ function buscarEstudiante(id:string) {
       estudiantes.value = res.data.estd
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
-
 function organizarDatos(data:any) {
-  seleccionado.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
-  seleccionado.value.cedula = data.alum[0].ced_alum
-  seleccionado.value.fecha = data.alum[0].fec_nac_alum
-  seleccionado.value.obs = data.alum[0].obs_alum
-  seleccionado.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
-  seleccionado.value.men = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
-  seleccionado.value.representante.nombre = data.alum[0].nom_rep + ' ' + data.alum[0].ape_rep
-  seleccionado.value.representante.paren = data.alum[0].paren_alum
-  seleccionado.value.representante.tel = data.alum[0].tel_rep
-  seleccionado.value.representante.telRe = data.alum[0].tel_re_rep
-  seleccionado.value.representante.dir = data.alum[0].dir_rep
+  alumno.value.nombre = data.alum[0].pnom_alum + ' ' + (data.alum[0].snom_alum !== 'undefined' ? data.alum[0].snom_alum : '')
+  + ' ' + data.alum[0].pape_alum + ' ' + (data.alum[0].sape_alum !== 'undefined' ? data.alum[0].sape_alum : '')
+  alumno.value.id = data.alum[0].id_alum
+  alumno.value.estd = data.alum[0].id_estd
+  alumno.value.pnom.value = data.alum[0].pnom_alum
+  alumno.value.snom.value = data.alum[0].snom_alum
+  alumno.value.pape.value = data.alum[0].pape_alum
+  alumno.value.sape.value = data.alum[0].sape_alum
+  alumno.value.ced.value = data.alum[0].ced_alum
+  alumno.value.fec.value = data.alum[0].fec_nac_alum
+  alumno.value.obs.value = data.alum[0].obs_alum
+  alumno.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
+  alumno.value.men = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
+  representante.value.nombre = data.alum[0].nom_rep + ' ' + data.alum[0].ape_rep
+  representante.value.id = data.alum[0].id_rep
+  cedRe.value.value = data.alum[0].ced_rep
+  representante.value.nomRe.value = data.alum[0].nom_rep
+  representante.value.apeRe.value = data.alum[0].ape_rep
+  alumno.value.paren.value = data.alum[0].paren_alum
+  representante.value.tel.value = data.alum[0].tel_rep
+  representante.value.telRe.value = data.alum[0].tel_re_rep
+  representante.value.dir.value = data.alum[0].dir_rep
   data.estd.forEach((d:any) => {
     if (d.id_estd == data.alum[0].id_estd) {
-      seleccionado.value.id = data.estd.indexOf(d) + 1
+      alumno.value.num = data.estd.indexOf(d) + 1
     }
   })
   menciones.value.ano = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
   menciones.value.id_ano = data.alum[0].id_ano
+
+  if(data.cal) {
+    const item:any = []
+    data.cal.forEach((c:any) => {
+      item.push({
+        id: c.id_obs,
+        startDate: new Date(c.fec_obs.toString() + ' ' + c.hor_obs),
+        endDate: c.fec_fin_obs.length ? new Date(c.fec_fin_obs.toString()) : new Date(c.fec_obs.toString()+' '+c.hor_obs),
+        title: c.nom_obs,
+        obs: c.nota_obs,
+        obsType: c.id_mo_obs,
+        classes: [asignarClases(c.id_mo_obs)]
+      })
+    });
+    items.value = item
+  }
 }
+function editarAlumno() {
+  let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
+  data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
+  data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
+  data +=  '&paren=' +  alumno.value.paren.value + '&id=' + alumno.value.id
+  data += '&obs=' + alumno.value.obs.value + '&idRe=' +  representante.value.id
+  data += '&nomRe=' + representante.value.nomRe.value + '&apeRe=' + representante.value.apeRe.value
+  data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
+  data += '&sTelRe=' + representante.value.telRe.value + '&dirRe=' + representante.value.dir.value
+
+  brunaApi({ s: 'editarAlum' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = "Datos actualizados"
+      edit.value = !edit.value
+      buscarEstudiante(alumno.value.estd)
+    } else {
+      alertaMsj.value = "Hubo un error actualizano los datos: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error actualizano los datos"
+  })
+}
+watch(()=>cedRe.value.value, ()=>{
+  disabled.value = false
+  representante.value.id = ''
+  representante.value.nomRe.value = ''
+  representante.value.apeRe.value = ''
+  representante.value.tel.value = ''
+  representante.value.dir.value = ''
+  representante.value.telRe.value = ''
+  if (cedRe.value.value.length < 8) return
+  brunaApi({ s: 'buscarRepresentante' }, 'ced=' + cedRe.value.value)
+  .then((res:any) => {
+    if (res.data[0].id_rep) {
+      disabled.value = true
+      representante.value.id = res.data[0].id_rep
+      representante.value.nomRe.value = res.data[0].nom_rep
+      representante.value.apeRe.value = res.data[0].ape_rep
+      representante.value.tel.value = res.data[0].tel_rep
+      representante.value.dir.value = res.data[0].dir_rep
+      representante.value.telRe.value = res.data[0].tel_re_rep || ''
+    }
+  }).catch(() => {
+    // message: 'Hubo un error actualizando los datos',
+  })
+})
 </script>
 
 <template>
 <v-card>
+  <AlertaMensaje :mensaje="alertaMsj" />
   <v-navigation-drawer
     v-model="studentDrawer"
     floating
     :location="mobile ? 'bottom' : 'left'"
     :class="mobile ? 'h-75' : ''"
+    touchless
   >
     <v-list-item class="text-center item-text-inline item-sticky px-0">
       <template v-if="mobile" #prepend>
         <v-btn variant="text" icon="mdi-arrow-down" class="d-inline" @click="studentDrawer = false"/>
       </template>
-      <template #title>
-        <span class="d-inline-block">
-          {{  seleccionado.men_abre }}
-          <span class="text-caption d-block">
-          {{  seleccionado.men }}
-          </span>
+      <span class="d-inline-block">
+        {{  alumno.men_abre }}
+        <span class="text-caption d-block">
+        {{  alumno.men }}
         </span>
-      </template>
+      </span>
       <AgregarEstudiante
         :data-academica="menciones"
         :variant="true"
@@ -327,7 +477,10 @@ function organizarDatos(data:any) {
       <v-list-item
         v-for="estudiante in estudiantes"
         :key="estudiante.id_estd"
-        :title="`${estudiante.pnom_alum} ${estudiante.snom_alum} ${estudiante.pape_alum} ${estudiante.sape_alum}`"
+        :title="`${estudiante.pnom_alum}
+                ${estudiante.snom_alum !== 'undefined' ? estudiante.snom_alum : ''}
+                ${estudiante.pape_alum}
+                ${estudiante.sape_alum !== 'undefined' ? estudiante.sape_alum : ''}`"
         :subtitle="estudiante.ced_alum"
         class="my-3"
         @click="buscarEstudiante(estudiante.id_estd)"
@@ -352,15 +505,16 @@ function organizarDatos(data:any) {
     location="right"
     class="sidebar-width"
   >
-    <v-sheet :width="mobile?'':'450'" class="pa-2">
+    <v-sheet class="pa-2">
+      <v-btn variant="plain" prepend-icon="mdi-close" text="Cerrar" block @click="calendarNav = !calendarNav" />
       <template v-if="selectedItem.id && !editItem">
         <p class="text-center text-capitalize text-medium-emphasis">
-          {{selectedItem.startDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
-          <template v-if="selectedItem.endDate !== selectedItem.startDate">
+          {{new Date(selectedItem.startDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+          <template v-if="selectedItem.endDate.toString() !== selectedItem.startDate.toString()">
             <span class="text-caption">
               al
             </span>
-            {{selectedItem.endDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+            {{new Date(selectedItem.endDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
           </template>
         </p>
         <p class="text-h5 text-center">{{ selectedItem.originalItem.title }}</p>
@@ -368,7 +522,7 @@ function organizarDatos(data:any) {
       </template>
       <template v-else>
         <p class="text-h5 text-center text-capitalize mb-4">
-          {{newItemStartDate.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
+          {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
         </p>
         <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
         <v-text-field
@@ -390,10 +544,7 @@ function organizarDatos(data:any) {
           class="mb-3"
         />
         <v-radio-group v-model="newItemType" label="Tipo de observación">
-          <v-radio label="Inasistencia" value="absentee"></v-radio>
-          <v-radio label="Inasistencia justificada" value="justified"></v-radio>
-          <v-radio label="Reposo" value="repose"></v-radio>
-          <v-radio label="Observación" value="observation"></v-radio>
+          <v-radio v-for="m in motivos" :keys="m.id_mo" :label="m.tipo_mo" :value="m.id_mo"></v-radio>
         </v-radio-group>
         <v-text-field
           v-model="newItemEndDate"
@@ -438,37 +589,48 @@ function organizarDatos(data:any) {
     </template>
   </v-navigation-drawer>
   <section>
-    <v-container>
+    <v-container class="px-0">
       <section class="d-flex flex-wrap">
         <v-btn
           variant="text"
           prepend-icon="mdi-arrow-left"
           @click="router.push('/')"
         >
-          <span class="d-none d-md-inline">
+          <span class="d-none d-sm-inline">
             Regresar
           </span>
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="seleccionado"
+          v-if="alumno"
           :variant="edit ? 'tonal' : 'text'"
-          :prepend-icon="edit ? 'mdi-sync' :'mdi-pen'"
-          :text="edit ? 'Guardar' : 'Editar'"
-          :color="edit ? 'secundario' : ''"
+          :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
+          :text="edit ? 'Cancelar' : 'Editar'"
+          :color="edit ? 'error' : ''"
+          class="mx-2"
           @click="edit = !edit"
         />
+        <v-btn
+          v-if="edit"
+          :loading="loading"
+          variant="tonal"
+          prepend-icon="mdi-sync"
+          text="Guardar"
+          color="secundario"
+          class="mx-2"
+          @click="validar"
+        />
       </section>
-      <template v-if="seleccionado.id">
-        <v-card variant="tonal" class="ma-3 pa-2">
+      <template v-if="alumno.num">
+        <v-card variant="tonal" class="ma-1 ma-sm-3 pa-2">
           <v-card-item class="pa-0">
-            <v-row class="pa-3">
-              <template v-if="!edit">
+            <template v-if="!edit">
+              <v-row class="pa-3">
                 <v-col cols="auto" class="d-none d-sm-block">
                   <v-badge icon="mdi-gender-female" color="pink">
                     <v-avatar color="brown">
                       <span class="text-h5">
-                        {{ seleccionado.nombre.split(" ").map(parte => parte.charAt(0)).join('').toUpperCase() }}
+                        {{ alumno.nombre.split(" ").map(parte => parte.charAt(0)).join('').toUpperCase() }}
                       </span>
                     </v-avatar>
                   </v-badge>
@@ -477,128 +639,224 @@ function organizarDatos(data:any) {
                   <v-card-title class="text-h4">
                     <v-tooltip text="Número de lista">
                       <template #activator="{ props }">
-                        <span v-bind="props" class="text-primario">{{ seleccionado.id }}</span>
+                        <span v-bind="props" class="text-primario">{{ alumno.num }}</span>
                       </template>
                     </v-tooltip>
-                    {{ seleccionado.nombre }}
+                    {{ alumno.nombre }}
                   </v-card-title>
                   <p>
                     <span class="text-caption font-weight-bold text-medium-emphasis">
                       C.I.
                     </span>
-                    <span class="font-weight-bold letter-spacing">{{ seleccionado.cedula }}</span>
+                    <span class="font-weight-bold letter-spacing">{{ alumno.ced.value }}</span>
                   </p>
                   <p>
                     <span class="text-caption font-weight-bold text-medium-emphasis">
                       Fecha de nacimiento
                     </span>
                     <span class="font-weight-bold letter-spacing">
-                      {{ seleccionado.fecha }}
+                      {{ alumno.fec.value }}
                     </span>
                   </p>
                 </v-col>
+                <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
+                  <p class="text-caption  font-weight-bold text-medium-emphasis">Representante</p>
+                  <v-divider/>
+                  <div class="d-sm-flex">
+                    <v-list-item
+                      :title="representante.nombre"
+                      class="px-0 pr-sm-3"
+                    >
+                      <template #subtitle>
+                        <p>
+                          <span class="text-caption font-weight-bold text-medium-emphasis">
+                            Parentesco:
+                          </span>
+                          <span class="font-weight-bold letter-spacing">
+                            {{ alumno.paren.value }}
+                          </span>
+                        </p>
+                        <p>
+                          <span class="text-caption font-weight-bold text-medium-emphasis">
+                            Teléfono:
+                          </span>
+                          <span class="font-weight-bold letter-spacing">
+                            {{ representante.tel.value }}
+                          </span>
+                        </p>
+                        <p v-if="representante.telRe.value">
+                          <span class="text-caption font-weight-bold text-medium-emphasis">
+                            Teléfonode repuesto:
+                          </span>
+                          <span class="font-weight-bold letter-spacing">
+                            {{ representante.telRe.value }}
+                          </span>
+                        </p>
+                        <p>
+                          <span class="text-caption font-weight-bold text-medium-emphasis">
+                            Dirección:
+                          </span>
+                          <span class="font-weight-bold letter-spacing">
+                            {{ representante.dir.value }}
+                          </span>
+                        </p>
+                      </template>
+                    </v-list-item>
+                  </div>
+                </v-col>
+                <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
+                  <p class="text-caption  font-weight-bold text-medium-emphasis">Estatus</p>
+                  <v-divider/>
+                  <div class="d-sm-flex flex-wrap align-start">
+                    <v-list-item
+                      title="Pases"
+                      class="flex-1-0 px-0 pr-sm-2"
+                    >
+                      <template #subtitle>
+                        <p>
+                          <span class="text-caption font-weight-bold text-medium-emphasis">
+                            De entrada:
+                          </span>
+                          <span class="font-weight-bold letter-spacing">
+                            1
+                          </span>
+                        </p>
+                        <p>
+                          <span class="text-caption font-weight-bold text-medium-emphasis">
+                            De salida
+                          </span>
+                          <span class="font-weight-bold letter-spacing">
+                            1
+                          </span>
+                        </p>
+                      </template>
+                    </v-list-item>
+                    <v-list-item
+                      title="Observaciones"
+                      :subtitle="alumno.obs.value"
+                      class="flex-1-0 px-0 pr-sm-2"
+                    ></v-list-item>
+                  </div>
+                </v-col>
+              </v-row>
               </template>
               <template v-else>
-                <v-col cols="12">
-                  <v-text-field
-                    label="Nombres y apellidos"
-                    v-model="seleccionado.nombre"
-                  />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    label="Cédula"
-                    v-model="seleccionado.cedula"
-                  />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    type="date"
-                    label="Fecha de nacimiento"
-                    v-model="seleccionado.fecha"
-                  />
-                </v-col>
+                <v-form ref="form">
+                  <v-row>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Primer nombre"
+                        v-model="alumno.pnom.value"
+                        :rules="alumno.pnom.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Segundo nombre"
+                        v-model="alumno.snom.value"
+                        :rules="alumno.snom.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Primer apellido"
+                        v-model="alumno.pape.value"
+                        :rules="alumno.pape.rules"
+                        />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Segundo apellido"
+                        v-model="alumno.sape.value"
+                        :rules="alumno.sape.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Cédula"
+                        v-model="alumno.ced.value"
+                        hint="Ej: V-12345678"
+                        prefix="V-"
+                        :rules="alumno.ced.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        type="date"
+                        label="Fecha de nacimiento"
+                        v-model="alumno.fec.value"
+                        :rules="alumno.fec.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
+                      <v-divider/>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Cédula"
+                        v-model="cedRe.value"
+                        hint="Ej: V-12345678"
+                        prefix="V-"
+                        :rules="cedRe.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Nombre del representante"
+                        v-model="representante.nomRe.value"
+                        :rules="representante.nomRe.rules"
+                        :disabled="disabled"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Apellido del representante"
+                        v-model="representante.apeRe.value"
+                        :rules="representante.apeRe.rules"
+                        :disabled="disabled"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Parentesco"
+                        v-model="alumno.paren.value"
+                        :rules="alumno.paren.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Teléfono"
+                        v-model="representante.tel.value"
+                        :rules="representante.tel.rules"
+                        :disabled="disabled"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Teléfono de repuesto"
+                        v-model="representante.telRe.value"
+                        :rules="representante.telRe.rules"
+                        :disabled="disabled"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Dirección"
+                        v-model="representante.dir.value"
+                        :rules="representante.dir.rules"
+                        :disabled="disabled"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="">
+                      <v-text-field
+                        label="Observaciones"
+                        v-model="alumno.obs.value"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-form>
               </template>
-              <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
-                <p class="text-caption  font-weight-bold text-medium-emphasis">Representante</p>
-                <v-divider/>
-                <div class="d-sm-flex">
-                  <v-list-item
-                    :title="seleccionado.representante.nombre"
-                    class="px-0 pr-sm-3"
-                  >
-                    <template #subtitle>
-                      <p>
-                        <span class="text-caption font-weight-bold text-medium-emphasis">
-                          Parentesco:
-                        </span>
-                        <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.paren }}
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-caption font-weight-bold text-medium-emphasis">
-                          Teléfono:
-                        </span>
-                        <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.tel }}
-                        </span>
-                      </p>
-                      <p v-if="seleccionado.representante.telRe">
-                        <span class="text-caption font-weight-bold text-medium-emphasis">
-                          Teléfonode repuesto:
-                        </span>
-                        <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.telRe }}
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-caption font-weight-bold text-medium-emphasis">
-                          Dirección:
-                        </span>
-                        <span class="font-weight-bold letter-spacing">
-                          {{ seleccionado.representante.dir }}
-                        </span>
-                      </p>
-                    </template>
-                  </v-list-item>
-                </div>
-              </v-col>
-              <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
-                <p class="text-caption  font-weight-bold text-medium-emphasis">Estatus</p>
-                <v-divider/>
-                <div class="d-sm-flex flex-wrap align-start">
-                  <v-list-item
-                    title="Pases"
-                    class="flex-1-0 px-0 pr-sm-2"
-                  >
-                    <template #subtitle>
-                      <p>
-                        <span class="text-caption font-weight-bold text-medium-emphasis">
-                          De entrada:
-                        </span>
-                        <span class="font-weight-bold letter-spacing">
-                          1
-                        </span>
-                      </p>
-                      <p>
-                        <span class="text-caption font-weight-bold text-medium-emphasis">
-                          De salida
-                        </span>
-                        <span class="font-weight-bold letter-spacing">
-                          1
-                        </span>
-                      </p>
-                    </template>
-                  </v-list-item>
-                  <v-list-item
-                    title="Observaciones"
-                    :subtitle="seleccionado.obs"
-                    class="flex-1-0 px-0 pr-sm-2"
-                  ></v-list-item>
-                </div>
-              </v-col>
-            </v-row>
           </v-card-item>
         </v-card>
         <v-row>
@@ -639,6 +897,7 @@ function organizarDatos(data:any) {
 
 <style>
 .v-navigation-drawer--temporary.sidebar-width {
+  min-width: 300px;
   width: fit-content !important;
 }
 .item-sticky {
@@ -659,4 +918,4 @@ function organizarDatos(data:any) {
     }
   }
 }
-</style>../funciones y constantes/api.ts
+</style>

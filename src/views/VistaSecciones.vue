@@ -3,6 +3,7 @@ import {ref,onMounted} from 'vue'
 import { brunaApi } from '../funciones/api.ts';
 import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
+import PasarAsistencia from '../components/PasarAsistencia.vue';
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
 const tabsLoading = ref<boolean>(true)
@@ -112,17 +113,25 @@ function organizarSecciones(data:string[]) {
                   <v-icon :icon="`mdi-numeric-${ano.num_ano}-circle`"/>
                   {{ ano.nom_ano }} año
                 </v-card-title>
-                <v-sheet class="d-flex flex-wrap pb-3 pl-2 justify-space-around">
-                  <RouterLink
+                <v-sheet :class="['d-flex flex-wrap pb-3 pl-2 justify-space-between', {'flex-fill': Object.values(n.ano[i].sec).length==1}]">
+                  <article
                     v-for="s in n.ano[i].sec"
                     :keys="`${s.num_sec}${s.sec_nom}`"
-                    :to="`/seccion/${s.id_ano}`"
+                    :class="['flex-fill d-inline-flex align-center', {'flex-lg-0-0': Object.values(n.ano[i].sec).length!==1}]"
                   >
-                  <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
-                    <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
-                      <p v-if="!s.semanero.includes('null')" class="text-caption">Semanero: {{ s.semanero }}</p>
-                    </v-list-item>
-                  </RouterLink>
+                    <RouterLink :to="`/seccion/${s.id_ano}`" class="flex-fill">
+                      <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
+                        <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
+                        <p v-if="!s.semanero.includes('null')" class="text-caption">
+                          <span class="d-block text-caption">
+                            Semanero:
+                          </span>
+                          {{ s.semanero }}
+                        </p>
+                      </v-list-item>
+                    </RouterLink>
+                    <PasarAsistencia :seccion="s.id_ano" />
+                  </article>
                 </v-sheet>
               </v-card>
             </v-col>
