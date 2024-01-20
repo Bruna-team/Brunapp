@@ -351,7 +351,8 @@ function buscarEstudiante(id:string) {
   })
 }
 function organizarDatos(data:any) {
-  alumno.value.nombre = data.alum[0].pnom_alum + ' ' + data.alum[0].snom_alum + ' ' + data.alum[0].pape_alum + ' ' + data.alum[0].sape_alum
+  alumno.value.nombre = data.alum[0].pnom_alum + ' ' + (data.alum[0].snom_alum !== 'undefined' ? data.alum[0].snom_alum : '')
+  + ' ' + data.alum[0].pape_alum + ' ' + (data.alum[0].sape_alum !== 'undefined' ? data.alum[0].sape_alum : '')
   alumno.value.id = data.alum[0].id_alum
   alumno.value.estd = data.alum[0].id_estd
   alumno.value.pnom.value = data.alum[0].pnom_alum
@@ -411,6 +412,7 @@ function editarAlumno() {
     if (res.data.r) {
       alertaMsj.value = "Datos actualizados"
       edit.value = !edit.value
+      buscarEstudiante(alumno.value.estd)
     } else {
       alertaMsj.value = "Hubo un error actualizano los datos: " + res.data.e
     }
