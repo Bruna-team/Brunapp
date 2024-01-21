@@ -67,7 +67,47 @@ function imprimirPdf (
       },
       parrafo1: {
         fontSize: 9
-      }
+      },
+      'html-h1': {
+        fontSize: 15,
+        bold: true,
+      },
+      'html-h2': {
+        fontSize: 14,
+        bold: true,
+      },
+      'html-h3': {
+        fontSize: 13,
+      },
+      'html-h4': {
+        fontSize: 11,
+      },
+      'html-h5': {
+        fontSize: 10,
+        bold: true,
+      },
+      'html-h6': {
+        fontSize: 9,
+        bold: true,
+        margin: 0,
+      },
+      'html-span': {
+        fontSize: 9,
+        margin: 0,
+      },
+      'html-p': {
+        fontSize: 9,
+        margin: 0,
+      },
+      'ql-align-left': {
+        alignment: 'left',
+      },
+      'ql-align-center': {
+        alignment: 'center',
+      },
+      'ql-align-right': {
+        alignment: 'right',
+      },
     },
     defaultStyle: {
       columnGap: 10,
@@ -98,6 +138,10 @@ function imprimirPdf (
 function pdfmakeImgStack(ret: any) {
   const contentWImageInStack: { nodeName: string; columns: any; }[] = [];
   ret.forEach((node: any) => {
+    // @ts-ignore
+    if(node.nodeName == 'P') {
+      node.margin = [0, 0, 0, 0]
+    }
     // @ts-ignore
     if(Object.hasOwn(node, 'stack')) {
       node.stack.forEach((span: any) => {
