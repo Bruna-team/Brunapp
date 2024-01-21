@@ -251,7 +251,7 @@ function limpiarItems() {
 function agregarItem() {
   let data = "estd=" + alumno.value.estd + '&mot=' + newItemType.value + '&fec=' + newItemStartDate.value
   data += '&hor=' + newItemStartDateTime.value + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
-  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+  data += newItemEndDate.value ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
 
   brunaApi({ s: 'crearObservacion' }, data)
   .then((res:any) => {
@@ -299,8 +299,10 @@ function asignarClases(type: string) {
       return 'bg-justified'
     case '2':
       return 'bg-repose'
-    default:
+    case '3':
       return 'bg-observation'
+    default:
+      return 'bg-absentee'
   }
 }
 function eliminarItem(item: any) {

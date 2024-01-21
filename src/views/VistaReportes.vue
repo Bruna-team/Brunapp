@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import {ref} from 'vue'
+import {ref,onMounted,watch} from 'vue'
 import ReportesInasistencias from './reportes/ReportesInasistencias.vue';
 import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
 import ReportesPases from './reportes/ReportesPases.vue';
+import { brunaApi } from '../funciones/api.ts';
+import { formatoFechaYHora } from '../funciones/funciones';
 const fechasFiltrar = ref([])
+const fechas = ref([''])
 const tabActiva = ref('pases')
 const tabs = ref([
   {
@@ -19,103 +22,159 @@ const tabs = ref([
     title: 'Inasistencias',
   }
 ])
-const año = ref([])
-const mencion = ref([])
-const seccion = ref([])
+const ano = ref('')
+const mencion = ref('')
+const seccion = ref('')
+const nombreABuscar = ref('')
 const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
 
-const plants = ref([
-  {
-    name: 'Fern',
-    abstente: 3,
-    justified: 0,
-    tabstense: 3,
-    pases: 0,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Snake Plant',
-    abstente: 2,
-    justified: 1,
-    tabstense: 3,
-    pases: 1,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Monstera',
-    abstente: 2,
-    justified: 2,
-    tabstense: 4,
-    pases: 2,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Pothos',
-    abstente: 0,
-    justified: 0,
-    tabstense: 0,
-    pases: 0,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'ZZ Plant',
-    abstente: 2,
-    justified: 3,
-    tabstense: 5,
-    pases: 3,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Spider Plant',
-    abstente: 1,
-    justified: 0,
-    tabstense: 1,
-    pases: 2,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Air Plant',
-    abstente: 0,
-    justified: 1,
-    tabstense: 1,
-    pases: 1,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Peperomia',
-    abstente: 0,
-    justified: 0,
-    tabstense: 0,
-    pases: 0,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Aloe Vera',
-    abstente: 0,
-    justified: 2,
-    tabstense: 2,
-    pases: 2,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-  {
-    name: 'Jade Plant',
-    abstente: 0,
-    justified: 0,
-    tabstense: 0,
-    pases: 0,
-    obs: 'AaaAaAaA',
-    date: '',
-  },
-])
+const menciones = ref<any[]>([{
+  id_men: '',
+  men: '',
+  ano: [
+    {
+      id_ano: '',
+      nom_ano: '',
+      num_ano: '',
+      sec: [
+        {
+          id_ano: '',
+          sec_nom: '',
+        }
+      ]
+    }
+  ]
+}])
+const estudiantes = ref([{
+  id_estd: '',
+  nombre: ''
+}]);
+const inasistencias = ref<any[]>([])
+const observaciones = ref<any[]>([])
+onMounted(() => {
+	cargaInicial();
+});
+
+function cargaInicial() {
+  brunaApi({ s: 'menciones' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      organizarSecciones(res.data)
+    }
+  }).catch(() => {
+  })
+}
+
+function organizarSecciones(data:string[]) {
+  const dataMen:any = {}
+  data.forEach((d:any) => {
+    if (!dataMen[d.id_men]) {
+      dataMen[d.id_men] = {
+        id_men: d.id_men,
+        men: d.nom_men,
+        ano: {}
+      }
+    }
+    if(!dataMen[d.id_men].ano[d.nom_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano] = {
+        id_ano: d.id_ano,
+        nom_ano: d.nom_ano,
+        num_ano: d.num_ano,
+        sec: {}
+      }
+    }
+    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
+        id_ano: d.id_ano,
+        sec_nom: d.sec_ano,
+      }
+    }
+  })
+  menciones.value = dataMen
+}
+
+function buscarEstudiante() {
+  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + nombreABuscar.value + '&ano=' + seccion.value)
+  .then((res:any) => {
+    if (res.data) {
+      estudiantes.value = res.data
+    }
+  }).catch(() => {
+  })
+}
+function cargaInasistencias() {
+  brunaApi({ s: 'inasistencias' }, 'fecha=' + fechas.value + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
+  .then((res:any) => {
+    if (res.data) {
+      organizarDatosInasistencias(res.data)
+    }
+  }).catch(() => {
+  })
+}
+
+function organizarDatosInasistencias(data:any) {
+  inasistencias.value = []
+  data.forEach((i:any) => {
+    if (i.id_obs) {
+      inasistencias.value.push({
+        name: i.pnom_alum + ' ' + (i.snom_alum !== 'undefined' ? i.snom_alum : '')
+          + ' ' + i.pape_alum + ' ' + (i.sape_alum !== 'undefined' ? i.sape_alum : ''),
+        abstente: i.inasistencia,
+        justified: i.justificada,
+        tabstense: i.total,
+        pases: i.pases
+      })
+    }
+  })
+}
+function cargaObservaciones() {
+  brunaApi({ s: 'observaciones' }, 'fecha=' + fechas.value + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
+  .then((res:any) => {
+    if (res.data) {
+      organizarDatosObservaciones(res.data)
+    }
+  }).catch(() => {
+  })
+}
+
+function organizarDatosObservaciones(data:any) {
+  observaciones.value = []
+  data.forEach((i:any) => {
+    if (i.id_obs) {
+      observaciones.value.push({
+        name: i.pnom_alum + ' ' + (i.snom_alum !== 'undefined' ? i.snom_alum : '')
+          + ' ' + i.pape_alum + ' ' + (i.sape_alum !== 'undefined' ? i.sape_alum : ''),
+        obs: i.nota_obs,
+        date: i.fec_obs + (i.fec_fin_obs !== i.fec_obs ? " hasta " + i.fec_fin_obs : ''),
+      })
+    }
+  })
+}
+function actualizar() {
+  nombreABuscar.value = ''
+  if (tabActiva.value == 'ast') {
+    cargaInasistencias()
+  } else if (tabActiva.value == 'obs') {
+    cargaObservaciones()
+  }
+}
+watch(()=>tabActiva.value, ()=>{
+  actualizar()
+})
+watch(()=>mencion.value, ()=>{
+  actualizar()
+})
+watch(()=>ano.value, ()=>{
+  actualizar()
+})
+watch(()=>seccion.value, ()=>{
+  actualizar()
+})
+watch(()=>fechasFiltrar.value, ()=>{
+  fechas.value = []
+  fechasFiltrar.value.forEach((f: Date) => fechas.value.push(formatoFechaYHora(f, 'fecha')))
+  actualizar()
+})
 </script>
 <template>
   <v-container class="px-0 px-md-2">
@@ -135,24 +194,51 @@ const plants = ref([
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <v-row class="d-flex flex-wrap">
-          <v-col cols="12" md="auto" class="grid-area--slider">
-            <v-radio-group v-model="año" inline label="Selecciona un año" hide-details>
-              <v-radio label="1" value="1"></v-radio>
-              <v-radio label="2" value="2"></v-radio>
-              <v-radio label="5" value="4"></v-radio>
+          <v-col cols="12" md="auto" class="grid-area--meniones">
+            <v-radio-group
+              v-model="mencion"
+              inline
+              label="Mención"
+            >
+              <v-radio
+                v-for="menc in menciones"
+                :key="menc.id_men"
+                :label="menc.men"
+                :value="menc.id_men"
+              />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="auto" class="grid-area--menciones">
-            <v-radio-group v-model="mencion" inline label="Selecciona una mención" hide-details>
-              <v-radio label="Telemática" value="t"></v-radio>
-              <v-radio label="Administración" value="a"></v-radio>
-              <v-radio label="Contabilidad" value="c"></v-radio>
+          <v-col cols="12" md="auto" class="grid-area--slider">
+            <v-radio-group
+              v-model="ano"
+              inline
+              label="Año"
+            >
+              <v-radio
+                v-if="mencion"
+                v-for="ano in menciones[mencion].ano"
+                :key="ano.id_ano"
+                :label="ano.num_ano"
+                :value="ano.nom_ano"
+              />
+              <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="4" class="grid-area--secciones">
-            <v-radio-group v-model="seccion" inline hide-details label="Selecciona una sección">
-              <v-radio label="'A'" value="a"></v-radio>
-              <v-radio label="'B'" value="b"></v-radio>
+            <v-radio-group
+              v-model="seccion"
+              inline
+              label="Sección"
+            >
+              <v-radio
+                v-if="ano"
+                v-for="sec in menciones[mencion]?.ano[ano]?.sec"
+                :key="sec.id_ano"
+                :label="sec.sec_nom"
+                :value="sec.id_ano"
+              />
+              <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+              <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
             </v-radio-group>
           </v-col>
           <v-col cols="12" md="auto" v-if="tabActiva !== 'pases'" class="grid-area--datetime">
@@ -167,7 +253,11 @@ const plants = ref([
             <v-col cols="12" md="6">
               <v-combobox
                 label="Escribe el nombre del estudiante"
-                :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+                v-model="nombreABuscar"
+                :items="Object.values(estudiantes)"
+                item-value="nombre"
+                item-title="nombre"
+                @input="buscarEstudiante"
               ></v-combobox>
             </v-col>
             <v-col cols="12" md="6">
@@ -184,10 +274,10 @@ const plants = ref([
                 <ReportesPases />
               </v-window-item>
               <v-window-item value="ast">
-                <ReportesInasistencias :students="plants"  />
+                <ReportesInasistencias :students="inasistencias"/>
               </v-window-item>
               <v-window-item value="obs">
-                <ReportesObservaciones :students="plants" />
+                <ReportesObservaciones :students="observaciones" />
               </v-window-item>
             </v-window>
           </v-col>
