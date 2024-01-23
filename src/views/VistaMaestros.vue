@@ -1,44 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import ConfigurarMaestro from '../components/ConfigurarMaestro.vue';
-const profes = ref([
-  {
-    id: 1,
-    nombre: 'Adolfo Manolo Gonzalez Hernandez' ,
-    nom_per: 'Adolfo',
-    snom_per: 'Manolo',
-    ape_per: 'Gonzalez',
-    sape_per: 'Hernandez',
-    materia: 'Biologia',
-  },
-  {
-    id: 2,
-    nombre: 'Maria Sofia Canolo Salado' ,
-    nom_per: 'Adolfo',
-    snom_per: 'Manolo',
-    ape_per: 'Gonzalez',
-    sape_per: 'Hernandez',
-    materia: 'Biologia',
-  },
-  {
-    id: 3,
-    nombre: 'Gregorio Gonzalo' ,
-    nom_per: 'Adolfo',
-    snom_per: 'Manolo',
-    ape_per: 'Gonzalez',
-    sape_per: 'Hernandez',
-    materia: 'Biologia',
-  },
-  {
-    id: 4,
-    nombre: 'Luiza Peña' ,
-    nom_per: 'Adolfo',
-    snom_per: 'Manolo',
-    ape_per: 'Gonzalez',
-    sape_per: 'Hernandez',
-    materia: 'Biologia',
-  }
-])
+import { brunaApi } from '../funciones/api.ts';
 const materias = ref([
   {
     id: 1,
@@ -57,39 +20,85 @@ const materias = ref([
     materia: 'Geografia',
   }
 ])
+const profes = ref([{
+  id_person: '',
+  dia_hor: '',
+  fin_hor: '',
+  inicio_hor: '',
+  nom_mat: '',
+  nom_men: '',
+  num_ano: '',
+  profesor: '',
+  sec_ano: ''
+}])
+const nombreABuscar = ref('')
+const materiaABuscar = ref('')
+const materiaSeleccionada = ref([])
+onMounted(() => {
+	cargaInicial();
+});
+
+function cargaInicial() {
+  brunaApi({ s: 'maestros' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      profes.value = res.data
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+}
+function actualizar() {
+  brunaApi({ s: 'maestros' }, 'nom=' + (nombreABuscar.value !== 'null' ? nombreABuscar.value : '') + '&mat=' + materiaABuscar.value)
+  .then((res:any) => {
+    if (res.data) {
+      profes.value = res.data
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+}
+function filtroMaterias() {
+  let materiaFiltro:any = ''
+  let coma = ''
+  materiaSeleccionada.value.forEach((m: any) => {
+    materiaFiltro += `${coma}'${m.materia}'`
+    coma = ", "
+  })
+  materiaABuscar.value = materiaFiltro
+  actualizar()
+}
 </script>
 <template>
   <v-container>
     <h2>Maestros</h2>
     <v-row>
       <v-col>
-        <v-combobox
-          multiple
+        <v-text-field
+          v-model="nombreABuscar"
           label="Buscar maestro"
-          no-data-text="No se encontro maestros con ese nombre"
-          :items="Object.values(profes)"
-          item-title="nombre"
-          item-value="id"
-          return-object
+          @input="actualizar"
         />
       </v-col>
       <v-col>
         <v-combobox
           multiple
           chips
+          v-model="materiaSeleccionada"
           label="Materia"
           :items="Object.values(materias)"
           item-title="materia"
           item-value="id"
+          @update:model-value="filtroMaterias"
         />
       </v-col>
     </v-row>
     <v-row>
-      <v-col v-for="p in profes" :key="p.id">
+      <v-col v-for="p in profes" :key="p.id_person">
         <v-card>
           <v-card-item>
-            <v-card-title>{{ p.nombre }}</v-card-title>
-            <v-card-subtitle>{{ p.materia }}</v-card-subtitle>
+            <v-card-title>{{ p.profesor }}</v-card-title>
+            <v-card-subtitle>{{ p.nom_mat }}</v-card-subtitle>
           </v-card-item>
           <v-card-text>
             horario
