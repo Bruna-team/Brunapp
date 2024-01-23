@@ -55,12 +55,13 @@ onMounted(() => emit('content', content.value))
 </script>
 
 <template>
-  <v-sheet>
+  <v-sheet color="muted">
     <v-row no-gutters>
       <v-col cols="auto">
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'ESTUDIANTE NOMBRES',
               id: 'Ename',
@@ -76,6 +77,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'REPRESENTANTE NOMBRES',
               id: 'representante',
@@ -91,6 +93,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'ESTUDIANTE CÉDULA',
               id: 'Ecedula',
@@ -106,6 +109,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'MÓDULO',
               id: 'modulo',
@@ -121,6 +125,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'CURSO',
               id: 'Curso',
@@ -136,6 +141,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'SECCIÓN',
               id: 'seccion',
@@ -151,6 +157,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'MENCIÓN',
               id: 'mencion',
@@ -166,6 +173,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'PROFESOR NOMBRES',
               id: 'Pname',
@@ -181,6 +189,7 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'MATERIA',
               id: 'materia',
@@ -196,13 +205,14 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'FECHA DE HOY',
               id: 'Date',
               type: 'Fecha',
             })"
         >
-          <v-chip variant="outlined" color="secundario">
+          <v-chip variant="outlined" color="secundario-claro">
             Fecha de hoy
           </v-chip>
         </v-btn>
@@ -211,13 +221,14 @@ onMounted(() => emit('content', content.value))
         <v-btn
           flat
           class="px-1"
+          color="muted"
           @click="insertSomething({
               text: 'HORA',
               id: 'DateTime',
               type: 'Fecha',
             })"
         >
-          <v-chip variant="outlined" color="secundario">
+          <v-chip variant="outlined" color="secundario-claro">
             Hora
           </v-chip>
         </v-btn>
@@ -257,7 +268,7 @@ onMounted(() => emit('content', content.value))
   border-color: rgb(var(--v-theme-info));
 }
 [data-type="Fecha"] {
-  color: rgb(var(--v-theme-secundario));
-  border-color: rgb(var(--v-theme-secundario));
+  color: rgb(var(--v-theme-secundario-claro));
+  border-color: rgb(var(--v-theme-secundario-claro));
 }
 </style>

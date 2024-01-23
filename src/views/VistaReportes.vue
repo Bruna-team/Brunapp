@@ -28,7 +28,7 @@ const seccion = ref('')
 const nombreABuscar = ref('')
 const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
 
-const menciones = ref<any[]>([{
+const menciones = ref<any[any]>([{
   id_men: '',
   men: '',
   ano: [
