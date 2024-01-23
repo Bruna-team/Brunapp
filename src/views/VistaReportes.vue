@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 import {ref,onMounted,watch} from 'vue'
 import ReportesInasistencias from './reportes/ReportesInasistencias.vue';
 import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
 import ReportesPases from './reportes/ReportesPases.vue';
 import { brunaApi } from '../funciones/api.ts';
 import { formatoFechaYHora } from '../funciones/funciones';
-const fechasFiltrar = ref([])
+const fechasFiltrar = ref()
 const fechas = ref([''])
 const tabActiva = ref('pases')
 const tabs = ref([
@@ -53,6 +55,9 @@ const inasistencias = ref<any[]>([])
 const observaciones = ref<any[]>([])
 onMounted(() => {
 	cargaInicial();
+  const startDate = new Date();
+  const endDate = new Date(new Date().setDate(startDate.getDate() + 4));
+  fechasFiltrar.value = [startDate, endDate];
 });
 
 function cargaInicial() {
@@ -194,7 +199,7 @@ watch(()=>fechasFiltrar.value, ()=>{
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <v-row class="d-flex flex-wrap">
-          <v-col cols="12" md="auto" class="grid-area--meniones">
+          <v-col cols="12" md="auto">
             <v-radio-group
               v-model="mencion"
               inline
@@ -208,7 +213,7 @@ watch(()=>fechasFiltrar.value, ()=>{
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="auto" class="grid-area--slider">
+          <v-col cols="12" md="auto">
             <v-radio-group
               v-model="ano"
               inline
@@ -224,7 +229,7 @@ watch(()=>fechasFiltrar.value, ()=>{
               <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="4" class="grid-area--secciones">
+          <v-col cols="12" md="4">
             <v-radio-group
               v-model="seccion"
               inline
@@ -242,13 +247,8 @@ watch(()=>fechasFiltrar.value, ()=>{
             </v-radio-group>
           </v-col>
           <template v-if="tabActiva !== 'pases'">
-            <v-col cols="12" md="auto" class="grid-area--datetime">
-              <v-date-picker
-                v-model="fechasFiltrar"
-                show-adjacent-months
-                multiple
-                class="flex-fill"
-              />
+            <v-col cols="12" md="auto">
+              <VueDatePicker v-model="fechasFiltrar" range text-input inline dark />
             </v-col>
           </template>
           <template v-else>
@@ -276,7 +276,7 @@ watch(()=>fechasFiltrar.value, ()=>{
               />
             </v-col>
           </template>
-          <v-col cols="12" :md="tabActiva !== 'pases' ? '' : '12'" class="grid-area--tabActiva">
+          <v-col cols="12" :md="tabActiva !== 'pases' ? '' : '12'">
             <v-window v-model="tabActiva" >
               <v-window-item value="pases">
                 <ReportesPases />
@@ -294,56 +294,3 @@ watch(()=>fechasFiltrar.value, ()=>{
     </v-card>
   </v-container>
 </template>
-<style>
-.v-date-picker-header {
-  padding-bottom: 0;
-}
-.v-picker-title {
-  display: none !important;
-}
-/* .grid-container--reportes {
-  @media (min-width: 600px) {
-    display: grid;
-    grid-template-areas:
-    'slider slider'
-    'datetime menciones'
-    'datetime secciones'
-    'datetime secciones'
-    'tabActiva tabActiva';
-  }
-  @media (min-width: 960px) {
-    grid-template-areas:
-    'datetime slider'
-    'datetime menciones'
-    'datetime secciones'
-    'tabActiva tabActiva';
-  }
-  @media (min-width: 1280px) {
-    grid-template-areas:
-    'slider menciones secciones'
-    'datetime tabActiva tabActiva';
-  }
-}
-.grid-area--slider { grid-area: slider;}
-.grid-area--menciones { grid-area: menciones;}
-.grid-area--secciones { grid-area: secciones;}
-.grid-area--datetime { grid-area: datetime;}
-.grid-area--tabActiva {
-  grid-area: tabActiva;
-  grid-auto-columns: min-content;
-}
-.tabPases .grid-container--reportes {
-  @media (min-width: 600px) {
-    grid-template-areas:
-    'slider slider'
-    'menciones menciones'
-    'secciones secciones'
-    'tabActiva tabActiva';
-  }
-  @media (min-width: 960px) {
-    grid-template-areas:
-      'slider slider menciones secciones'
-      'tabActiva tabActiva tabActiva tabActiva';
-  }
-} */
-</style>
