@@ -347,12 +347,14 @@ async function validarFormEst () {
   loading.value = false
 }
 function cargaInicial() {
+  sectionLoading.value = true
   brunaApi({ s: 'motivos' }, '')
   .then((res:any) => {
     if (res.data) {
       motivos.value = res.data
     }
   }).catch(() => {
+    sectionLoading.value = false
     // message: 'Hubo un error cargando los datos',
   })
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
@@ -362,8 +364,10 @@ function cargaInicial() {
       estudiantes.value = res.data.estd
     }
   }).catch(() => {
+    sectionLoading.value = false
     // message: 'Hubo un error cargando los datos',
   })
+  sectionLoading.value = false
 }
 function buscarEstudiante(id:string) {
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec + "&estd=" + id)
@@ -377,6 +381,7 @@ function buscarEstudiante(id:string) {
   })
 }
 function organizarDatos(data:any) {
+  sectionLoading.value = true
   alumno.value.nombre = data.alum[0].pnom_alum + ' ' + (data.alum[0].snom_alum !== 'undefined' ? data.alum[0].snom_alum : '')
   + ' ' + data.alum[0].pape_alum + ' ' + (data.alum[0].sape_alum !== 'undefined' ? data.alum[0].sape_alum : '')
   alumno.value.id = data.alum[0].id_alum
