@@ -110,7 +110,7 @@ function buscarEstudiante() {
   })
 }
 function cargaInasistencias() {
-  brunaApi({ s: 'inasistencias' }, 'fecha=' + fechas.value + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
+  brunaApi({ s: 'inasistencias' }, 'desde=' + fechas.value[0] + '&hasta=' + fechas.value[1] + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
   .then((res:any) => {
     if (res.data) {
       organizarDatosInasistencias(res.data)
@@ -135,7 +135,7 @@ function organizarDatosInasistencias(data:any) {
   })
 }
 function cargaObservaciones() {
-  brunaApi({ s: 'observaciones' }, 'fecha=' + fechas.value + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
+  brunaApi({ s: 'observaciones' }, 'desde=' + fechas.value[0] + '&hasta=' + fechas.value[1] + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
   .then((res:any) => {
     if (res.data) {
       organizarDatosObservaciones(res.data)
@@ -179,7 +179,11 @@ watch(()=>seccion.value, ()=>{
 })
 watch(()=>fechasFiltrar.value, ()=>{
   fechas.value = []
-  fechasFiltrar.value.forEach((f: Date) => fechas.value.push(formatoFechaYHora(f, 'fecha')))
+  fechasFiltrar.value.forEach((f: Date) => {
+    if (f) {
+      fechas.value.push(formatoFechaYHora(f, 'fecha'))
+    }
+  })
   actualizar()
 })
 </script>
