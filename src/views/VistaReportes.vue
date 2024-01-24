@@ -8,7 +8,7 @@ import ReportesPases from './reportes/ReportesPases.vue';
 import { brunaApi } from '../funciones/api.ts';
 import { formatoFechaYHora } from '../funciones/funciones';
 import { useTheme, useDisplay } from 'vuetify'
-const { mobile } = useDisplay()
+const { lgAndUp } = useDisplay()
 const theme = ref(useTheme().name)
 const fechasFiltrar = ref()
 const fechas = ref([''])
@@ -183,17 +183,10 @@ watch(()=>fechasFiltrar.value, ()=>{
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <v-row class="d-flex flex-wrap">
-          <v-col cols="12" sm="5" class="px-0">
-            <!-- <v-select
-              v-model="mencion"
-              label="Mención"
-              hide-details
-              :items="Object.values(menciones)"
-              item-title="men"
-              item-value="id_men"
-              /> -->
+          <v-col cols="12" sm="5" lg="auto" class="px-0">
               <v-radio-group
                 v-model="mencion"
+                :inline="lgAndUp"
                 label="Mención"
                 hide-details
               >
@@ -205,7 +198,7 @@ watch(()=>fechasFiltrar.value, ()=>{
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" sm="7" class="px-0">
+          <v-col cols="12" sm="7" class="px-0 d-lg-flex">
             <v-radio-group
               v-model="ano"
               inline
@@ -238,12 +231,12 @@ watch(()=>fechasFiltrar.value, ()=>{
               <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="auto" v-if="tabActiva !== 'pases'">
+          <v-col cols="12" lg="auto" v-if="tabActiva !== 'pases'">
             <VueDatePicker
               v-model="fechasFiltrar"
               :range="tabActiva !== 'pases'"
               text-input
-              :inline="!mobile"
+              :inline="lgAndUp"
               :dark="theme == 'darkTheme'"
               :action-row="{ showNow: true }"
               now-button-label="Hoy"
