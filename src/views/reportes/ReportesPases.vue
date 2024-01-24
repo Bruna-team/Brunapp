@@ -10,13 +10,13 @@ const content = ref('')
 <template>
   <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
   <v-toolbar flat>
-    <v-toolbar-title>Configura el formato de pase que deseas generar</v-toolbar-title>
+    <v-toolbar-title  class="flex-fill">Configura el formato de pase que deseas generar</v-toolbar-title>
+    <v-spacer/>
     <v-divider
       class="mx-4"
       inset
       vertical
-    ></v-divider>
-    <v-spacer></v-spacer>
+    />
     <ModalImpresion
       :quill="true"
       :content="content ? content : []"
