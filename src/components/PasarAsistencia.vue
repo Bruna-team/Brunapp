@@ -4,7 +4,7 @@ import { brunaApi } from '../funciones/api.ts';
 import { formatoFechaYHora } from '../funciones/funciones';
 formatoFechaYHora
 const props = defineProps({
-  id_sec: {
+  seccion: {
     type: String,
     default: ''
   },
@@ -23,14 +23,16 @@ const estudiantes = ref([
 ])
 const asistencias = ref([])
 function cargaInicial() {
-  brunaApi({ s: 'sesion' }, 'ano=' + props.id_sec)
-  .then((res:any) => {
-    if (res.data) {
-      estudiantes.value = res.data.estd
-    }
-  }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
-  })
+  if (props.seccion) {
+    brunaApi({ s: 'estudiantes' }, 'ano=' + props.seccion)
+    .then((res:any) => {
+      if (res.data) {
+        estudiantes.value = res.data
+      }
+    }).catch(() => {
+      // message: 'Hubo un error cargando los datos',
+    })
+  }
 }
 onMounted(() => {
 	cargaInicial();
