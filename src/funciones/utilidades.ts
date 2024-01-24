@@ -5,6 +5,8 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs
 // @ts-ignore
 import htmlToPdfmake from 'html-to-pdfmake';
+import { Quill } from '@vueup/vue-quill'
+import BlotFormatter from 'quill-blot-formatter'
 
 /**
  * Función de impresión con Quill
@@ -129,7 +131,6 @@ function imprimirPdf (
   }
   pdfMake.createPdf(docDefinition).open()
 }
-
 /**
  * Evita que las imágenes queden en un stack aparte y no junto al texto
  * @param {*} ret lista de items a evaluar
@@ -171,5 +172,33 @@ function conversorDeUnidad(mm: number) {
   const pts = cm / 2.54 * 72
   return pts
 }
+function QuillConfig() {
+  const Embed = Quill.import('blots/embed')
+    /**
+     * SpanEmbed
+     */
+    class SpanEmbed extends Embed {
+      /**
+       * Create span template
+       * @param {*} value {text: String, id: String, type: String,}
+       * @return {*} node
+       */
+      static create(value: {text: String, id: String, type: String,}) {
+        const node = super.create();
+        node.setAttribute('data-type', value.type);
+        node.setAttribute('data-id', value.id);
+        node.innerText = value.text;
+        return node;
+      }
+    }
+    // @ts-ignore
+    SpanEmbed.blotName = 'spanEmbed';
+    // @ts-ignore
+    SpanEmbed.tagName = 'span';
+    // @ts-ignore
+    SpanEmbed.className='editor-var';
+    Quill.register(SpanEmbed);
+    Quill.register('modules/blotFormatter', BlotFormatter);
+}
 
-export {imprimirPdf}
+export {imprimirPdf, QuillConfig}

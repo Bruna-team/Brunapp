@@ -7,6 +7,8 @@ import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
 import ReportesPases from './reportes/ReportesPases.vue';
 import { brunaApi } from '../funciones/api.ts';
 import { formatoFechaYHora } from '../funciones/funciones';
+import { useTheme } from 'vuetify'
+const theme = ref(useTheme().name)
 const fechasFiltrar = ref()
 const fechas = ref([''])
 const tabActiva = ref('pases')
@@ -248,7 +250,18 @@ watch(()=>fechasFiltrar.value, ()=>{
           </v-col>
           <template v-if="tabActiva !== 'pases'">
             <v-col cols="12" md="auto">
-              <VueDatePicker v-model="fechasFiltrar" range text-input inline dark />
+              <VueDatePicker
+                v-model="fechasFiltrar"
+                range
+                text-input
+                inline
+                :dark="theme == 'darkTheme'"
+                :action-row="{ showNow: true }"
+                now-button-label="Hoy"
+                locale="es"
+                selectText="Seleccionar"
+                :enable-time-picker="false"
+              />
             </v-col>
           </template>
           <template v-else>
