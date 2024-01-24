@@ -7,7 +7,8 @@ import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
 import ReportesPases from './reportes/ReportesPases.vue';
 import { brunaApi } from '../funciones/api.ts';
 import { formatoFechaYHora } from '../funciones/funciones';
-import { useTheme } from 'vuetify'
+import { useTheme, useDisplay } from 'vuetify'
+const { mobile } = useDisplay()
 const theme = ref(useTheme().name)
 const fechasFiltrar = ref()
 const fechas = ref([''])
@@ -32,27 +33,8 @@ const seccion = ref('')
 const nombreABuscar = ref('')
 const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
 
-const menciones = ref<any[any]>([{
-  id_men: '',
-  men: '',
-  ano: [
-    {
-      id_ano: '',
-      nom_ano: '',
-      num_ano: '',
-      sec: [
-        {
-          id_ano: '',
-          sec_nom: '',
-        }
-      ]
-    }
-  ]
-}])
-const estudiantes = ref([{
-  id_estd: '',
-  nombre: ''
-}]);
+const menciones = ref<any[any]>()
+const estudiantes = ref<[{id_estd: String, nombre: String}] | []>([]);
 const inasistencias = ref<any[]>([])
 const observaciones = ref<any[]>([])
 onMounted(() => {
@@ -71,7 +53,6 @@ function cargaInicial() {
   }).catch(() => {
   })
 }
-
 function organizarSecciones(data:string[]) {
   const dataMen:any = {}
   data.forEach((d:any) => {
@@ -99,7 +80,6 @@ function organizarSecciones(data:string[]) {
   })
   menciones.value = dataMen
 }
-
 function buscarEstudiante() {
   brunaApi({ s: 'burcarEstudiante' }, 'nom=' + nombreABuscar.value + '&ano=' + seccion.value)
   .then((res:any) => {
@@ -118,7 +98,6 @@ function cargaInasistencias() {
   }).catch(() => {
   })
 }
-
 function organizarDatosInasistencias(data:any) {
   inasistencias.value = []
   data.forEach((i:any) => {
@@ -143,7 +122,6 @@ function cargaObservaciones() {
   }).catch(() => {
   })
 }
-
 function organizarDatosObservaciones(data:any) {
   observaciones.value = []
   data.forEach((i:any) => {
@@ -201,12 +179,20 @@ watch(()=>fechasFiltrar.value, ()=>{
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <v-row class="d-flex flex-wrap">
-          <v-col cols="12" md="auto">
-            <v-radio-group
+          <v-col cols="12" sm="5" class="px-0">
+            <!-- <v-select
               v-model="mencion"
-              inline
               label="Mención"
-            >
+              hide-details
+              :items="Object.values(menciones)"
+              item-title="men"
+              item-value="id_men"
+              /> -->
+              <v-radio-group
+                v-model="mencion"
+                label="Mención"
+                hide-details
+              >
               <v-radio
                 v-for="menc in menciones"
                 :key="menc.id_men"
@@ -215,11 +201,12 @@ watch(()=>fechasFiltrar.value, ()=>{
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" md="auto">
+          <v-col cols="12" sm="7" class="px-0">
             <v-radio-group
               v-model="ano"
               inline
               label="Año"
+              hide-details
             >
               <v-radio
                 v-if="mencion"
@@ -230,12 +217,11 @@ watch(()=>fechasFiltrar.value, ()=>{
               />
               <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
             </v-radio-group>
-          </v-col>
-          <v-col cols="12" md="4">
             <v-radio-group
               v-model="seccion"
               inline
               label="Sección"
+              hide-details
             >
               <v-radio
                 v-if="ano"
@@ -248,30 +234,40 @@ watch(()=>fechasFiltrar.value, ()=>{
               <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
             </v-radio-group>
           </v-col>
-          <template v-if="tabActiva !== 'pases'">
-            <v-col cols="12" md="auto">
+          <v-col cols="12" md="auto" v-if="tabActiva !== 'pases'">
+            <VueDatePicker
+              v-model="fechasFiltrar"
+              :range="tabActiva !== 'pases'"
+              text-input
+              :inline="!mobile"
+              :dark="theme == 'darkTheme'"
+              :action-row="{ showNow: true }"
+              now-button-label="Hoy"
+              locale="es"
+              selectText="Seleccionar"
+              :enable-time-picker="false"
+            />
+          </v-col>
+          <template v-else>
+            <v-col cols="12" sm="6" md="4">
               <VueDatePicker
-                v-model="fechasFiltrar"
-                range
+                v-model="paseFecha"
                 text-input
-                inline
                 :dark="theme == 'darkTheme'"
                 :action-row="{ showNow: true }"
                 now-button-label="Hoy"
                 locale="es"
                 selectText="Seleccionar"
-                :enable-time-picker="false"
               />
             </v-col>
-          </template>
-          <template v-else>
-            <v-col cols="12" md="4">
+            <v-col cols="12" sm="6" md="4">
               <v-combobox
                 label="Escribe el nombre del estudiante"
                 v-model="nombreABuscar"
                 :items="Object.values(estudiantes)"
                 item-value="nombre"
                 item-title="nombre"
+                hide-details
                 @input="buscarEstudiante"
               ></v-combobox>
             </v-col>
@@ -281,15 +277,8 @@ watch(()=>fechasFiltrar.value, ()=>{
                 :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
               ></v-combobox>
             </v-col> -->
-            <v-col cols="12" md="4">
-              <v-text-field
-                label="Especifica si la fecha es de hoy"
-                type="date"
-                v-model="paseFecha"
-              />
-            </v-col>
           </template>
-          <v-col cols="12" :md="tabActiva !== 'pases' ? '' : '12'">
+          <v-col cols="12" sm="" :md="tabActiva !== 'pases' ? '' : '12'">
             <v-window v-model="tabActiva" >
               <v-window-item value="pases">
                 <ReportesPases />

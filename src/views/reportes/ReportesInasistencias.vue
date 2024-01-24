@@ -67,13 +67,13 @@ const contentPrint = computed(() => {
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Inasistencias</v-toolbar-title>
+        <v-toolbar-title  class="flex-fill">Inasistencias</v-toolbar-title>
+        <v-spacer />
         <v-divider
           class="mx-4"
           inset
           vertical
-        ></v-divider>
-        <v-spacer></v-spacer>
+        />
         <ModalImpresion
           :title="'Inasistencias'"
           :seccion="'primero A'"
