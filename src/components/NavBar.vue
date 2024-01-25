@@ -37,9 +37,9 @@ const drawer = ref(false)
       <v-icon icon="mdi-file-chart" />
       Reportes
     </RouterLink>
-    <RouterLink to="/diario" class="ma-2 nav-link">
-      <v-icon icon="mdi-notebook" />
-      Diario
+    <RouterLink to="/configuracion" class="ma-2 nav-link">
+      <v-icon icon="mdi-cog" />
+      Configuración
     </RouterLink>
     <RouterLink to="/usuario" class="ma-2 nav-link">
       <v-icon icon="mdi-account" />
