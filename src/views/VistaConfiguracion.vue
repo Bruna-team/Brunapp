@@ -167,7 +167,7 @@ function AgregarHorario() {
               variant="text"
               :icon="horario.active ? 'mdi-circle' : 'mdi-minus-circle'"
               :class="horario.active ? 'text-secundario' : 'text-muted'"
-              @click="horario.active = !horario.active"
+              @click="horario.active = !horario.active, horario.edit = false"
             />
             <v-btn
               variant="text"
@@ -219,7 +219,7 @@ function AgregarHorario() {
               variant="text"
               :icon="materia.active ? 'mdi-circle' : 'mdi-minus-circle'"
               :class="materia.active ? 'text-secundario' : 'text-muted'"
-              @click="materia.active = !materia.active"
+              @click="materia.active = !materia.active, materia.edit = false"
             />
             <v-btn
               variant="text"
