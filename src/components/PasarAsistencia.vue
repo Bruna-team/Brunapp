@@ -62,17 +62,14 @@ onMounted(() => {
         <v-card>
           <v-card-text style="height: 300px;">
             <v-text-field v-model="asisDate" type="date" label="Selecciona la fecha de la asistencia" />
-            <v-radio-group
+            <v-checkbox
               v-model="asistencias"
-            >
-              <v-radio
-                v-for="estudiante in estudiantes"
-                :key="estudiante.id_estd"
-                :label="`${estudiante.pnom_alum} ${estudiante.snom_alum || ''} ${estudiante.pape_alum} ${estudiante.sape_alum || ''}`"
-                  multiple
-                :value="estudiante.id_estd"
-              ></v-radio>
-            </v-radio-group>
+              v-for="estudiante in estudiantes"
+              :key="estudiante.id_estd"
+              :label="`${estudiante.pnom_alum} ${estudiante.snom_alum || ''} ${estudiante.pape_alum} ${estudiante.sape_alum || ''}`"
+              :value="estudiante.id_estd"
+              hide-details
+            />
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions>
