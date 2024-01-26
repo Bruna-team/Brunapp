@@ -2,8 +2,8 @@
 import { computed, ref } from "vue";
 import ModalImpresion from "../../components/ModalImpresion.vue"
 const props = defineProps({
-  students: {type: Array, default: ref<any[] | [{name: String, obs: string, date: string}]>([])
-  },
+  students: {type: Array, default: ref<any[] | [{name: String, obs: string, date: string}]>([])},
+  subtitle: String
 })
 const header = ref([
   {
@@ -41,7 +41,7 @@ const contentPrint = computed(() => {
       table: {
         headerRows: 1,
         body: tabla,
-        widths: [100, '*', 200,]
+        widths: [200, '*', 150,]
       },
       layout: 'lightHorizontalLines'
   })
@@ -66,8 +66,8 @@ const contentPrint = computed(() => {
           vertical
         />
         <ModalImpresion
-          :title="'Inasistencias'"
-          :subtitle="'Primero A Telemática'"
+          :title="'Observaciones'"
+          :subtitle="props.subtitle"
           :content="contentPrint"
         />
       </v-sheet>

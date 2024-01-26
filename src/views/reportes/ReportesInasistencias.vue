@@ -3,6 +3,7 @@ import ModalImpresion from "../../components/ModalImpresion.vue"
 import {ref, computed} from 'vue'
 const props = defineProps({
   students: {type: Array, default: []},
+  subtitle: String
 })
 const headers = ref([
   {
@@ -77,7 +78,8 @@ const contentPrint = computed(() => {
         />
         <ModalImpresion
           :title="'Inasistencias'"
-          :subtitle="'Primero A Telemática'"
+          :subtitle="props.subtitle"
+          :datos-validos="!!props.subtitle?.length"
           :content="contentPrint"
         />
       </v-sheet>

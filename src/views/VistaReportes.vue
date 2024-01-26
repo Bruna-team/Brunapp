@@ -59,6 +59,13 @@ const dataPase = computed(()=> {
     // materia: '',
   }
 })
+const printSubtitle = computed(() => {
+  if (inasistencias.value.length || observaciones.value.length) {
+    if (mencion.value && ano.value && seccion.value) {
+      return `${mencion.value ? menciones.value[Number(mencion.value)].men : estudiante.value.nom_men} ${ano.value} - ${seccion.value}`
+    } else ''
+  } else ''
+})
 function cargaInicial() {
   brunaApi({ s: 'menciones' }, '')
   .then((res:any) => {
@@ -306,10 +313,16 @@ onMounted(() => {
                 <ReportesPases :dataPase="dataPase" />
               </v-window-item>
               <v-window-item value="ast">
-                <ReportesInasistencias :students="inasistencias"/>
+                <ReportesInasistencias
+                  :students="inasistencias"
+                  :subtitle="printSubtitle"
+                  />
               </v-window-item>
               <v-window-item value="obs">
-                <ReportesObservaciones :students="observaciones" />
+                <ReportesObservaciones
+                  :students="observaciones"
+                  :subtitle="printSubtitle"
+                  />
               </v-window-item>
             </v-window>
           </v-col>
