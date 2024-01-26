@@ -4,7 +4,7 @@ import { CalendarView, CalendarViewHeader, CalendarMath } from "vue-simple-calen
 import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
-import AgregarEstudiante from "../components/AgregarEstudiante.vue";
+// import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
@@ -499,12 +499,12 @@ watch(()=>cedRe.value.value, ()=>{
         {{  alumno.men }}
         </span>
       </span>
-      <AgregarEstudiante
+      <!-- <AgregarEstudiante
         :data-academica="menciones"
         :variant="true"
         :classBtn="'float-right float-lg-none mt-2 mt-lg-1'"
         @recargar="cargaInicial"
-      />
+      /> -->
     </v-list-item>
     <v-list v-if="estudiantes[0].id_estd" lines="one" density="compact" nav>
       <v-list-item
