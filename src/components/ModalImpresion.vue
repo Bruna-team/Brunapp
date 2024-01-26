@@ -45,6 +45,7 @@ const docConfiguration = ref({
   >
     <template v-slot:activator="{ props }">
       <v-btn
+        variant="tonal"
         prepend-icon="mdi-printer"
         text="Imprimir"
         class="mb-2"

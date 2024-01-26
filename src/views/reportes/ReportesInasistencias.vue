@@ -66,9 +66,10 @@ const contentPrint = computed(() => {
     :sort-by="[{ key: 'pases', order: 'desc' }]"
   >
     <template v-slot:top>
-      <v-toolbar flat>
-        <v-toolbar-title  class="flex-fill">Inasistencias</v-toolbar-title>
-        <v-spacer />
+      <v-sheet flat color="muted" class="d-flex align-center pa-3 rounded-t-lg">
+        <p class="text-h6 flex-1-1-100 flex-md-fill">
+          Inasistencias
+        </p>
         <v-divider
           class="mx-4"
           inset
@@ -76,10 +77,10 @@ const contentPrint = computed(() => {
         />
         <ModalImpresion
           :title="'Inasistencias'"
-          :seccion="'primero A'"
+          :subtitle="'Primero A Telemática'"
           :content="contentPrint"
         />
-      </v-toolbar>
+      </v-sheet>
     </template>
   </v-data-table>
 </template>

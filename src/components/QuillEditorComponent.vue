@@ -13,9 +13,8 @@ const editor = ref()
 const editorOptions = ref({
   modules: {
     toolbar: [
-      [{'header': [1, 2, 3, 4, 5, 6, false]}],
-      [{ 'font': [] }],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote', {'color': []}, {'background': []}, 'clean'],
+      [{'header': [1, 2, 3, 4, 5, 6, false]}, { 'font': [] }, 'bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'color': []}, {'background': []}, 'clean'],
       [{ 'direction': 'rtl' }, {'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}, 'image'],
     ],
     blotFormatter: {},
