@@ -43,11 +43,14 @@ const observaciones = ref<any[]>([])
 
 const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
 const dataPase = computed(()=> {
+  const hor = paseFecha.value.split('T')
   return {
-    ano: ano.value,
-    mencion: mencion.value ? menciones.value[Number(mencion.value)].men : '',
-    seccion: seccion.value,
-    pasefecha: paseFecha.value,
+    ano: ano.value || estudiante.value.num_ano,
+    mencion: mencion.value ? menciones.value[Number(mencion.value)].men : estudiante.value.nom_men,
+    seccion: seccion.value || estudiante.value.sec_ano,
+    pasefecha: hor[0],
+    pasehor: hor[1],
+    id: estudiante.value.id_estd,
     estudiante: estudiante.value.nombre,
     estudianteCedula: estudiante.value.ced_alum,
     representante: estudiante.value.representantes,
@@ -269,14 +272,12 @@ onMounted(() => {
           </v-col>
           <template v-else>
             <v-col cols="12" sm="6" md="4">
-              <VueDatePicker
+              <v-text-field
                 v-model="paseFecha"
-                text-input
-                :dark="theme == 'darkTheme'"
-                :action-row="{ showNow: true }"
-                now-button-label="Hoy"
-                locale="es"
-                selectText="Seleccionar"
+                label="Fecha y hora del pase"
+                type="datetime-local"
+                persistent-hint
+                class="mb-3"
               />
             </v-col>
             <v-col cols="12" sm="6" md="4">

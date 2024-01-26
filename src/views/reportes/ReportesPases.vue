@@ -5,6 +5,7 @@ import AlertaMensaje from '../../components/AlertaMensaje.vue'
 import QuillEditorComponentVue from '../../components/QuillEditorComponent.vue';
 import { formatoFechaYHora } from '../../funciones/funciones';
 import { useDisplay } from 'vuetify';
+import { brunaApi } from "../../funciones/api";
 const props = defineProps({
   dataPase: {
     type: Object,
@@ -13,8 +14,10 @@ const props = defineProps({
       mencion: string,
       seccion: string,
       pasefecha: string,
+      pasehor: string,
+      id: string,
       estudiante: string,
-      estudianteCedula: String,
+      estudianteCedula: string,
       representante: string,
     } | {}>({})
   }
@@ -23,7 +26,7 @@ const { smAndUp } = useDisplay()
 
 const alertaMsj = ref('')
 const content = ref('')
-const paseTipo = ref(true)
+const paseTipo = ref('')
 const valido = computed(() => {
   return Object.values(props.dataPase).every((d: any) => d !== '')
 })
@@ -117,6 +120,22 @@ function sustituirSpandEmbed() {
     }
   })
 }
+function registrarPase() {
+  if (props.dataPase.id.length && paseTipo.value && props.dataPase.pasefecha) {
+    brunaApi({ s: 'registrarPases' }, 'alum=' + props.dataPase.id + '&pase=' + paseTipo.value + '&fec=' + props.dataPase.pasefecha + '&mot=' + ' ' + '&hor=' + props.dataPase.pasehor)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+      } else {
+        alertaMsj.value = res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Ocurrió un error"
+    })
+  } else { 
+    alertaMsj.value = "Faltan datos"
+  }
+}
 watch(()=> props.dataPase,()=> {
   sustituirSpandEmbed()
   const elements = document.getElementsByClassName('ql-editor');
@@ -130,8 +149,8 @@ watch(()=> props.dataPase,()=> {
     <div class="flex-fill">
       <p class="text-caption">Especifica el tipo de pase</p>
       <v-radio-group v-model="paseTipo" inline>
-        <v-radio :value="true" label="Pase de entrada" />
-        <v-radio :value="false" label="Pase de salida" />
+        <v-radio value="5" label="Pase de entrada" />
+        <v-radio value="6" label="Pase de salida" />
       </v-radio-group>
     </div>
     <div class="text-center">
@@ -141,6 +160,7 @@ watch(()=> props.dataPase,()=> {
         color="primario"
         prepend-icon="mdi-content-save"
         text="Registar"
+        @click="registrarPase"
       />
     </div>
   </v-sheet>

@@ -48,7 +48,7 @@ function guardarInasistencias() {
         alertaMsj.value = res.data.e
       }
     }).catch(() => {
-      alertaMsj.value = res.data.e
+      alertaMsj.value = "Ocurrió un error"
     })
   }
 }
