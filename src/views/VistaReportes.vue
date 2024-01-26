@@ -41,7 +41,7 @@ const menciones = ref<any[any]>()
 const inasistencias = ref<any[]>([])
 const observaciones = ref<any[]>([])
 
-const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
+const paseFecha = ref(formatoFechaYHora(new Date(), 'FechayHora'))
 const dataPase = computed(()=> {
   const hor = paseFecha.value.split('T')
   return {

@@ -121,7 +121,7 @@ function sustituirSpandEmbed() {
   })
 }
 function registrarPase() {
-  if (props.dataPase.id.length && paseTipo.value && props.dataPase.pasefecha) {
+  if (props.dataPase.id && paseTipo.value && props.dataPase.pasefecha) {
     brunaApi({ s: 'registrarPases' }, 'alum=' + props.dataPase.id + '&pase=' + paseTipo.value + '&fec=' + props.dataPase.pasefecha + '&mot=' + ' ' + '&hor=' + props.dataPase.pasehor)
     .then((res:any) => {
       if (res.data.r) {
@@ -132,7 +132,7 @@ function registrarPase() {
     }).catch(() => {
       alertaMsj.value = "Ocurrió un error"
     })
-  } else { 
+  } else {
     alertaMsj.value = "Faltan datos"
   }
 }
