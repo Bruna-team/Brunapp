@@ -93,7 +93,9 @@ function sustituirSpandEmbed() {
 }
 watch(()=> props.dataPase,()=> {
   sustituirSpandEmbed()
-  // content = document.get
+  const elements = document.getElementsByClassName('ql-editor');
+  const elementContents = Array.from(elements).map(element => element.innerHTML)[0];
+  content.value = JSON.stringify(elementContents).replace(/"/g, '')
 })
 </script>
 <template>
