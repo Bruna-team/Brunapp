@@ -3,7 +3,7 @@ import {ref,onMounted} from 'vue'
 import { brunaApi } from '../funciones/api.ts';
 import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
-// import PasarAsistencia from '../components/PasarAsistencia.vue';
+import PasarAsistencia from '../components/PasarAsistencia.vue';
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
 const tabsLoading = ref<boolean>(true)
@@ -130,7 +130,7 @@ function organizarSecciones(data:string[]) {
                         </p>
                       </v-list-item>
                     </RouterLink>
-                    <!-- <PasarAsistencia :seccion="s.id_ano" /> -->
+                    <PasarAsistencia :seccion="s.id_ano" />
                   </article>
                 </v-sheet>
               </v-card>
