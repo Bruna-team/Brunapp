@@ -30,7 +30,11 @@ const fechas = ref([''])
 const ano = ref('')
 const mencion = ref('')
 const seccion = ref('')
-const nombreABuscar = ref('')
+const estudiante = ref<any>({
+  ced_alum: '',
+  nombre: '',
+  representantes: '',
+})
 
 const estudiantes = ref<[{id_estd: String, nombre: String}] | []>([]);
 const menciones = ref<any[any]>()
@@ -44,11 +48,11 @@ const dataPase = computed(()=> {
     mencion: mencion.value ? menciones.value[Number(mencion.value)].men : '',
     seccion: seccion.value,
     pasefecha: paseFecha.value,
-    estudiante: nombreABuscar.value,
-    // estudianteCedula: '',
+    estudiante: estudiante.value.nombre,
+    estudianteCedula: estudiante.value.ced_alum,
+    representante: estudiante.value.representantes,
     // modulo: '',
     // profesor: '',
-    // representante: '',
     // materia: '',
   }
 })
@@ -89,7 +93,7 @@ function organizarSecciones(data:string[]) {
   menciones.value = dataMen
 }
 function buscarEstudiante() {
-  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + nombreABuscar.value + '&ano=' + seccion.value)
+  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + estudiante.value.nombre + '&ano=' + seccion.value)
   .then((res:any) => {
     if (res.data) {
       estudiantes.value = res.data
@@ -144,7 +148,11 @@ function organizarDatosObservaciones(data:any) {
   })
 }
 function actualizar() {
-  nombreABuscar.value = ''
+  estudiante.value = {
+    ced_alum: '',
+    nombre: '',
+    representantes: '',
+  }
   if (tabActiva.value == 'ast') {
     cargaInasistencias()
   } else if (tabActiva.value == 'obs') {
@@ -274,11 +282,13 @@ onMounted(() => {
             <v-col cols="12" sm="6" md="4">
               <v-autocomplete
                 label="Escribe el nombre del estudiante"
-                v-model="nombreABuscar"
+                v-model="estudiante"
                 :items="Object.values(estudiantes)"
                 item-value="nombre"
                 item-title="nombre"
+                return-object
                 hide-details
+                no-data-text="Sin estudiantes que coincidan "
                 @input="buscarEstudiante"
               ></v-autocomplete>
             </v-col>

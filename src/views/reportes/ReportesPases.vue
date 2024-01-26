@@ -13,7 +13,10 @@ const props = defineProps({
       mencion: string,
       seccion: string,
       pasefecha: string,
-      estudiante: string,} | {}>({})
+      estudiante: string,
+      estudianteCedula: String,
+      representante: string,
+    } | {}>({})
   }
 })
 const { smAndUp } = useDisplay()
@@ -32,59 +35,82 @@ function sustituirSpandEmbed() {
       case 'Estudiante':
         switch(id) {
           case 'Ename':
-            e.getElementsByTagName('span')[0].textContent =
-            props.dataPase.estudiante
+            if(props.dataPase.estudiante) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.estudiante
+            }
             break;
-          // case 'representante':
-          //   e.getElementsByTagName('span')[0].textContent =
-          //   props.dataPase.representante
-          //   break;
-          // case 'Ecedula':
-          //   e.getElementsByTagName('span')[0].textContent =
-          //   props.dataPase.estudianteCedula
-          //   break;
+          case 'representante':
+            if(props.dataPase.representante) {
+               e.getElementsByTagName('span')[0].textContent =
+               props.dataPase.representante
+            }
+            break;
+          case 'Ecedula':
+            if(props.dataPase.estudianteCedula) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.estudianteCedula
+            }
+            break;
         }
         break;
       case 'Academico':
         switch(id) {
-          // case 'modulo':
-          //   e.getElementsByTagName('span')[0].textContent =
-          //   props.dataPase.modulo
-          //   break;
+           case 'modulo':
+            if(props.dataPase.modulo) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.modulo
+            }
+            break;
           case 'seccion':
-            e.getElementsByTagName('span')[0].textContent =
-            props.dataPase.seccion
+            if(props.dataPase.seccion) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.seccion
+            }
             break;
           case 'mencion':
-            e.getElementsByTagName('span')[0].textContent =
-            props.dataPase.mencion
+            if(props.dataPase.mencion) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.mencion
+            }
             break;
           case 'curso':
-            e.getElementsByTagName('span')[0].textContent =
-            props.dataPase.ano
+            if(props.dataPase.ano) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.ano
+            }
             break;
         }
         break;
       case 'Profesor':
-        // switch(id) {
-        // case'Pname':
-        //   e.getElementsByTagName('span')[0].textContent =
-        //   props.dataPase.profesor
-        //   break;
-        // case'materia':
-        //   e.getElementsByTagName('span')[0].textContent =
-        //   props.dataPase.materia
-        // }
-        break;
+         switch(id) {
+          case'Pname':
+            if(props.dataPase.profesor) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.profesor
+            }
+            break;
+          case'materia':
+            if(props.dataPase.materia) {
+              e.getElementsByTagName('span')[0].textContent =
+              props.dataPase.materia
+            }
+            break;
+          }
+          break;
       case 'Fecha':
       switch(id) {
         case('Date'):
-          e.getElementsByTagName('span')[0].textContent =
-          formatoFechaYHora(new Date(props.dataPase.pasefecha), 'fecha')
+          if(props.dataPase.pasefecha) {
+            e.getElementsByTagName('span')[0].textContent =
+            formatoFechaYHora(new Date(props.dataPase.pasefecha), 'fecha')
+          }
           break;
         case('DateTime'):
-          e.getElementsByTagName('span')[0].textContent =
-          formatoFechaYHora(new Date(props.dataPase.pasefecha), 'hora')
+          if(props.dataPase.pasefecha) {
+            e.getElementsByTagName('span')[0].textContent =
+            formatoFechaYHora(new Date(props.dataPase.pasefecha), 'hora')
+          }
           break;
       }
       break;
