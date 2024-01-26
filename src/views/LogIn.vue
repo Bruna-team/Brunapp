@@ -88,6 +88,7 @@ function iniciarSesion() {
     brunaApi({ s: 'auth' }, `usuario=${userData.value.cedula.value}&clave=${btoa(userData.value.password.value)}&rec=${recSesion.value}`)
     .then((res:any) => {
       if (res.data.r) {
+        localStorage.setItem("bruna", res.data.m)
         router.push('/')
       } else {
         // mensaje de error
@@ -104,7 +105,7 @@ function registro() {
   brunaApi({ s: 'register' }, data)
   .then((res:any) => {
     if (res.data.r) {
-      router.push('/')
+      router.push('LogIn')
     } else {
       // mensaje de error
     }
