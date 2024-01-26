@@ -1,5 +1,3 @@
-const formatoEmail = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
-
 /**
  * @param {string} string
  * @return {string}
@@ -15,28 +13,25 @@ function capitalizar (string: string) {
    return string
  }
 }
-
 /**
- * @param {string} email
- * @return {boolean}
+ * @param {date} Date
+ * @param {type} string
+ * @return {string}
  */
-function validarEmail(email:string) {
-  return formatoEmail.test(email);
-}
-
-/**
- * @param {string} telefono
- * @param {string} codigo
- * @return {boolean}
- */
-function validarTel(telefono:string, codigo:string) {
-  const telefonoFormateado = String(codigo) + String(telefono);
-  const valido = parseFloat(telefonoFormateado) && /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(telefonoFormateado);
-  return (valido);
+function formatoFechaYHora (date: Date, type: string) {
+  const fecha = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  const hora = `${String(date.getHours()).padStart(2, '0')}:${String(date.getDate()).padStart(2, '0')}`
+  switch (type) {
+    case 'fecha':
+      return fecha
+    case 'hora':
+      return hora
+    default:
+      return `${fecha}T${hora}`
+  }
 }
 
 export {
   capitalizar,
-  validarTel,
-  validarEmail,
+  formatoFechaYHora,
 };

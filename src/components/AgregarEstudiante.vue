@@ -2,7 +2,8 @@
 import { ref, computed, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
-const { mobile } = useDisplay()
+import { capitalizar } from "../funciones/funciones.ts";
+const { mobile, smAndUp } = useDisplay()
 const emit = defineEmits([
 	'recargar', 'alerta'
 ]);
@@ -45,24 +46,27 @@ const cedRe = ref({
       (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
   ]
 });
-const representante = ref({
-  id: '',
+const representante = ref<any>({
+  id: {value: ''},
   nomRe: {
     value: '',
     rules: [
       (v: string) => !!v || 'El nombre es necesario',
+      (v: string) => v.length>3 || 'El nombre es muy corto',
     ],
   },
   apeRe: {
     value: '',
     rules: [
       (v: string) => !!v || 'El apellido es necesario',
+      (v: string) => v.length>3 || 'El apellido es muy corto',
     ],
   },
   tel: {
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
+      (v: string) => /^(0412|0414|0416|0424|0426|0271|0272)\d{7}$/.test(v)  || 'El numero de teléfono parese ser incorrecto',
     ],
   },
   telRe: {
@@ -76,7 +80,7 @@ const representante = ref({
     ],
   }
 })
-const alumno = ref({
+const alumno = ref<any>({
   pnom: {
     value: '',
     rules: [
@@ -158,15 +162,15 @@ async function validacion () {
   loading.value = false
 }
 function guardarAlumno() {
-  let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
-  data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
+  let data =  'pnom=' +  capitalizar(alumno.value.pnom.value) + '&snom=' +  capitalizar(alumno.value.snom.value)
+  data +=  '&pape=' +  capitalizar(alumno.value.pape.value) + '&sape=' +  capitalizar(alumno.value.sape.value)
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
-  data +=  '&paren=' +  alumno.value.paren.value + '&idAno=' + alumno.value.sec.value
+  data +=  '&paren=' +  capitalizar(alumno.value.paren.value) + '&idAno=' + alumno.value.sec.value
   data += '&obs=' + alumno.value.obs.value
-  if (representante.value.id) {
-    data += '&idRe=' +  representante.value.id
+  if (representante.value.id.value) {
+    data += '&idRe=' +  representante.value.id.value
   } else {
-    data += '&nomRe=' + representante.value.nomRe.value + '&apeRe=' + representante.value.apeRe.value
+    data += '&nomRe=' + capitalizar(representante.value.nomRe.value) + '&apeRe=' + capitalizar(representante.value.apeRe.value)
     data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
     data += '&sTelRe=' + representante.value.telRe.value + '&dirRe=' + representante.value.dir.value
   }
@@ -174,16 +178,27 @@ function guardarAlumno() {
   .then((res:any) => {
     if (res.data.r) {
       emit('alerta', res.data.e)
+      limpiarDatos()
       emit('recargar')
-      dialog.value=false
     }
   }).catch(() => {
     emit('alerta', 'Hubo un error agregando el alumno')
   })
 }
+function limpiarDatos() {
+  dialog.value = false
+  step.value = steps.value.length == 2 ? 1 : 0
+  for (let key in alumno.value) {
+    alumno.value[key].value = '';
+  }
+  for (let key in representante.value) {
+    representante.value[key].value = '';
+  }
+  cedRe.value.value = ''
+}
 watch(()=>cedRe.value.value, ()=>{
   disabled.value = false
-  representante.value.id = ''
+  representante.value.id.value = ''
   representante.value.nomRe.value = ''
   representante.value.apeRe.value = ''
   representante.value.tel.value = ''
@@ -194,7 +209,7 @@ watch(()=>cedRe.value.value, ()=>{
   .then((res:any) => {
     if (res.data[0].id_rep) {
       disabled.value = true
-      representante.value.id = res.data[0].id_rep
+      representante.value.id.value = res.data[0].id_rep
       representante.value.nomRe.value = res.data[0].nom_rep
       representante.value.apeRe.value = res.data[0].ape_rep
       representante.value.tel.value = res.data[0].tel_rep
@@ -202,18 +217,18 @@ watch(()=>cedRe.value.value, ()=>{
       representante.value.telRe.value = res.data[0].tel_re_rep || ''
     }
   }).catch(() => {
-    // message: 'Hubo un error actualizando los datos',
+    emit('alerta', 'No se encontró un representante con esos datos.')
   })
 })
 </script>
 <template>
-<v-dialog v-model="dialog" :fullscreen="mobile">
+<v-dialog v-model="dialog" :fullscreen="!smAndUp">
   <template #activator="{ props }">
     <v-btn
       v-bind="props"
       append-icon="mdi-account-school-outline"
-      :variant="props.variant ? 'text' : 'tonal'"
-      :class="props.classBtn"
+      :variant="variant ? 'text' : 'tonal'"
+      :class="classBtn"
     >
       Agregar
     </v-btn>
@@ -234,16 +249,17 @@ watch(()=>cedRe.value.value, ()=>{
           />
         </v-toolbar-items>
       </v-toolbar>
-      <v-sheet class="pa-3">
+      <v-sheet class="pa-md-3">
         <v-form ref="form">
           <v-stepper v-model="step" :mobile="mobile" :items="steps" item-title="title" item-value="value">
             <v-stepper-window>
               <Transition mode="out-in" name="rotate" type="animation">
                 <v-stepper-window-item key="0" :value="0" v-if="step==0">
-                  <v-card class="box-shadow-none" title="Ingresa la información estudiantil" flat>
+                  <v-card class="box-shadow-none" flat>
+                    <v-card-title class="text-wrap text-center text-sm-start">Ingresa la información estudiantil</v-card-title>
                     <v-divider></v-divider>
-                    <v-row class="mt-2">
-                      <v-col>
+                    <v-row class="mt-2" justify="space-around">
+                      <v-col cols="12" md="">
                         <v-radio-group
                           v-model="alumno.men.value"
                           :rules="alumno.men.rules"
@@ -258,7 +274,7 @@ watch(()=>cedRe.value.value, ()=>{
                           />
                         </v-radio-group>
                       </v-col>
-                      <v-col>
+                      <v-col cols="12" sm="8" md="4">
                         <v-radio-group
                           v-model="alumno.ano.value"
                           :rules="alumno.ano.rules"
@@ -272,9 +288,10 @@ watch(()=>cedRe.value.value, ()=>{
                             :label="ano.num_ano"
                             :value="ano.nom_ano"
                           />
+                          <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                         </v-radio-group>
                       </v-col>
-                      <v-col>
+                      <v-col cols="12" sm="4" md="2">
                         <v-radio-group
                           v-model="alumno.sec.value"
                           :rules="alumno.sec.rules"
@@ -288,6 +305,8 @@ watch(()=>cedRe.value.value, ()=>{
                             :label="sec.sec_nom"
                             :value="sec.id_ano"
                           />
+                          <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                          <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
                         </v-radio-group>
                       </v-col>
                     </v-row>
@@ -297,35 +316,35 @@ watch(()=>cedRe.value.value, ()=>{
                   <v-card class="box-shadow-none" title="Ingresa los datos del estudiante" flat>
                     <v-divider></v-divider>
                     <v-row class="mt-2">
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.pnom.value"
                           label="Primer nombre"
                           :rules="alumno.pnom.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.snom.value"
                           label="Segundo nombre"
                           :rules="alumno.snom.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.pape.value"
                           label="Primer apellido"
                           :rules="alumno.pape.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.sape.value"
                           label="Segundo apellido"
                           :rules="alumno.sape.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.ced.value"
                           label="Cédula"
@@ -334,7 +353,7 @@ watch(()=>cedRe.value.value, ()=>{
                           :rules="alumno.ced.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.fec.value"
                           label="Fecha de nacimiento"
@@ -342,7 +361,7 @@ watch(()=>cedRe.value.value, ()=>{
                           :rules="alumno.fec.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12">
                         <v-text-field
                           v-model="alumno.obs.value"
                           label="Observaciones"
@@ -356,7 +375,7 @@ watch(()=>cedRe.value.value, ()=>{
                   <v-card title="Ingresa los datos del representante" flat>
                     <v-divider></v-divider>
                     <v-row class="mt-2">
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="cedRe.value"
                           label="Cédula"
@@ -366,7 +385,7 @@ watch(()=>cedRe.value.value, ()=>{
                         />
                       </v-col>
                       <v-divider></v-divider>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="representante.nomRe.value"
                           label="Nombre"
@@ -374,7 +393,7 @@ watch(()=>cedRe.value.value, ()=>{
                           :disabled="disabled"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="representante.apeRe.value"
                           label="Apellido"
@@ -382,14 +401,14 @@ watch(()=>cedRe.value.value, ()=>{
                           :disabled="disabled"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="alumno.paren.value"
                           label="Parentesco"
                           :rules="alumno.paren.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="representante.tel.value"
                           label="Teléfono"
@@ -397,7 +416,7 @@ watch(()=>cedRe.value.value, ()=>{
                           :disabled="disabled"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="representante.telRe.value"
                           label="Teléfono repuesto"
@@ -405,7 +424,7 @@ watch(()=>cedRe.value.value, ()=>{
                           :disabled="disabled"
                         />
                       </v-col>
-                      <v-col cols="12" sm="4">
+                      <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="representante.dir.value"
                           label="Dirección"
@@ -419,7 +438,7 @@ watch(()=>cedRe.value.value, ()=>{
               </Transition>
             </v-stepper-window>
             <template #actions>
-              <div class="d-flex">
+              <v-card-actions class="d-flex justify-space-around">
                 <v-btn
                   text="Atrás"
                   flat
@@ -427,7 +446,6 @@ watch(()=>cedRe.value.value, ()=>{
                   :disabled="step==0"
                   @click="step--"
                 />
-                <v-spacer></v-spacer>
                 <v-btn
                   :loading="loading"
                   flat
@@ -436,7 +454,7 @@ watch(()=>cedRe.value.value, ()=>{
                   :color="step == 2 ? 'primario' : ''"
                   @click="validacion"
                 />
-              </div>
+              </v-card-actions>
             </template>
           </v-stepper>
         </v-form>
