@@ -27,7 +27,7 @@ const lightTheme = {
     secundario: colors.lightGreen.darken2,
     'secundario-claro': colors.green.lighten1,
     white: '#f3f3f3',
-    muted: '#e4e4e4',
+    muted: colors.grey.lighten3,
     error: colors.red.lighten2,
     info: '#2196F3',
     success: '#4CAF50',

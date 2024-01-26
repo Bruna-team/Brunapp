@@ -4,7 +4,7 @@ import { CalendarView, CalendarViewHeader, CalendarMath } from "vue-simple-calen
 import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
-import AgregarEstudiante from "../components/AgregarEstudiante.vue";
+// import AgregarEstudiante from "../components/AgregarEstudiante.vue";
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
@@ -17,6 +17,209 @@ const { mobile } = useDisplay()
 const studentDrawer = ref( mobile.value ? false : true)
 const alertaMsj = ref<string>('')
 
+const loading = ref(false)
+const sectionLoading = ref(true)
+const disabled = ref(false)
+onMounted(() => {
+	cargaInicial();
+});
+// Editar estudiante
+const edit = ref(false)
+
+// Variables del calendario
+const motivos = ref([{
+  id_mo: '',
+  tipo_mo: '',
+  eli_mo: ''
+}])
+const calendarNav = ref(false)
+const editItem = ref(false)
+const periodo = ref("month")
+
+const showDate = ref(new Date())
+function setShowDate(d: any) {
+  showDate.value = d;
+}
+
+// Variables del scrum del calendario
+const formObs = ref()
+const formObsValidate = ref()
+const selectedItem= ref({
+  originalItem:{
+    id:"",
+    startDate:"",
+    endDate:"",
+    title:"",
+    obs: "",
+    obsDes: "",
+    obsType: "",
+    classes:"",
+  },
+  startDate: '',
+  endDate: '',
+  classes: "",
+  title: "",
+  id:"",
+})
+const selectedDate= ref('')
+const newItemTitle= ref('')
+const newItemObservacion= ref('')
+const newItemType= ref({
+  value:'',
+  rules: [
+      (v: string) => !!v || 'El tipo de observación es necesario',
+  ]
+})
+const newItemStartDate= ref('')
+const newItemStartDateTime= ref({
+  value:'',
+  rules: [
+      (v: string) => !!v || 'La hora es necesaria',
+  ]
+})
+const newItemEndDate = ref('')
+
+const items = ref([
+  {
+    id: "",
+    startDate: "",
+    endDate: "",
+    title: "",
+    obs: '',
+    obsType: '',
+    classes: [],
+  }
+])
+
+// Funcionalidades del calendario
+function onDrop(item: any, date: any) {
+  // Determine the delta between the old start date and the date chosen,
+  // and apply that delta to both the start and end date to move the item.
+  const eLength = CalendarMath.dayDiff(item.startDate, date)
+  item.originalItem.startDate = CalendarMath.addDays(item.startDate, eLength)
+  item.originalItem.endDate = CalendarMath.addDays(item.endDate, eLength)
+}
+function onClickDay(d: any) {
+  calendarNav.value = true
+  selectedDate.value = d
+  newItemStartDate.value = formatoFechaYHora(d, 'fecha')
+}
+function onClickItem(d: any) {
+  calendarNav.value = true
+  selectedItem.value = d
+}
+// Funciones del SCRUM del calendario
+async function validarFormObs () {
+  loading.value = true
+  const { valid } = await formObs.value.validate()
+  if (formObsValidate.value && valid) {
+    agregarItem()
+  }
+  loading.value = false
+}
+function limpiarItems() {
+  editItem.value = false
+  calendarNav.value = false
+  newItemTitle.value = ''
+  newItemObservacion.value = ''
+  newItemType.value.value = ''
+  newItemStartDate.value = ''
+  newItemStartDateTime.value.value = ''
+  newItemEndDate.value = ''
+  selectedItem.value = {
+    originalItem:{
+      id:"",
+      startDate:"",
+      endDate:"",
+      title:"",
+      obs: "",
+      obsDes: "",
+      obsType: "",
+      classes:"",
+    },
+    startDate: '',
+    endDate: '',
+    classes: "",
+    title: "",
+    id:"",
+  }
+}
+function agregarItem() {
+  newItemTitle.value = newItemTitle.value.length ? newItemTitle.value : motivos.value[Number(newItemType.value.value)-1].tipo_mo
+  let data = "estd=" + alumno.value.estd + '&mot=' + newItemType.value.value + '&fec=' + newItemStartDate.value
+  data += '&hor=' + newItemStartDateTime.value.value + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
+  data += newItemEndDate.value ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+
+  brunaApi({ s: 'crearObservacion' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = "Observación guardada"
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = "Hubo un error guardando la observación"
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando la observación"
+  })
+}
+function actualizarItem(item: any) {
+  const hor = newItemStartDate.value.split('T')
+  let data = 'mot=' + newItemType.value.value + '&fec=' + hor[0] + '&id=' + item.originalItem.id
+  data += '&hor=' + hor[1] + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
+  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
+
+  brunaApi({ s: 'editarObservacion' }, data)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error editando la observación"
+  })
+}
+function editarItem(item: any) {
+  newItemTitle.value = item.originalItem.title
+  newItemObservacion.value = item.originalItem.obs
+  newItemType.value.value = item.originalItem.obsType
+  newItemStartDate.value = formatoFechaYHora(item.originalItem.startDate, 'fechaYhora')
+  newItemEndDate.value = formatoFechaYHora(item.originalItem.endDate, 'fechaYhora')
+  editItem.value = true
+}
+function asignarClases(type: string) {
+  switch (type) {
+    case '1':
+      return 'bg-justified'
+    case '2':
+      return 'bg-repose'
+    case '3':
+      return 'bg-observation'
+    default:
+      return 'bg-absentee'
+  }
+}
+function eliminarItem(item: any) {
+  brunaApi({ s: 'eliminarObservacion' }, 'obs=' + item.originalItem.id)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      buscarEstudiante(alumno.value.estd)
+      limpiarItems()
+    } else {
+      alertaMsj.value = res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando la observación"
+  })
+}
+watch(calendarNav, (value) => {
+  if (!value) {limpiarItems()}
+})
+// Funciones de la vista
 // Consulta de estudiantes
 const menciones = ref({
   ano: '',
@@ -134,26 +337,8 @@ const cedRe = ref({
       (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
   ]
 });
-const loading = ref(false)
 const form = ref()
-const disabled = ref(false)
-onMounted(() => {
-	cargaInicial();
-});
-// Editar estudiante
-const edit = ref(false)
-
-// Variables del calendario
-const motivos = ref([{
-  id_mo: '',
-  tipo_mo: '',
-  eli_mo: ''
-}])
-const calendarNav = ref(false)
-const editItem = ref(false)
-const periodo = ref("month")
-
-async function validar () {
+async function validarFormEst () {
   loading.value = true
   const { valid } = await form.value.validate()
   if (valid) {
@@ -161,166 +346,17 @@ async function validar () {
   }
   loading.value = false
 }
-
-const showDate = ref(new Date())
-function setShowDate(d: any) {
-  showDate.value = d;
-}
-
-// Variables del scrum del calendario
-const selectedItem= ref({
-  originalItem:{
-    id:"",
-    startDate:"",
-    endDate:"",
-    title:"",
-    obs: "",
-    obsType: "",
-    classes:"",
-  },
-  startDate: '',
-  endDate: '',
-  classes: "",
-  title: "",
-  id:"",
-})
-const selectedDate= ref('')
-const newItemTitle= ref('')
-const newItemObservacion= ref('')
-const newItemType= ref('')
-const newItemStartDate= ref('')
-const newItemStartDateTime= ref('')
-const newItemEndDate = ref('')
-
-const items = ref([
-  {
-    id: "",
-    startDate: "",
-    endDate: "",
-    title: "",
-    obs: '',
-    obsType: '',
-    classes: [],
-  }
-])
-
-// Funcionalidades del calendario
-function onDrop(item: any, date: any) {
-  // Determine the delta between the old start date and the date chosen,
-  // and apply that delta to both the start and end date to move the item.
-  const eLength = CalendarMath.dayDiff(item.startDate, date)
-  item.originalItem.startDate = CalendarMath.addDays(item.startDate, eLength)
-  item.originalItem.endDate = CalendarMath.addDays(item.endDate, eLength)
-}
-function onClickDay(d: any) {
-  calendarNav.value = true
-  selectedDate.value = d
-  newItemStartDate.value = formatoFechaYHora(d, 'fecha')
-}
-function onClickItem(d: any) {
-  calendarNav.value = true
-  selectedItem.value = d
-}
-// Funciones del SCRUM del calendario
-function limpiarItems() {
-  editItem.value = false
-  calendarNav.value = false
-  newItemTitle.value = ''
-  newItemObservacion.value = ''
-  newItemType.value = ''
-  newItemStartDate.value = ''
-  newItemStartDateTime.value = ''
-  newItemEndDate.value = ''
-  selectedItem.value = {
-    originalItem:{
-      id:"",
-      startDate:"",
-      endDate:"",
-      title:"",
-      obs: "",
-      obsType: "",
-      classes:"",
-    },
-    startDate: '',
-    endDate: '',
-    classes: "",
-    title: "",
-    id:"",
-  }
-}
-function agregarItem() {
-  let data = "estd=" + alumno.value.estd + '&mot=' + newItemType.value + '&fec=' + newItemStartDate.value
-  data += '&hor=' + newItemStartDateTime.value + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
-  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
-
-  brunaApi({ s: 'crearObservacion' }, data)
-  .then((res:any) => {
-    if (res.data.r) {
-      alertaMsj.value = "Observación guardada"
-      buscarEstudiante(alumno.value.estd)
-      limpiarItems()
-    } else {
-      alertaMsj.value = "Hubo un error guardando la observación"
-    }
-  }).catch(() => {
-    alertaMsj.value = "Hubo un error guardando la observación"
-  })
-}
-function actualizarItem(item: any) {
-  const hor = newItemStartDate.value.split('T')
-  let data = 'mot=' + newItemType.value + '&fec=' + hor[0] + '&id=' + item.originalItem.id
-  data += '&hor=' + hor[1] + '&nom=' + newItemTitle.value + '&obs=' + newItemObservacion.value
-  data += newItemEndDate.value.length ? '&fecFin=' + newItemEndDate.value : '&fecFin=' + newItemStartDate.value
-
-  brunaApi({ s: 'editarObservacion' }, data)
-  .then((res:any) => {
-    if (res.data.r) {
-      alertaMsj.value = res.data.e
-      buscarEstudiante(alumno.value.estd)
-      limpiarItems()
-    } else {
-      alertaMsj.value = res.data.e
-    }
-  }).catch(() => {
-    alertaMsj.value = "Hubo un error editando la observación"
-  })
-}
-function editarItem(item: any) {
-  newItemTitle.value = item.originalItem.title
-  newItemObservacion.value = item.originalItem.obs
-  newItemType.value = item.originalItem.obsType
-  newItemStartDate.value = formatoFechaYHora(item.originalItem.startDate, 'fechaYhora')
-  newItemEndDate.value = formatoFechaYHora(item.originalItem.endDate, 'fechaYhora')
-  editItem.value = true
-}
-function asignarClases(type: string) {
-  switch (type) {
-    case '1':
-      return 'bg-justified'
-    case '2':
-      return 'bg-repose'
-    default:
-      return 'bg-observation'
-  }
-}
-function eliminarItem(item: any) {
-  brunaApi({ s: 'eliminarObservacion' }, 'obs=' + item.originalItem.id)
-  .then((res:any) => {
-    if (res.data.r) {
-      alertaMsj.value = res.data.e
-      buscarEstudiante(alumno.value.estd)
-      limpiarItems()
-    } else {
-      alertaMsj.value = res.data.e
-    }
-  }).catch(() => {
-    alertaMsj.value = "Hubo un error guardando la observación"
-  })
-}
-watch(calendarNav, (value) => {
-  if (!value) {limpiarItems()}
-})
 function cargaInicial() {
+  sectionLoading.value = true
+  brunaApi({ s: 'motivos' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      motivos.value = res.data
+    }
+  }).catch(() => {
+    sectionLoading.value = false
+    // message: 'Hubo un error cargando los datos',
+  })
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
   .then((res:any) => {
     if (res.data) {
@@ -328,16 +364,10 @@ function cargaInicial() {
       estudiantes.value = res.data.estd
     }
   }).catch(() => {
+    sectionLoading.value = false
     // message: 'Hubo un error cargando los datos',
   })
-  brunaApi({ s: 'motivos' }, '')
-  .then((res:any) => {
-    if (res.data) {
-      motivos.value = res.data
-    }
-  }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
-  })
+  sectionLoading.value = false
 }
 function buscarEstudiante(id:string) {
   brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec + "&estd=" + id)
@@ -351,6 +381,7 @@ function buscarEstudiante(id:string) {
   })
 }
 function organizarDatos(data:any) {
+  sectionLoading.value = true
   alumno.value.nombre = data.alum[0].pnom_alum + ' ' + (data.alum[0].snom_alum !== 'undefined' ? data.alum[0].snom_alum : '')
   + ' ' + data.alum[0].pape_alum + ' ' + (data.alum[0].sape_alum !== 'undefined' ? data.alum[0].sape_alum : '')
   alumno.value.id = data.alum[0].id_alum
@@ -389,13 +420,15 @@ function organizarDatos(data:any) {
         startDate: new Date(c.fec_obs.toString() + ' ' + c.hor_obs),
         endDate: c.fec_fin_obs.length ? new Date(c.fec_fin_obs.toString()) : new Date(c.fec_obs.toString()+' '+c.hor_obs),
         title: c.nom_obs,
-        obs: c.nota_obs,
+        obsDes: c.nota_obs,
         obsType: c.id_mo_obs,
+        obs: motivos.value[c.id_mo_obs-1].tipo_mo,
         classes: [asignarClases(c.id_mo_obs)]
       })
     });
     items.value = item
   }
+  sectionLoading.value = false
 }
 function editarAlumno() {
   let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
@@ -447,7 +480,7 @@ watch(()=>cedRe.value.value, ()=>{
 </script>
 
 <template>
-<v-card>
+<v-card color="transparent">
   <AlertaMensaje :mensaje="alertaMsj" />
   <v-navigation-drawer
     v-model="studentDrawer"
@@ -466,12 +499,12 @@ watch(()=>cedRe.value.value, ()=>{
         {{  alumno.men }}
         </span>
       </span>
-      <AgregarEstudiante
+      <!-- <AgregarEstudiante
         :data-academica="menciones"
         :variant="true"
         :classBtn="'float-right float-lg-none mt-2 mt-lg-1'"
         @recargar="cargaInicial"
-      />
+      /> -->
     </v-list-item>
     <v-list v-if="estudiantes[0].id_estd" lines="one" density="compact" nav>
       <v-list-item
@@ -517,43 +550,52 @@ watch(()=>cedRe.value.value, ()=>{
             {{new Date(selectedItem.endDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
           </template>
         </p>
-        <p class="text-h5 text-center">{{ selectedItem.originalItem.title }}</p>
-        <p>{{ selectedItem.originalItem.obs }}</p>
+        <p class="text-h5 text-center mb-2">{{ selectedItem.originalItem.title }}</p>
+        <p class="text-center"><v-chip :class="asignarClases(selectedItem.originalItem.obsType)">{{ selectedItem.originalItem.obs }}</v-chip></p>
+        <p>{{ selectedItem.originalItem.obsDes }}</p>
       </template>
       <template v-else>
-        <p class="text-h5 text-center text-capitalize mb-4">
-          {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
-        </p>
-        <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
-        <v-text-field
-          v-if="editItem"
-          v-model="newItemStartDate"
-          label="Fecha y hora de la observación"
-          type="datetime-local"
-          hint="Ej: Pasó el dia... a las..."
-          persistent-hint
-          class="mb-3"
-        />
-        <v-text-field
-          v-else
-          v-model="newItemStartDateTime"
-          label="Hora de la observación (opcional)"
-          type="time"
-          hint="Ej: Pasó a las..."
-          persistent-hint
-          class="mb-3"
-        />
-        <v-radio-group v-model="newItemType" label="Tipo de observación">
-          <v-radio v-for="m in motivos" :keys="m.id_mo" :label="m.tipo_mo" :value="m.id_mo"></v-radio>
-        </v-radio-group>
-        <v-text-field
-          v-model="newItemEndDate"
-          label="Observación hasta el..."
-          type="datetime-local"
-          persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
-          class="mb-3"
-        />
-        <v-textarea label="Observación" v-model="newItemObservacion"/>
+        <v-form v-model="formObsValidate" ref="formObs">
+          <p class="text-h5 text-center text-capitalize mb-4">
+            {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
+          </p>
+          <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
+          <v-text-field
+            v-if="editItem"
+            v-model="newItemStartDate"
+            label="Fecha y hora de la observación"
+            type="datetime-local"
+            hint="Ej: Pasó el dia... a las..."
+            persistent-hint
+            class="mb-3"
+          />
+          <v-text-field
+            v-else
+            v-model="newItemStartDateTime.value"
+            :rules="newItemStartDateTime.rules"
+            label="Hora de la observación (opcional)"
+            type="time"
+            hint="Ej: Pasó a las..."
+            persistent-hint
+            class="mb-3"
+          />
+          <v-radio-group
+            v-model="newItemType.value"
+            :rules="newItemType.rules"
+            label="Tipo de observación"
+            class="mb-2"
+          >
+            <v-radio v-for="m in motivos" :keys="m.id_mo" :label="m.tipo_mo" :value="m.id_mo"></v-radio>
+          </v-radio-group>
+          <v-text-field
+            v-model="newItemEndDate"
+            label="Observación hasta el..."
+            type="datetime-local"
+            persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
+            class="mb-3"
+          />
+          <v-textarea label="Observación" v-model="newItemObservacion"/>
+        </v-form>
       </template>
     </v-sheet>
     <template #append>
@@ -584,13 +626,13 @@ watch(()=>cedRe.value.value, ()=>{
         />
       </template>
       <template  v-else>
-        <v-btn class="py-7" color="primario-claro" block @click="agregarItem()">Agregar</v-btn>
+        <v-btn class="py-7" color="primario-claro" block @click="validarFormObs()">Agregar</v-btn>
       </template>
     </template>
   </v-navigation-drawer>
   <section>
     <v-container class="px-0">
-      <section class="d-flex flex-wrap">
+      <section  class="d-flex flex-wrap">
         <v-btn
           variant="text"
           prepend-icon="mdi-arrow-left"
@@ -602,7 +644,7 @@ watch(()=>cedRe.value.value, ()=>{
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn
-          v-if="alumno"
+          v-if="alumno.num && !sectionLoading"
           :variant="edit ? 'tonal' : 'text'"
           :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
           :text="edit ? 'Cancelar' : 'Editar'"
@@ -618,10 +660,11 @@ watch(()=>cedRe.value.value, ()=>{
           text="Guardar"
           color="secundario"
           class="mx-2"
-          @click="validar"
+          @click="validarFormEst"
         />
       </section>
-      <template v-if="alumno.num">
+      <v-skeleton-loader v-if="sectionLoading" type="table-heading, article, paragraph" />
+      <template v-else-if="alumno.num">
         <v-card variant="tonal" class="ma-1 ma-sm-3 pa-2">
           <v-card-item class="pa-0">
             <template v-if="!edit">
@@ -630,7 +673,7 @@ watch(()=>cedRe.value.value, ()=>{
                   <v-badge icon="mdi-gender-female" color="pink">
                     <v-avatar color="brown">
                       <span class="text-h5">
-                        {{ alumno.nombre.split(" ").map(parte => parte.charAt(0)).join('').toUpperCase() }}
+                        {{ alumno.nombre.split(" ").map(parte => parte.charAt(0))[0] + alumno.nombre.split(" ").map(parte => parte.charAt(0))[1] }}
                       </span>
                     </v-avatar>
                   </v-badge>
@@ -659,8 +702,8 @@ watch(()=>cedRe.value.value, ()=>{
                     </span>
                   </p>
                 </v-col>
-                <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
-                  <p class="text-caption  font-weight-bold text-medium-emphasis">Representante</p>
+                <v-col cols="12" sm="4" class="pa-0 px-sm-2 py-sm-0">
+                  <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
                   <v-divider/>
                   <div class="d-sm-flex">
                     <v-list-item
@@ -704,18 +747,17 @@ watch(()=>cedRe.value.value, ()=>{
                     </v-list-item>
                   </div>
                 </v-col>
-                <v-col cols="12" md="6" class="pa-0 px-sm-2 py-sm-0">
-                  <p class="text-caption  font-weight-bold text-medium-emphasis">Estatus</p>
+                <v-col cols="12" sm="3" class="pa-0 px-sm-2 py-sm-0">
+                  <p class="text-caption font-weight-bold text-medium-emphasis">Estatus</p>
                   <v-divider/>
                   <div class="d-sm-flex flex-wrap align-start">
                     <v-list-item
-                      title="Pases"
                       class="flex-1-0 px-0 pr-sm-2"
                     >
                       <template #subtitle>
                         <p>
                           <span class="text-caption font-weight-bold text-medium-emphasis">
-                            De entrada:
+                            Pases de entrada:
                           </span>
                           <span class="font-weight-bold letter-spacing">
                             1
@@ -723,7 +765,7 @@ watch(()=>cedRe.value.value, ()=>{
                         </p>
                         <p>
                           <span class="text-caption font-weight-bold text-medium-emphasis">
-                            De salida
+                            Pases de salida
                           </span>
                           <span class="font-weight-bold letter-spacing">
                             1
@@ -731,12 +773,15 @@ watch(()=>cedRe.value.value, ()=>{
                         </p>
                       </template>
                     </v-list-item>
-                    <v-list-item
-                      title="Observaciones"
-                      :subtitle="alumno.obs.value"
-                      class="flex-1-0 px-0 pr-sm-2"
-                    ></v-list-item>
                   </div>
+                </v-col>
+                <v-col cols="12" sm="5" class="pa-0 px-sm-2 py-sm-0">
+                  <p class="text-caption font-weight-bold text-medium-emphasis">Observaciones</p>
+                  <v-divider/>
+                  <v-list-item
+                    :subtitle="alumno.obs.value || 'Sin Observaciones'"
+                    class="flex-1-0 px-0 pr-sm-2"
+                  ></v-list-item>
                 </v-col>
               </v-row>
               </template>
@@ -871,6 +916,7 @@ watch(()=>cedRe.value.value, ()=>{
           :items="items"
           :display-period-uom="periodo"
           :starting-day-of-week="1"
+          show-times
           :show-date="showDate"
           :enable-drag-drop="true"
           :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
