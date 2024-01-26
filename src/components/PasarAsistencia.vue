@@ -54,10 +54,10 @@ function guardarInasistencias() {
 }
 function showTime(){
   const myDate = new Date();
-  let hours = myDate.getHours();
-  let minutes = myDate.getMinutes();
-  if (hours < 10) hours = '0' + hours;
-  if (minutes < 10) minutes = '0' + minutes;
+  let hours = myDate.getHours().toString();
+  let minutes = myDate.getMinutes().toString();
+  if (Number(hours) < 10) hours = '0' + hours;
+  if (Number(minutes) < 10) minutes = '0' + minutes;
   return hours+ ":" +minutes
 }
 watch(()=>dialog.value, ()=>{
