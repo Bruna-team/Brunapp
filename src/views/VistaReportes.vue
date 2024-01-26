@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import {ref,onMounted,watch} from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import ReportesInasistencias from './reportes/ReportesInasistencias.vue';
 import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
 import ReportesPases from './reportes/ReportesPases.vue';
@@ -10,8 +10,6 @@ import { formatoFechaYHora } from '../funciones/funciones';
 import { useTheme, useDisplay } from 'vuetify'
 const { lgAndUp } = useDisplay()
 const theme = ref(useTheme().name)
-const fechasFiltrar = ref()
-const fechas = ref([''])
 const tabActiva = ref('pases')
 const tabs = ref([
   {
@@ -27,23 +25,33 @@ const tabs = ref([
     title: 'Inasistencias',
   }
 ])
+const fechasFiltrar = ref()
+const fechas = ref([''])
 const ano = ref('')
 const mencion = ref('')
 const seccion = ref('')
 const nombreABuscar = ref('')
-const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
 
-const menciones = ref<any[any]>()
 const estudiantes = ref<[{id_estd: String, nombre: String}] | []>([]);
+const menciones = ref<any[any]>()
 const inasistencias = ref<any[]>([])
 const observaciones = ref<any[]>([])
-onMounted(() => {
-	cargaInicial();
-  const startDate = new Date();
-  const endDate = new Date(new Date().setDate(startDate.getDate() + 4));
-  fechasFiltrar.value = [startDate, endDate];
-});
 
+const paseFecha = ref(`${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}-${new Date().getDay().toString().padStart(2, '0')}`)
+const dataPase = computed(()=> {
+  return {
+    ano: ano.value,
+    mencion: mencion.value ? menciones.value[Number(mencion.value)].men : '',
+    seccion: seccion.value,
+    pasefecha: paseFecha.value,
+    estudiante: nombreABuscar.value,
+    // estudianteCedula: '',
+    // modulo: '',
+    // profesor: '',
+    // representante: '',
+    // materia: '',
+  }
+})
 function cargaInicial() {
   brunaApi({ s: 'menciones' }, '')
   .then((res:any) => {
@@ -164,6 +172,12 @@ watch(()=>fechasFiltrar.value, ()=>{
   })
   actualizar()
 })
+onMounted(() => {
+	cargaInicial();
+  const startDate = new Date();
+  const endDate = new Date(new Date().setDate(startDate.getDate() + 4));
+  fechasFiltrar.value = [startDate, endDate];
+});
 </script>
 <template>
   <v-container class="px-0 px-md-2">
@@ -258,7 +272,7 @@ watch(()=>fechasFiltrar.value, ()=>{
               />
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-combobox
+              <v-autocomplete
                 label="Escribe el nombre del estudiante"
                 v-model="nombreABuscar"
                 :items="Object.values(estudiantes)"
@@ -266,7 +280,7 @@ watch(()=>fechasFiltrar.value, ()=>{
                 item-title="nombre"
                 hide-details
                 @input="buscarEstudiante"
-              ></v-combobox>
+              ></v-autocomplete>
             </v-col>
             <!-- <v-col cols="12" md="4">
               <v-combobox
@@ -278,7 +292,7 @@ watch(()=>fechasFiltrar.value, ()=>{
           <v-col cols="12" sm="" :md="tabActiva !== 'pases' ? '' : '12'">
             <v-window v-model="tabActiva" >
               <v-window-item value="pases">
-                <ReportesPases />
+                <ReportesPases :dataPase="dataPase" />
               </v-window-item>
               <v-window-item value="ast">
                 <ReportesInasistencias :students="inasistencias"/>

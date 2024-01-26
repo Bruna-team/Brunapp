@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import {imprimirPdf} from '../funciones/utilidades'
 import {ref} from 'vue'
-const props = defineProps({
+import AlertaMensaje from '../components/AlertaMensaje.vue';
+import {imprimirPdf} from '../funciones/utilidades'
+const printProps = defineProps({
   title: {type: String, default: ''},
   subtitle: {type: String, default: ''},
   content: [Array, String],
-  quill: {type: Boolean, default: false}
+  quill: {type: Boolean, default: false},
+  datosValidos: {type: Boolean, default: true}
 })
 defineEmits(['confirmar'])
 const dialog = ref(false)
+const alertaMsj = ref('')
 const pageOrientations = ref([
   {
     value: 'landscape',
@@ -23,7 +26,7 @@ const pageOrientations = ref([
     title: 'Personalizada'
   },
 ])
-const header = ref({title: props.title, subtitle: props.subtitle})
+const header = ref({title: printProps.title, subtitle: printProps.subtitle})
 const docConfiguration = ref({
   orientation: 'landscape',
   margins: {
@@ -39,18 +42,21 @@ const docConfiguration = ref({
 })
 </script>
 <template>
+  <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <v-dialog
     v-model="dialog"
     max-width="500px"
   >
-    <template v-slot:activator="{ props }">
+    <template v-slot:activator>
       <v-btn
+        @click="printProps.datosValidos ? dialog = true : (alertaMsj = 'Faltan datos por ingresar para poder imprimir')"
         variant="tonal"
         prepend-icon="mdi-printer"
         text="Imprimir"
         class="mb-2"
-        v-bind="props"
       />
+        <!-- :disabled="!printProps.datosValidos" -->
+        <!-- :v-bind="props" -->
     </template>
     <v-card>
       <v-card-title>
@@ -135,7 +141,7 @@ const docConfiguration = ref({
           color="primario"
           prepend-icon="mdi-printer"
           variant="tonal"
-          @click="imprimirPdf(header, content, docConfiguration, props.quill)"
+          @click="imprimirPdf(header, content, docConfiguration, printProps.quill)"
         >
           Imprimir
         </v-btn>

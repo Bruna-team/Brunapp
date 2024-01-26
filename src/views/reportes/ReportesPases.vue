@@ -1,15 +1,100 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import ModalImpresion from '../../components/ModalImpresion.vue'
 import AlertaMensaje from '../../components/AlertaMensaje.vue'
 import QuillEditorComponentVue from '../../components/QuillEditorComponent.vue';
+import { formatoFechaYHora } from '../../funciones/funciones';
 import { useDisplay } from 'vuetify';
-
+const props = defineProps({
+  dataPase: {
+    type: Object,
+    default: ref<{
+      ano: string,
+      mencion: string,
+      seccion: string,
+      pasefecha: string,
+      estudiante: string,} | {}>({})
+  }
+})
 const { smAndUp } = useDisplay()
 
 const alertaMsj = ref('')
 const content = ref('')
 const paseTipo = ref(true)
+const valido = computed(() => {
+  return Object.values(props.dataPase).every((d: any) => d !== '')
+})
+
+function sustituirSpandEmbed() {
+  document.querySelectorAll('.editor-var').forEach((e: any) => {
+    const id = e.getAttribute('data-id')
+    switch (e.getAttribute('data-type')) {
+      case 'Estudiante':
+        switch(id) {
+          case 'Ename':
+            e.getElementsByTagName('span')[0].textContent =
+            props.dataPase.estudiante
+            break;
+          // case 'representante':
+          //   e.getElementsByTagName('span')[0].textContent =
+          //   props.dataPase.representante
+          //   break;
+          // case 'Ecedula':
+          //   e.getElementsByTagName('span')[0].textContent =
+          //   props.dataPase.estudianteCedula
+          //   break;
+        }
+        break;
+      case 'Academico':
+        switch(id) {
+          // case 'modulo':
+          //   e.getElementsByTagName('span')[0].textContent =
+          //   props.dataPase.modulo
+          //   break;
+          case 'seccion':
+            e.getElementsByTagName('span')[0].textContent =
+            props.dataPase.seccion
+            break;
+          case 'mencion':
+            e.getElementsByTagName('span')[0].textContent =
+            props.dataPase.mencion
+            break;
+          case 'curso':
+            e.getElementsByTagName('span')[0].textContent =
+            props.dataPase.ano
+            break;
+        }
+        break;
+      case 'Profesor':
+        // switch(id) {
+        // case'Pname':
+        //   e.getElementsByTagName('span')[0].textContent =
+        //   props.dataPase.profesor
+        //   break;
+        // case'materia':
+        //   e.getElementsByTagName('span')[0].textContent =
+        //   props.dataPase.materia
+        // }
+        break;
+      case 'Fecha':
+      switch(id) {
+        case('Date'):
+          e.getElementsByTagName('span')[0].textContent =
+          formatoFechaYHora(new Date(props.dataPase.pasefecha), 'fecha')
+          break;
+        case('DateTime'):
+          e.getElementsByTagName('span')[0].textContent =
+          formatoFechaYHora(new Date(props.dataPase.pasefecha), 'hora')
+          break;
+      }
+      break;
+    }
+  })
+}
+watch(()=> props.dataPase,()=> {
+  sustituirSpandEmbed()
+  // content = document.get
+})
 </script>
 <template>
   <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
@@ -42,8 +127,10 @@ const paseTipo = ref(true)
     <ModalImpresion
       :quill="true"
       :content="content ? content : []"
+      :datos-validos="valido"
     />
   </v-sheet>
+  <!-- <v-btn @click="sustituirSpandEmbed">A</v-btn> -->
   <QuillEditorComponentVue @content="content=$event" />
 </template>
 <style>
