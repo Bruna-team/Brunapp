@@ -160,7 +160,7 @@ function AgregarHorario() {
             <v-btn
               variant="text"
               :disabled="!horario.active"
-              icon="mdi-pen"
+              :icon="horario.edit ? 'mdi-check' : 'mdi-pen'"
               @click="horario.edit = !horario.edit"
             />
             <v-btn
@@ -212,7 +212,7 @@ function AgregarHorario() {
             <v-btn
               variant="text"
               :disabled="!materia.active"
-              icon="mdi-pen"
+              :icon="materia.edit ? 'mdi-check' : 'mdi-pen'"
               @click="materia.edit = !materia.edit"
             />
             <v-btn
