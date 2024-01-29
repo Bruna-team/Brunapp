@@ -1,13 +1,50 @@
-// @ts-ignore
-import pdfMake from "pdfmake/build/pdfmake";
-// @ts-ignore
-import pdfFonts from "pdfmake/build/vfs_fonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+import * as pdfMake from "pdfmake/build/pdfmake";
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+
 // @ts-ignore
 import htmlToPdfmake from 'html-to-pdfmake';
-import { Quill } from '@vueup/vue-quill'
-import BlotFormatter from 'quill-blot-formatter'
 
+/**
+ * Evita que las imágenes queden en un stack aparte y no junto al texto
+ * @param {*} ret lista de items a evaluar
+ * @return {*} items sin imágenes por url
+ */
+function pdfmakeImgStack(ret: any) {
+  const contentWImageInStack: { nodeName: string; columns: any; }[] = [];
+  ret.forEach((node: any) => {
+    // @ts-ignore
+    if(node.nodeName == 'P') {
+      node.margin = [0, 0, 0, 0]
+    }
+    // @ts-ignore
+    if(Object.hasOwn(node, 'stack')) {
+      node.stack.forEach((span: any) => {
+        // @ts-ignore
+        if (Object.hasOwn(span, 'text')) {
+          span.width = 'auto'
+        }
+      })
+      contentWImageInStack.push({
+       nodeName: 'column',
+       columns:
+         node.stack,
+      })
+    } else {
+       contentWImageInStack.push(node);
+    }
+  });
+  return contentWImageInStack;
+}
+/**
+ * Convierte las unidades de cm a pt
+ * @param {Number} mm Unidad en milímetros
+ * @return {*} milímetros convertidos a puntos
+ */
+function conversorDeUnidad(mm: number) {
+  const cm = mm / 10
+  const pts = cm / 2.54 * 72
+  return pts
+}
 /**
  * Función de impresión con Quill
  * @param {object} header Objeto con el titulo y subtitulo del documento
@@ -37,7 +74,7 @@ function imprimirPdf (
       removeExtraBlanks: false,
       imagesByReference: true,
     });
-  const docDefinition = {
+  const docDefinition: any = {
     info: {
       title: `${header.title} - ${header.subtitle}`,
       author: "Bruna. E.T.C. 'Madre Rafols'"
@@ -129,76 +166,14 @@ function imprimirPdf (
     ],
     images: ret.images ? ret.images : [],
   }
-  pdfMake.createPdf(docDefinition).open()
-}
-/**
- * Evita que las imágenes queden en un stack aparte y no junto al texto
- * @param {*} ret lista de items a evaluar
- * @return {*} items sin imágenes por url
- */
-function pdfmakeImgStack(ret: any) {
-  const contentWImageInStack: { nodeName: string; columns: any; }[] = [];
-  ret.forEach((node: any) => {
-    // @ts-ignore
-    if(node.nodeName == 'P') {
-      node.margin = [0, 0, 0, 0]
+  pdfMake.createPdf(docDefinition, {}, {
+    Roboto: {
+      normal: 'Roboto-Regular.ttf',
+      bold: 'Roboto-Medium.ttf',
+      italics: 'Roboto-Italic.ttf',
+      bolditalics: 'Roboto-MediumItalic.ttf'
     }
-    // @ts-ignore
-    if(Object.hasOwn(node, 'stack')) {
-      node.stack.forEach((span: any) => {
-        // @ts-ignore
-        if (Object.hasOwn(span, 'text')) {
-          span.width = 'auto'
-        }
-      })
-      contentWImageInStack.push({
-       nodeName: 'column',
-       columns:
-         node.stack,
-      })
-    } else {
-       contentWImageInStack.push(node);
-    }
-  });
-  return contentWImageInStack;
-}
-/**
- * Convierte las unidades de cm a pt
- * @param {Number} mm Unidad en milímetros
- * @return {*} milímetros convertidos a puntos
- */
-function conversorDeUnidad(mm: number) {
-  const cm = mm / 10
-  const pts = cm / 2.54 * 72
-  return pts
-}
-function QuillConfig() {
-  const Embed = Quill.import('blots/embed')
-    /**
-     * SpanEmbed
-     */
-    class SpanEmbed extends Embed {
-      /**
-       * Create span template
-       * @param {*} value {text: String, id: String, type: String,}
-       * @return {*} node
-       */
-      static create(value: {text: String, id: String, type: String,}) {
-        const node = super.create();
-        node.setAttribute('data-type', value.type);
-        node.setAttribute('data-id', value.id);
-        node.innerText = value.text;
-        return node;
-      }
-    }
-    // @ts-ignore
-    SpanEmbed.blotName = 'spanEmbed';
-    // @ts-ignore
-    SpanEmbed.tagName = 'span';
-    // @ts-ignore
-    SpanEmbed.className='editor-var';
-    Quill.register(SpanEmbed);
-    Quill.register('modules/blotFormatter', BlotFormatter);
+  }, pdfFonts.pdfMake.vfs).open()
 }
 
-export {imprimirPdf, QuillConfig}
+export default imprimirPdf

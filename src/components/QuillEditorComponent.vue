@@ -2,6 +2,8 @@
 import { ref, watch, onMounted } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import QuillConfig from '../funciones/quillConfigModule'
+QuillConfig()
 
 const emit = defineEmits(['content'])
 
