@@ -69,7 +69,7 @@ function imprimirPdf (
     }
   },
   quill: Boolean) {
-  const ret = htmlToPdfmake(content,
+  const ret:any = htmlToPdfmake(content,
     {
       removeExtraBlanks: false,
       imagesByReference: true,
