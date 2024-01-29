@@ -1,32 +1,28 @@
 
 import { Quill } from '@vueup/vue-quill'
-import BlotFormatter from 'quill-blot-formatter'
 
-export default function QuillConfig() {
-  const Embed = Quill.import('blots/embed')
+const Embed = Quill.import('blots/embed')
+/**
+ * SpanEmbed
+ */
+class SpanEmbed extends Embed {
   /**
-   * SpanEmbed
+   * Create span template
+   * @param {*} value {text: String, id: String, type: String,}
+   * @return {*} node
    */
-  class SpanEmbed extends Embed {
-    /**
-     * Create span template
-     * @param {*} value {text: String, id: String, type: String,}
-     * @return {*} node
-     */
-    static create(value: {text: String, id: String, type: String,}) {
-      const node = super.create();
-      node.setAttribute('data-type', value.type);
-      node.setAttribute('data-id', value.id);
-      node.innerText = value.text;
-      return node;
-    }
+  static create(value: {text: String, id: String, type: String,}) {
+    const node = super.create();
+    node.setAttribute('data-type', value.type);
+    node.setAttribute('data-id', value.id);
+    node.innerText = value.text;
+    return node;
   }
-  // @ts-ignore
-  SpanEmbed.blotName = 'spanEmbed';
-  // @ts-ignore
-  SpanEmbed.tagName = 'span';
-  // @ts-ignore
-  SpanEmbed.className='editor-var';
-  Quill.register(SpanEmbed);
-  Quill.register('modules/blotFormatter', BlotFormatter);
 }
+// @ts-ignore
+SpanEmbed.blotName = 'spanEmbed';
+// @ts-ignore
+SpanEmbed.tagName = 'span';
+// @ts-ignore
+SpanEmbed.className='editor-var';
+export {SpanEmbed}
