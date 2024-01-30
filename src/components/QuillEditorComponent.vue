@@ -2,6 +2,11 @@
 import { ref, watch, onMounted } from 'vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+// @ts-ignore
+import BlotFormatter from 'quill-blot-formatter/dist/BlotFormatter';
+import {SpanEmbed} from '../funciones/quillConfigModule'
+import { Quill } from '@vueup/vue-quill'
+Quill.register(SpanEmbed);
 
 const emit = defineEmits(['content'])
 
@@ -10,18 +15,16 @@ onMounted(() => {
 })
 
 const editor = ref()
-const editorOptions = ref({
-  modules: {
-    toolbar: [
-      [{'header': [1, 2, 3, 4, 5, 6, false]}, { 'font': [] }, 'bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{'color': []}, {'background': []}, 'clean'],
-      [{ 'direction': 'rtl' }, {'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}, 'image'],
-    ],
-    blotFormatter: {},
-  },
-  placeholder: 'Escribe que deseas imprimir...',
-  theme: 'snow'
+const modules = ref({
+  name: 'blotFormatter',
+  module: BlotFormatter,
+  options: {}
 })
+const toolbar = ref([
+  [{'header': [1, 2, 3, 4, 5, 6, false]}, { 'font': [] }, 'bold', 'italic', 'underline', 'strike', 'blockquote'],
+  [{'color': []}, {'background': []}, 'clean'],
+  [{ 'direction': 'rtl' }, {'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}, 'image'],
+])
 const focusEditor = ref(false)
 const content = ref("<p><strong>E.T.C \"MADRE RAFOLS\"</strong></p><p><strong>VALERA ESTADO TRUJILLO</strong></p><h4 class=\"ql-align-center\">Pase de entrada</h4><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"Date\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">FECHA DE HOY</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"DateTime\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">HORA</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></br><p>Estudiante: <span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"Ename\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">ESTUDIANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Curso: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"curso\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">CURSO</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Sección: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"seccion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">SECCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Mención: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"mencion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MENCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></br><p>Tiene permiso para entrar a la clase de <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"materia\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MATERIA</span>﻿</span>﻿</span>﻿</span> correspondiente al <span class=\"editor-var\" data-type=\"Academico\" data-id=\"modulo\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MÓDULO</span>﻿</span>﻿</span>﻿</span>﻿</span> módulo.</p><p><br></p><p><strong>Motivo del retraso: </strong></p><p><br></p><p><u>                                             </u>            <u>                                      </u></p><p>Firma del representante                       Firma del coordinador</p><p><span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"representante\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">REPRESENTANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>  <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"Pname\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">PROFESOR NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span> </p>")
 
@@ -219,7 +222,8 @@ watch(content, (value) => {
   <QuillEditor
     ref="editor"
     v-model:content="content"
-    :options="editorOptions"
+    :toolbar="toolbar"
+    :modules="modules"
     content-type="html"
     class="quill-height"
     @focus="focusEditor= !focusEditor"
