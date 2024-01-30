@@ -326,6 +326,12 @@ const alumno = ref({
   obs: {
     value: '',
   },
+  entrada: {
+    value: 0,
+  },
+  salida: {
+    value: 0,
+  },
   men: '',
   men_abre: ''
 })
@@ -393,6 +399,8 @@ function organizarDatos(data:any) {
   alumno.value.ced.value = data.alum[0].ced_alum
   alumno.value.fec.value = data.alum[0].fec_nac_alum
   alumno.value.obs.value = data.alum[0].obs_alum
+  alumno.value.entrada.value = data.alum[0].entrada
+  alumno.value.salida.value = data.alum[0].salida
   alumno.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
   alumno.value.men = data.alum[0].nom_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].nom_men
   representante.value.nombre = data.alum[0].nom_rep + ' ' + data.alum[0].ape_rep
@@ -760,7 +768,7 @@ watch(()=>cedRe.value.value, ()=>{
                             Pases de entrada:
                           </span>
                           <span class="font-weight-bold letter-spacing">
-                            1
+                            {{  alumno.entrada.value }}
                           </span>
                         </p>
                         <p>
@@ -768,7 +776,7 @@ watch(()=>cedRe.value.value, ()=>{
                             Pases de salida
                           </span>
                           <span class="font-weight-bold letter-spacing">
-                            1
+                            {{  alumno.salida.value }}
                           </span>
                         </p>
                       </template>
