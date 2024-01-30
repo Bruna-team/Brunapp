@@ -1,5 +1,5 @@
 {
-  "name": "vite-vue-typescript-starter",
+  "name": "bruna",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -12,7 +12,13 @@
     "node": "18"
   },
   "dependencies": {
+    "@types/pdfmake": "^0.2.8",
+    "@vuepic/vue-datepicker": "^7.4.1",
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^0.21.1",
+    "html-to-pdfmake": "^2.5.1",
+    "pdfmake": "^0.2.9",
+    "quill-blot-formatter": "^1.0.5",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
     "vue-simple-calendar": "^6.3.1",
