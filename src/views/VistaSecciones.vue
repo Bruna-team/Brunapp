@@ -4,6 +4,7 @@ import { brunaApi } from '../funciones/api.ts';
 import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import PasarAsistencia from '../components/PasarAsistencia.vue';
+const car = ref(localStorage.getItem("bruna"))
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
 const tabsLoading = ref<boolean>(true)
@@ -89,6 +90,7 @@ function organizarSecciones(data:string[]) {
           {{ m.men }}
         </v-tab>
         <AgregarEstudiante
+          v-if="car == '1' || car == '2'"
           :menciones="menciones"
           :classBtn="'ml-2'"
           @recargar="cargaInicial"
