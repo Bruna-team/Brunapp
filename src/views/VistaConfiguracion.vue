@@ -158,6 +158,7 @@ function AgregarCurso() {
           <v-card title="Estudiantes" class="pb-3">
             <template #append>
               <v-btn
+                variant="text"
                 prepend-icon="mdi-file-excel"
                 text="Agregar estudiantes como excel"
                 color="secundario"
@@ -175,6 +176,7 @@ function AgregarCurso() {
           <v-card title="Menciones" class="pb-3">
             <template #append>
               <v-btn
+                variant="text"
                 prepend-icon="mdi-account-school"
                 text="Agregar mención"
                 color="secundario"
@@ -216,6 +218,7 @@ function AgregarCurso() {
           <v-card title="Cursos" class="pb-3">
             <template #append>
               <v-btn
+                variant="text"
                 prepend-icon="mdi-town-hall"
                 text="Agregar curso"
                 color="secundario"
@@ -263,6 +266,7 @@ function AgregarCurso() {
           <v-card title="Módulos" class="pb-3">
             <template #append>
               <v-btn
+                variant="text"
                 prepend-icon="mdi-store-clock"
                 text="Agregar modulo"
                 color="secundario"
@@ -337,6 +341,7 @@ function AgregarCurso() {
           <v-card title="Materias" class="pb-3">
             <template #append>
               <v-btn
+                variant="text"
                 prepend-icon="mdi-book"
                 text="Agregar materia"
                 color="secundario"
