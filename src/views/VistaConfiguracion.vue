@@ -156,7 +156,16 @@ function AgregarCurso() {
         </v-col>
         <v-col>
           <v-card title="Estudiantes" class="pb-3">
-            <v-btn text="Agregar estudiantes como excel"/>
+            <template #append>
+              <v-btn
+                prepend-icon="mdi-file-excel"
+                text="Agregar estudiantes como excel"
+                color="secundario"
+              />
+            </template>
+            <v-list-item>
+              Total de estudiantes: 650
+            </v-list-item>
           </v-card>
         </v-col>
         <v-col cols="12">
@@ -166,9 +175,7 @@ function AgregarCurso() {
           <v-card title="Menciones" class="pb-3">
             <template #append>
               <v-btn
-                block
-                variant="tonal"
-                prepend-icon="mdi-plus"
+                prepend-icon="mdi-account-school"
                 text="Agregar mención"
                 color="secundario"
                 @click="AgregarMencion()"
@@ -209,9 +216,7 @@ function AgregarCurso() {
           <v-card title="Cursos" class="pb-3">
             <template #append>
               <v-btn
-                block
-                variant="tonal"
-                prepend-icon="mdi-plus"
+                prepend-icon="mdi-town-hall"
                 text="Agregar curso"
                 color="secundario"
                 @click="AgregarCurso()"
@@ -258,9 +263,7 @@ function AgregarCurso() {
           <v-card title="Módulos" class="pb-3">
             <template #append>
               <v-btn
-                block
-                variant="tonal"
-                prepend-icon="mdi-plus"
+                prepend-icon="mdi-store-clock"
                 text="Agregar modulo"
                 color="secundario"
                 @click="AgregarModulo()"
@@ -334,9 +337,7 @@ function AgregarCurso() {
           <v-card title="Materias" class="pb-3">
             <template #append>
               <v-btn
-                block
-                variant="tonal"
-                prepend-icon="mdi-plus"
+                prepend-icon="mdi-book"
                 text="Agregar materia"
                 color="secundario"
                 @click="AgregarMaterias()"
