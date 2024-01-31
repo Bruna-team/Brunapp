@@ -104,6 +104,7 @@ function iniciarSesion() {
     brunaApi({ s: 'auth' }, `usuario=${logData.value.cedula.value}&clave=${btoa(logData.value.password.value)}&rec=${recSesion.value}`)
     .then((res:any) => {
       if (res.data.r) {
+        localStorage.setItem("bruna", res.data.m)
         router.push('/')
       } else {
         alertaMsj.value = "Hubo un error: " + (res.data.e || 'Usuario no registrado')

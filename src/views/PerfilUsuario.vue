@@ -125,6 +125,7 @@ function cerrarSesion() {
   brunaApi({ s: 'salir' }, '')
   .then((r:any) => {
     if (r.data.r) {
+      localStorage.removeItem("bruna");
       router.push('LogIn')
     }
   }).catch(() => {
