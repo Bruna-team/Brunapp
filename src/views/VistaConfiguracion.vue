@@ -120,7 +120,7 @@ function AgregarCurso() {
   <v-container>
     <h2 class="flex-fill">Configuración</h2>
     <v-sheet color="transparent" class="d-flex flex-wrap align-start">
-      <v-row>
+      <v-row class="mt-2">
         <v-col cols="12">
           <p class="text-caption text-uppercase text-medium-emphasis my-0">Estudiantes y periodo académico</p>
         </v-col>
