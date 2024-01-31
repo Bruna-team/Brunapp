@@ -124,23 +124,33 @@ function AgregarCurso() {
         <v-col cols="12">
           <p class="text-caption text-uppercase text-medium-emphasis my-0">Estudiantes y periodo académico</p>
         </v-col>
-        <v-col cols="12" sm="4">
+        <v-col cols="12" sm="">
           <v-card title="Año académico" class="pb-3">
-            <v-list-item>
+            <template #append>
+              <v-btn
+                variant="text"
+                text="Subir un año"
+                prepend-icon="mdi-human-handsup"
+                color="secundario"
+              />
+            </template>
+            <v-list-item title="Inicio y fin del año académico">
               <template v-if="periodo.edit">
                 <v-row>
-                  <v-col>
+                  <v-col cols="12" sm="5">
                     <v-text-field
                       label="Ingresa el inicio"
                       type="date"
                       v-model="periodo.start"
+                      hide-details="auto"
                     />
                   </v-col>
-                  <v-col>
+                  <v-col cols="12" sm="5">
                     <v-text-field
                       label="Ingresa el fin"
                       type="date"
                       v-model="periodo.end"
+                      hide-details="auto"
                     />
                   </v-col>
                 </v-row>
@@ -149,12 +159,13 @@ function AgregarCurso() {
                 <v-list-item-title class="text-capitalize">{{ periodo.start }} - {{ periodo.end }}</v-list-item-title>
               </template>
               <template #append>
-                <v-btn flat icon="mdi-pen" @click="periodo.edit = !periodo.edit" />
+                <v-btn flat :icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'" @click="periodo.edit = !periodo.edit" />
+                <v-btn v-if="periodo.edit" flat icon="mdi-check" @click="periodo.edit = !periodo.edit" />
               </template>
             </v-list-item>
           </v-card>
         </v-col>
-        <v-col>
+        <!-- <v-col>
           <v-card title="Estudiantes" class="pb-3">
             <template #append>
               <v-btn
@@ -168,7 +179,7 @@ function AgregarCurso() {
               Total de estudiantes: 650
             </v-list-item>
           </v-card>
-        </v-col>
+        </v-col> -->
         <v-col cols="12">
           <p class="text-caption text-uppercase text-medium-emphasis my-0">Menciones y cursos/años de la institución</p>
         </v-col>
