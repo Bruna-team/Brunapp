@@ -6,40 +6,14 @@ import { brunaApi } from '../funciones/api.ts';
 
 const alertaMsj = ref<string>('')
 const periodo = ref({startF: '', endF: '', startS: '', endS: '', edit: false})
-const modulos = ref<{
-  id_mod: number;
-  name_mod: string;
-  timeStart: string;
-  timeEnd: string;
-  edit: boolean;
-  active: boolean;
-  nuevo?: boolean
-}[]>([
-  {
-    id_mod: 1,
-    name_mod: 'Primer modulo',
-    timeStart: formatoFechaYHora(new Date(), 'hora'),
-    timeEnd: formatoFechaYHora(new Date(), 'hora'),
-    edit: false,
-    active: true,
-  },
-  {
-    id_mod: 2,
-    name_mod: 'Segundo modulo',
-    timeStart: formatoFechaYHora(new Date(), 'hora'),
-    timeEnd: formatoFechaYHora(new Date(), 'hora'),
-    edit: false,
-    active: true,
-  },
-  {
-    id_mod: 0,
-    name_mod: 'Tercer modulo',
-    timeStart: formatoFechaYHora(new Date(), 'hora'),
-    timeEnd: formatoFechaYHora(new Date(), 'hora'),
-    edit: false,
-    active: true,
-  }
-])
+const modulos = ref([{
+  id_mod: '',
+  name_mod: '',
+  timeStart: '',
+  timeEnd: '',
+  edit: false,
+  nuevo: false
+}])
 onMounted(() => {
 	cargaInicial();
 });
@@ -102,6 +76,27 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Hubo un error consultando los datos"
   })
+  brunaApi({ s: 'horarios' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      let hor:any = []
+      res.data.forEach((h: any) => {
+        hor.push({
+          id_mod: h.id_hor,
+          name_mod: h.modulo_hor,
+          timeStart: h.inicio_hor,
+          timeEnd: h.fin_hor,
+          edit: false,
+          nuevo: false
+        })
+      })
+      modulos.value = hor
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error consultando los datos"
+  })
 }
 function AgregarMaterias() {
   materias.value.push({
@@ -113,12 +108,11 @@ function AgregarMaterias() {
 }
 function AgregarModulo() {
   modulos.value.push({
-    id_mod: 0,
+    id_mod: '0',
     name_mod: '',
     timeStart: formatoFechaYHora(new Date(), 'hora'),
     timeEnd: formatoFechaYHora(new Date(), 'hora'),
     edit: true,
-    active: true,
     nuevo: true,
   })
 }
@@ -148,6 +142,55 @@ function guardaPeriodo() {
     }
   }).catch(() => {
     alertaMsj.value = "Hubo un error guardando los datos"
+  })
+}
+function guardaModulo(id: any) {
+  if (modulos.value[id].name_mod) {
+    brunaApi({ s: 'horarioCrear' }, 'mod=' + modulos.value[id].name_mod + '&ini=' + modulos.value[id].timeStart + '&fin=' + modulos.value[id].timeEnd)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+        modulos.value[id].edit = false
+        modulos.value[id].nuevo = false
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error guardando los datos"
+    })
+  } else {
+    alertaMsj.value = "Rellene todos los campos"
+  }
+}
+function editarModulo(id: any) {
+  if (modulos.value[id].name_mod) {
+    brunaApi({ s: 'editarHorario' }, 'mod=' + modulos.value[id].name_mod + '&ini=' + modulos.value[id].timeStart 
+    + '&fin=' + modulos.value[id].timeEnd + '&id=' + modulos.value[id].id_mod)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+        modulos.value[id].edit = false
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error editando los datos"
+    })
+  } else {
+    alertaMsj.value = "Rellene todos los campos"
+  }
+}
+function eliminarModulo(id: any) {
+  brunaApi({ s: 'horarioEliminar' }, 'id=' + modulos.value[id].id_mod)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      cargaInicial()
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error eliminando los datos"
   })
 }
 </script>
@@ -342,13 +385,12 @@ function guardaPeriodo() {
             <v-list-item
               v-for="(modulo, m) in modulos"
               :key="m"
-              :class="{'text-muted' : !modulo.active}"
             >
               <template v-if="modulo.edit">
                 <v-row>
                   <v-col cols="12" lg="">
                     <v-text-field
-                      v-if="modulo.nuevo"
+                      v-if="modulo.edit"
                       v-model="modulo.name_mod"
                       label="Modulo"
                       variant="underlined"
@@ -382,22 +424,22 @@ function guardaPeriodo() {
               </template>
               <template #append>
                 <v-btn
+                  v-if="modulo.nuevo"
                   variant="text"
-                  :disabled="!modulo.active"
                   :icon="modulo.edit ? 'mdi-check' : 'mdi-pen'"
-                  @click="modulo.edit = !modulo.edit"
+                  @click="modulo.edit ? guardaModulo(m) : modulo.edit = !modulo.edit"
+                />
+                <v-btn
+                  v-else
+                  variant="text"
+                  :icon="modulo.edit ? 'mdi-check' : 'mdi-pen'"
+                  @click="modulo.edit ? editarModulo(m) : modulo.edit = !modulo.edit"
                 />
                 <v-btn
                   variant="text"
-                  :icon="modulo.active ? 'mdi-circle' : 'mdi-minus-circle'"
-                  :class="modulo.active ? 'text-secundario' : 'text-muted'"
-                  @click="modulo.active = !modulo.active, modulo.edit = false"
-                />
-                <v-btn
-                  variant="text"
-                  icon="mdi-trash-can"
+                  :icon="modulo.edit ? 'mdi-cancel' : 'mdi-trash-can'"
                   class="text-error"
-                  @click="modulo.edit = !modulo.edit"
+                  @click="modulo.edit ? modulo.edit = !modulo.edit : eliminarModulo(m)"
                 />
               </template>
             </v-list-item>
