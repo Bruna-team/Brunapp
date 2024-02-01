@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { formatoFechaYHora } from '../funciones/funciones';
+import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '../funciones/api.ts';
 
-const periodo = ref({start: '2024-02-02', end: '2024-03-10', edit: false})
+const alertaMsj = ref<string>('')
+const periodo = ref({startF: '', endF: '', startS: '', endS: '', edit: false})
 const modulos = ref<{
   id_mod: number;
   name_mod: string;
@@ -37,6 +40,9 @@ const modulos = ref<{
     active: true,
   }
 ])
+onMounted(() => {
+	cargaInicial();
+});
 const materias = ref([
   {
     id_mat: 1,
@@ -82,6 +88,21 @@ const cursos = ref([
   {id: 5, nom: 'Quinto', edit: false},
   {id: 6, nom: 'Sexto', edit: false},
 ])
+function cargaInicial() {
+  brunaApi({ s: 'informacion' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      periodo.value.startF = res.data[0].ano_oct_inf
+      periodo.value.endF = res.data[0].ano_dic_inf
+      periodo.value.startS = res.data[0].ano_ene_inf
+      periodo.value.endS = res.data[0].ano_jul_inf
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error consultando los datos"
+  })
+}
 function AgregarMaterias() {
   materias.value.push({
     id_mat: materias.value.length+1,
@@ -115,9 +136,24 @@ function AgregarCurso() {
     edit: true,
   })
 }
+function guardaPeriodo() {
+  brunaApi({ s: 'informacionGuardar' }, 'oct=' + periodo.value.startF + '&dic=' + periodo.value.endF + '&ene='
+  + periodo.value.startS + '&jul=' + periodo.value.endS)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      periodo.value.edit = false
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error guardando los datos"
+  })
+}
 </script>
 <template>
   <v-container>
+    <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
     <h2 class="flex-fill">Configuración</h2>
     <v-sheet color="transparent" class="d-flex flex-wrap align-start">
       <v-row class="mt-2">
@@ -139,28 +175,47 @@ function AgregarCurso() {
                 <v-row>
                   <v-col cols="12" sm="5">
                     <v-text-field
-                      label="Ingresa el inicio"
+                      label="Ingresa el inicio del periodo Oct-Dic"
                       type="date"
-                      v-model="periodo.start"
+                      v-model="periodo.startF"
                       hide-details="auto"
                     />
                   </v-col>
                   <v-col cols="12" sm="5">
                     <v-text-field
-                      label="Ingresa el fin"
+                      label="Ingresa el fin del periodo Oct-Dic"
                       type="date"
-                      v-model="periodo.end"
+                      v-model="periodo.endF"
+                      hide-details="auto"
+                    />
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="12" sm="5">
+                    <v-text-field
+                      label="Ingresa el inicio del periodo Ene-Jul"
+                      type="date"
+                      v-model="periodo.startS"
+                      hide-details="auto"
+                    />
+                  </v-col>
+                  <v-col cols="12" sm="5">
+                    <v-text-field
+                      label="Ingresa el fin del periodo Ene-Jul"
+                      type="date"
+                      v-model="periodo.endS"
                       hide-details="auto"
                     />
                   </v-col>
                 </v-row>
               </template>
               <template v-else>
-                <v-list-item-title class="text-capitalize">{{ periodo.start }} - {{ periodo.end }}</v-list-item-title>
+                <v-list-item-title class="text-capitalize">{{ periodo.startF }} - {{ periodo.endF }}</v-list-item-title>
+                <v-list-item-title class="text-capitalize">{{ periodo.startS }} - {{ periodo.endS }}</v-list-item-title>
               </template>
               <template #append>
                 <v-btn flat :icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'" @click="periodo.edit = !periodo.edit" />
-                <v-btn v-if="periodo.edit" flat icon="mdi-check" @click="periodo.edit = !periodo.edit" />
+                <v-btn v-if="periodo.edit" flat icon="mdi-check" @click="guardaPeriodo" />
               </template>
             </v-list-item>
           </v-card>
