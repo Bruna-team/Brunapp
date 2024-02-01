@@ -137,6 +137,24 @@ function AgregarCurso() {
     edit: true,
   })
 }
+function limpiarMateria(m: any) {
+  if (materias.value[m].nuevo) {
+    materias.value.splice(m, 1)
+  } else {
+    cargaInicial()
+  }
+}
+function limpiarModulo(m: any) {
+  if (modulos.value[m].nuevo) {
+    modulos.value.splice(m, 1)
+  } else {
+    cargaInicial()
+  }
+}
+function limpiarPeriodo() {
+  periodo.value.edit = false
+  cargaInicial()
+}
 function guardaPeriodo() {
   brunaApi({ s: 'informacionGuardar' }, 'oct=' + periodo.value.startF + '&dic=' + periodo.value.endF + '&ene='
   + periodo.value.startS + '&jul=' + periodo.value.endS)
@@ -310,7 +328,7 @@ function eliminarMateria(id: any) {
                 <v-list-item-title class="text-capitalize">{{ periodo.startS }} - {{ periodo.endS }}</v-list-item-title>
               </template>
               <template #append>
-                <v-btn flat :icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'" @click="periodo.edit = !periodo.edit" />
+                <v-btn flat :icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'" @click="periodo.edit ? limpiarPeriodo() : periodo.edit = !periodo.edit" />
                 <v-btn v-if="periodo.edit" flat icon="mdi-check" @click="guardaPeriodo" />
               </template>
             </v-list-item>
@@ -492,7 +510,7 @@ function eliminarMateria(id: any) {
                   variant="text"
                   :icon="modulo.edit ? 'mdi-cancel' : 'mdi-trash-can'"
                   class="text-error"
-                  @click="modulo.edit ? modulo.edit = !modulo.edit : eliminarModulo(m)"
+                  @click="modulo.edit ? limpiarModulo(m) : eliminarModulo(m)"
                 />
               </template>
             </v-list-item>
@@ -540,9 +558,9 @@ function eliminarMateria(id: any) {
                 />
                 <v-btn
                   variant="text"
-                  icon="mdi-trash-can"
+                  :icon="materia.edit ? 'mdi-cancel' : 'mdi-trash-can'"
                   class="text-error"
-                  @click="materia.edit ? materia.edit = !materia.edit : eliminarMateria(m)"
+                  @click="materia.edit ? limpiarMateria(m) : eliminarMateria(m)"
                 />
               </template>
             </v-list-item>
