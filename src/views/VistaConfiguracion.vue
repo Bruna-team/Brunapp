@@ -19,22 +19,10 @@ onMounted(() => {
 });
 const materias = ref([
   {
-    id_mat: 1,
-    title: 'Geografía',
+    id_mat: '',
+    title: '',
     edit: false,
-    active: true,
-  },
-  {
-    id_mat: 2,
-    title: 'Ingles',
-    edit: false,
-    active: true,
-  },
-  {
-    id_mat: 0,
-    title: 'Computación',
-    edit: false,
-    active: true,
+    nuevo: false,
   }
 ])
 const menciones = ref([
@@ -97,13 +85,32 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Hubo un error consultando los datos"
   })
+  brunaApi({ s: 'materias' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      let mat:any = []
+      res.data.forEach((h: any) => {
+        mat.push({
+          id_mat: h.id_mat,
+          title: h.nom_mat,
+          edit: false,
+          nuevo: false
+        })
+      })
+      materias.value = mat
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error consultando los datos"
+  })
 }
 function AgregarMaterias() {
   materias.value.push({
-    id_mat: materias.value.length+1,
+    id_mat: '0',
     title: '',
     edit: true,
-    active: true,
+    nuevo: true,
   })
 }
 function AgregarModulo() {
@@ -150,8 +157,7 @@ function guardaModulo(id: any) {
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = res.data.e
-        modulos.value[id].edit = false
-        modulos.value[id].nuevo = false
+        cargaInicial()
       } else {
         alertaMsj.value = "Hubo un error: " + res.data.e
       }
@@ -182,6 +188,53 @@ function editarModulo(id: any) {
 }
 function eliminarModulo(id: any) {
   brunaApi({ s: 'horarioEliminar' }, 'id=' + modulos.value[id].id_mod)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      cargaInicial()
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error eliminando los datos"
+  })
+}
+function guardarMateria(id: any) {
+  if (materias.value[id].title) {
+    brunaApi({ s: 'materiasCrear' }, 'mat=' + materias.value[id].title)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+        cargaInicial()
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error guardando los datos"
+    })
+  } else {
+    alertaMsj.value = "Rellene todos los campos"
+  }
+}
+function editarMateria(id: any) {
+  if (materias.value[id].title) {
+    brunaApi({ s: 'materiaEditar' }, 'mat=' + materias.value[id].title + '&id=' + materias.value[id].id_mat)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+        materias.value[id].edit = false
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error editando los datos"
+    })
+  } else {
+    alertaMsj.value = "Rellene todos los campos"
+  }
+}
+function eliminarMateria(id: any) {
+  brunaApi({ s: 'materiaEliminar' }, 'id=' + materias.value[id].id_mat)
   .then((res:any) => {
     if (res.data.r) {
       alertaMsj.value = res.data.e
@@ -470,26 +523,26 @@ function eliminarModulo(id: any) {
                 />
               </template>
               <template v-else>
-                <v-list-item-title :class="['text-capitalize', {'text-muted' : !materia.active}]"> {{ materia.title }}</v-list-item-title>
+                <v-list-item-title class="text-capitalize"> {{ materia.title }}</v-list-item-title>
               </template>
               <template #append>
                 <v-btn
+                  v-if="materia.nuevo"
                   variant="text"
-                  :disabled="!materia.active"
                   :icon="materia.edit ? 'mdi-check' : 'mdi-pen'"
-                  @click="materia.edit = !materia.edit"
+                  @click="materia.edit ? guardarMateria(m) : materia.edit = !materia.edit"
                 />
                 <v-btn
+                  v-else
                   variant="text"
-                  :icon="materia.active ? 'mdi-circle' : 'mdi-minus-circle'"
-                  :class="materia.active ? 'text-secundario' : 'text-muted'"
-                  @click="materia.active = !materia.active, materia.edit = false"
+                  :icon="materia.edit ? 'mdi-check' : 'mdi-pen'"
+                  @click="materia.edit ? editarMateria(m) : materia.edit = !materia.edit"
                 />
                 <v-btn
                   variant="text"
                   icon="mdi-trash-can"
                   class="text-error"
-                  @click="materia.edit = !materia.edit"
+                  @click="materia.edit ? materia.edit = !materia.edit : eliminarMateria(m)"
                 />
               </template>
             </v-list-item>
