@@ -37,12 +37,7 @@ const router = createRouter({
           path: "/usuario",
           name: "Perfil",
           component: () => import("../views/PerfilUsuario.vue"),
-        },
-        {
-          path: "/reportes",
-          name: "reportes",
-          component: () => import("../views/VistaReportes.vue"),
-        },
+        }
       ]
     },
     {
