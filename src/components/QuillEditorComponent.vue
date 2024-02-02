@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, PropType } from 'vue'
+import ModalImpresion from './ModalImpresion.vue'
+import { sustituirSpandEmbed } from '../funciones/funciones';
+import { useDisplay } from 'vuetify';
+const { smAndUp } = useDisplay()
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 // @ts-ignore
@@ -8,12 +12,27 @@ import {SpanEmbed} from '../funciones/quillConfigModule'
 import { Quill } from '@vueup/vue-quill'
 Quill.register(SpanEmbed);
 
-const emit = defineEmits(['content'])
-
-onMounted(() => {
-  emit('content', content.value)
+const props = defineProps({
+  plantilla: {
+    type: String,
+    default: '',
+  },
+  data: {
+    type: Object as PropType<{
+      ano?: string,
+      mencion?: string,
+      seccion?: string,
+      pasefecha?: string,
+      pasehor?: string,
+      id?: string,
+      estudiante?: string,
+      estudianteCedula?: string,
+      representante?: string,
+      paseTipo?: String
+    }>,
+    default: () => ({})
+  }
 })
-
 const editor = ref()
 const modules = ref({
   name: 'blotFormatter',
@@ -26,19 +45,36 @@ const toolbar = ref([
   [{ 'direction': 'rtl' }, {'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}, 'image'],
 ])
 const focusEditor = ref(false)
-const content = ref("<p><strong>E.T.C \"MADRE RAFOLS\"</strong></p><p><strong>VALERA ESTADO TRUJILLO</strong></p><h4 class=\"ql-align-center\">Pase de entrada</h4><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"Date\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">FECHA DE HOY</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"DateTime\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">HORA</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></br><p>Estudiante: <span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"Ename\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">ESTUDIANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Curso: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"curso\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">CURSO</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Sección: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"seccion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">SECCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Mención: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"mencion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MENCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></br><p>Tiene permiso para entrar a la clase de <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"materia\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MATERIA</span>﻿</span>﻿</span>﻿</span> correspondiente al <span class=\"editor-var\" data-type=\"Academico\" data-id=\"modulo\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MÓDULO</span>﻿</span>﻿</span>﻿</span>﻿</span> módulo.</p><p><br></p><p><strong>Motivo del retraso: </strong></p><p><br></p><p><u>                                             </u>            <u>                                      </u></p><p>Firma del representante                       Firma del coordinador</p><p><span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"representante\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">REPRESENTANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>  <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"Pname\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">PROFESOR NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span> </p>")
-
+const content = ref(props.plantilla ? props.plantilla : '')
 function insertSomething(value:Object) {
   const e = editor.value.getQuill()
   const p = e.selection.savedRange.index
    e.insertEmbed(p, 'spanEmbed', value);
+   sustituirSpandEmbed(props.data)
 }
-watch(content, (value) => {
-  emit('content', value)
+watch(()=> props.data,()=> {
+  console.log(props.data.paseTipo)
+  sustituirSpandEmbed(props.data)
+  const elements = document.getElementsByClassName('ql-editor');
+  const elementContents = Array.from(elements).map(element => element.innerHTML)[0];
+  content.value = JSON.stringify(elementContents).replace(/"/g, '')
 })
 </script>
 
 <template>
+  <v-sheet flat color="muted" class="d-sm-flex text-center text-sm-start align-center pa-3 rounded-t-lg">
+    <p class="text-h6 flex-1-1-100 flex-md-fill">
+      Configura el formato de pase que deseas generar
+    </p>
+    <v-divider
+      class="mx-auto my-1 mx-sm-2"
+      :vertical="smAndUp"
+    />
+    <ModalImpresion
+      :quill="true"
+      :content="content ? content : []"
+    />
+  </v-sheet>
   <v-sheet color="muted">
     <v-row no-gutters>
       <v-col cols="auto">
@@ -217,6 +253,22 @@ watch(content, (value) => {
           </v-chip>
         </v-btn>
       </v-col>
+      <v-col cols="auto">
+        <v-btn
+          flat
+          class="px-1"
+          color="muted"
+          @click="insertSomething({
+              text: 'TIPO DE PASE',
+              id: 'pase',
+              type: 'pase',
+            })"
+        >
+          <v-chip variant="outlined" color="secundario-claro">
+            Tipo de pase
+          </v-chip>
+        </v-btn>
+      </v-col>
     </v-row>
   </v-sheet>
   <QuillEditor
@@ -250,7 +302,7 @@ watch(content, (value) => {
   color: rgb(var(--v-theme-info));
   border-color: rgb(var(--v-theme-info));
 }
-[data-type="Fecha"] {
+[data-type="Fecha"], [data-type="pase"] {
   color: rgb(var(--v-theme-secundario-claro));
   border-color: rgb(var(--v-theme-secundario-claro));
 }

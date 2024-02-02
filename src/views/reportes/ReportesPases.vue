@@ -1,125 +1,27 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import ModalImpresion from '../../components/ModalImpresion.vue'
+import { ref, computed, PropType } from 'vue'
 import AlertaMensaje from '../../components/AlertaMensaje.vue'
 import QuillEditorComponentVue from '../../components/QuillEditorComponent.vue';
-import { formatoFechaYHora } from '../../funciones/funciones';
-import { useDisplay } from 'vuetify';
 import { brunaApi } from "../../funciones/api";
 const props = defineProps({
   dataPase: {
-    type: Object,
-    default: ref<{
-      ano: string,
-      mencion: string,
-      seccion: string,
-      pasefecha: string,
-      pasehor: string,
-      id: string,
-      estudiante: string,
-      estudianteCedula: string,
-      representante: string,
-    } | {}>({})
+    type: Object as PropType<{
+      ano?: string,
+      mencion?: string,
+      seccion?: string,
+      pasefecha?: string,
+      pasehor?: string,
+      id?: string,
+      estudiante?: string,
+      estudianteCedula?: string,
+      representante?: string,
+    }>,
+    default: () => ({})
   }
 })
-const { smAndUp } = useDisplay()
-
 const alertaMsj = ref('')
-const content = ref('')
+const plantilla = ref("<p><strong>E.T.C \"MADRE RAFOLS\"</strong></p><p><strong>VALERA ESTADO TRUJILLO</strong></p><h4 class=\"ql-align-center\"><span class=\"editor-var\" data-type=\"pase\" data-id=\"pase\">﻿<span contenteditable=\"false\">TIPO DE PASE</span>﻿</span></h4><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"Date\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">2024-01-31</span>﻿</span>﻿</span></p><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"DateTime\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">20:31</span>﻿</span>﻿</span></p><p><br></p><p>Estudiante: <span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"Ename\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">ESTUDIANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Curso: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"curso\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">CURSO</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Sección: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"seccion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">SECCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Mención: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"mencion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MENCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></p><p>Tiene permiso para entrar a la clase de <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"materia\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MATERIA</span>﻿</span>﻿</span>﻿</span>﻿</span> correspondiente al <span class=\"editor-var\" data-type=\"Academico\" data-id=\"modulo\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MÓDULO</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span> módulo.</p><p><br></p><p><strong>Motivo del retraso: </strong></p><p><br></p><p><u>                                             </u>            <u>                                      </u></p><p>Firma del representante                       Firma del coordinador</p><p><span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"representante\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">REPRESENTANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>  <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"Pname\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">PROFESOR NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span> </p>")
 const paseTipo = ref('')
-const valido = computed(() => {
-  return Object.values(props.dataPase).every((d: any) => d !== '')
-})
-
-function sustituirSpandEmbed() {
-  document.querySelectorAll('.editor-var').forEach((e: any) => {
-    const id = e.getAttribute('data-id')
-    switch (e.getAttribute('data-type')) {
-      case 'Estudiante':
-        switch(id) {
-          case 'Ename':
-            if(props.dataPase.estudiante) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.estudiante
-            }
-            break;
-          case 'representante':
-            if(props.dataPase.representante) {
-               e.getElementsByTagName('span')[0].textContent =
-               props.dataPase.representante
-            }
-            break;
-          case 'Ecedula':
-            if(props.dataPase.estudianteCedula) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.estudianteCedula
-            }
-            break;
-        }
-        break;
-      case 'Academico':
-        switch(id) {
-           case 'modulo':
-            if(props.dataPase.modulo) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.modulo
-            }
-            break;
-          case 'seccion':
-            if(props.dataPase.seccion) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.seccion
-            }
-            break;
-          case 'mencion':
-            if(props.dataPase.mencion) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.mencion
-            }
-            break;
-          case 'curso':
-            if(props.dataPase.ano) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.ano
-            }
-            break;
-        }
-        break;
-      case 'Profesor':
-         switch(id) {
-          case'Pname':
-            if(props.dataPase.profesor) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.profesor
-            }
-            break;
-          case'materia':
-            if(props.dataPase.materia) {
-              e.getElementsByTagName('span')[0].textContent =
-              props.dataPase.materia
-            }
-            break;
-          }
-          break;
-      case 'Fecha':
-      switch(id) {
-        case('Date'):
-          if(props.dataPase.pasefecha) {
-            e.getElementsByTagName('span')[0].textContent =
-            formatoFechaYHora(new Date(props.dataPase.pasefecha), 'fecha')
-          }
-          break;
-        case('DateTime'):
-          if(props.dataPase.pasefecha) {
-            e.getElementsByTagName('span')[0].textContent =
-            formatoFechaYHora(new Date(props.dataPase.pasefecha), 'hora')
-          }
-          break;
-      }
-      break;
-    }
-  })
-}
 function registrarPase() {
   if (props.dataPase.id && paseTipo.value && props.dataPase.pasefecha) {
     brunaApi({ s: 'registrarPases' }, 'alum=' + props.dataPase.id + '&pase=' + paseTipo.value + '&fec=' + props.dataPase.pasefecha + '&mot=' + ' ' + '&hor=' + props.dataPase.pasehor)
@@ -136,11 +38,12 @@ function registrarPase() {
     alertaMsj.value = "Faltan datos"
   }
 }
-watch(()=> props.dataPase,()=> {
-  sustituirSpandEmbed()
-  const elements = document.getElementsByClassName('ql-editor');
-  const elementContents = Array.from(elements).map(element => element.innerHTML)[0];
-  content.value = JSON.stringify(elementContents).replace(/"/g, '')
+const dataImpresion = computed(() => {
+  const data:any = props.dataPase
+  if (paseTipo.value) {
+    data.paseTipo = paseTipo.value == '5' ? 'Pase de entrada' : 'Pase de salida'
+    return data
+  } else {return data}
 })
 </script>
 <template>
@@ -164,22 +67,10 @@ watch(()=> props.dataPase,()=> {
       />
     </div>
   </v-sheet>
-  <v-sheet flat color="muted" class="d-sm-flex text-center text-sm-start align-center pa-3 rounded-t-lg">
-    <p class="text-h6 flex-1-1-100 flex-md-fill">
-      Configura el formato de pase que deseas generar
-    </p>
-    <v-divider
-      class="mx-auto my-1 mx-sm-2"
-      :vertical="smAndUp"
-    />
-    <ModalImpresion
-      :quill="true"
-      :content="content ? content : []"
-      :datos-validos="valido"
-    />
-  </v-sheet>
-  <!-- <v-btn @click="sustituirSpandEmbed">A</v-btn> -->
-  <QuillEditorComponentVue @content="content=$event" />
+  <QuillEditorComponentVue
+    :plantilla="plantilla"
+    :data="dataImpresion"
+  />
 </template>
 <style>
 .v-toolbar__content {
