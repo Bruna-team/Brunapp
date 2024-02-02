@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { formatoFechaYHora } from '../funciones/funciones';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { Menciones } from '../types/interfaceTypes';
 
 const alertaMsj = ref<string>('')
 const periodo = ref({startF: '', endF: '', startS: '', endS: '', edit: false})
@@ -25,7 +26,8 @@ const materias = ref([
     nuevo: false,
   }
 ])
-const menciones = ref([
+
+const menciones = ref<Menciones[]>([
   {
     id_men: '1',
     men: 'Telematica',
@@ -33,7 +35,7 @@ const menciones = ref([
     ano: [
       {
         id_ano: '1',
-        nom_ano: 'primero',
+        nom_ano: 'Primero',
         num_ano: '1',
         sec: [
           {
@@ -44,9 +46,9 @@ const menciones = ref([
         ]
       },
       {
-        id_ano: '1',
-        nom_ano: 'primero',
-        num_ano: '1',
+        id_ano: '2',
+        nom_ano: 'Segundo',
+        num_ano: '2',
         sec: [
           {
             id_ano: '1',
@@ -169,20 +171,48 @@ function AgregarModulo() {
     nuevo: true,
   })
 }
-// function AgregarMencion() {
-//   menciones.value.push({
-//     id: menciones.value.length+1,
-//     nom: '',
-//     edit: true,
-//   })
-// }
-// function AgregarCurso() {
-//   cursos.value.push({
-//     id: cursos.value.length+1,
-//     nom: '',
-//     edit: true,
-//   })
-// }
+function AgregarMencion() {
+  menciones.value.push({
+    id_men: (menciones.value.length+1).toString(),
+    men: '',
+    edit: true,
+    ano: [
+      {
+        id_ano: '0',
+        nom_ano: 'Primero',
+        num_ano: '1',
+        sec: [
+          {
+            id_ano: '1',
+            sec_nom: 'A',
+            num_sec: '1'
+          }
+        ]
+      }
+    ]
+  })
+}
+function agregarSeccion(menId:string, anoId: string) {
+  menciones.value[Number(menId)].ano[Number(anoId)].sec.push({
+    id_ano: '1',
+    sec_nom: 'A',
+    num_sec: '1'
+  })
+}
+function agregarAno(menId: string) {
+  menciones.value[Number(menId)].ano.push({
+    id_ano: '0',
+    nom_ano: 'Primero',
+    num_ano: '1',
+    sec: [
+      {
+        id_ano: '1',
+        sec_nom: 'A',
+        num_sec: '1'
+      }
+    ]
+  })
+}
 function limpiarMateria(m: any) {
   if (materias.value[m].nuevo) {
     materias.value.splice(m, 1)
@@ -412,67 +442,72 @@ function eliminarMateria(id: any) {
                 prepend-icon="mdi-account-school"
                 text="Agregar mención"
                 color="secundario"
-                @click=""
+                @click="AgregarMencion()"
               />
             </template>
             <v-list-item
               v-for="men in menciones"
               :key="men.id_men"
+              class="justify-start"
             >
+              <div class="float-right">
+                <v-btn
+                  variant="text"
+                  :prepend-icon="men.edit ? 'mdi-check' : 'mdi-pen'"
+                  :text="men.edit ? 'Guardar' : 'Editar'"
+                  @click="men.edit = !men.edit"
+                />
+                <v-btn
+                  variant="text"
+                  :prepend-icon="men.edit ? 'mdi-cancel' : 'mdi-trash-can'"
+                  :text="men.edit ? 'Cancelar' : 'Eliminar'"
+                  class="text-error"
+                  @click="men.edit = !men.edit"
+                />
+              </div>
               <template v-if="men.edit">
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="men.men"
-                      label="Nombre de la mención"
-                      variant="underlined"
-                      hide-details="auto"
-                    />
-                  </v-col>
-                  <template v-for="anos in men.ano" :key="anos.id_ano">
-                    <v-col cols="6">
+                <v-sheet class="d-flex align-center mb-3 mx-auto px-4 py-2" max-width="350px" color="muted" rounded="sm">
+                  <v-text-field
+                    v-model="men.men"
+                    label="Nombre de la mención"
+                    variant="underlined"
+                    hide-details="auto"
+                  />
+                  <v-btn variant="tonal" text="+ año" class="ml-4" @click="agregarAno(men.id_men)" />
+                </v-sheet>
+                <template v-for="anos in men.ano" :key="anos.id_ano">
+                  <v-row class="d-flex">
+                    <v-col cols="12" md="3">
                       <v-text-field
                         v-model="anos.nom_ano"
                         label="Cantidad de años o cursos"
-                        variant="underlined"
                         hide-details="auto"
                       />
                     </v-col>
-                    <v-col cols="6">
+                    <v-col>
                       <v-row>
-                        <v-col>
-                          <template v-for="secs in anos.sec">
+                        <template v-for="secs in anos.sec">
+                          <v-col cols="12" md="6">
                             <v-text-field
                               v-model="secs.sec_nom"
                               label="Cantidad de años o cursos"
-                              variant="underlined"
                               hide-details="auto"
                             />
-                          </template>
-                        </v-col>
+                          </v-col>
+                        </template>
                       </v-row>
                     </v-col>
-                    </template>
-                </v-row>
+                    <v-col cols="auto">
+                      <v-btn variant="tonal" text="+ sección" @click="agregarSeccion(men.id_men, anos.id_ano)" />
+                    </v-col>
+                  </v-row>
+                </template>
               </template>
               <template v-else>
                 <div>
                   <v-list-item-title class="text-capitalize">{{ men.men }}</v-list-item-title>
-                  <p>cantidad de cursos: {{ men.ano.length }}</p>
+                  <p>Cantidad de cursos: {{ men.ano.length }}</p>
                 </div>
-              </template>
-              <template #append>
-                <v-btn
-                  variant="text"
-                  :icon="men.edit ? 'mdi-check' : 'mdi-pen'"
-                  @click="men.edit = !men.edit"
-                />
-                <v-btn
-                  variant="text"
-                  icon="mdi-trash-can"
-                  class="text-error"
-                  @click="men.edit = !men.edit"
-                />
               </template>
             </v-list-item>
           </v-card>
@@ -608,3 +643,13 @@ function eliminarMateria(id: any) {
     </v-sheet>
   </v-container>
 </template>
+
+<style>
+.grid-column {
+  display: grid;
+  grid-template-areas:
+  'column-first column-second column-second column-second'
+}
+.column-first { grid-area: column-first;}
+.column-second { grid-area: column-second;}
+</style>
