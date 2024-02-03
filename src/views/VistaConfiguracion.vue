@@ -3,7 +3,6 @@ import { ref, onMounted } from 'vue'
 import { formatoFechaYHora } from '../funciones/funciones';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
-import { Menciones } from '../types/interfaceTypes';
 
 const alertaMsj = ref<string>('')
 const periodo = ref({startF: '', endF: '', startS: '', endS: '', edit: false})
@@ -27,71 +26,23 @@ const materias = ref([
   }
 ])
 
-const menciones = ref<Menciones[]>([
+const menciones = ref([
   {
-    id_men: '1',
-    men: 'Telematica',
+    id_men: '',
+    men: '',
     edit: false,
+    nuevo: false,
     ano: [
       {
-        id_ano: '1',
-        nom_ano: 'Primero',
-        num_ano: '1',
+        id_ano: '',
+        nom_ano: '',
+        num_ano: '',
+        nuevo: false,
         sec: [
           {
-            id_ano: '1',
-            sec_nom: 'A',
-            num_sec: '1'
-          }
-        ]
-      },
-      {
-        id_ano: '2',
-        nom_ano: 'Segundo',
-        num_ano: '2',
-        sec: [
-          {
-            id_ano: '1',
-            sec_nom: 'A',
-            num_sec: '1'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id_men: '1',
-    men: 'Administración',
-    edit: false,
-    ano: [
-      {
-        id_ano: '1',
-        nom_ano: 'primero',
-        num_ano: '1',
-        sec: [
-          {
-            id_ano: '1',
-            sec_nom: 'A',
-            num_sec: '1'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id_men: '1',
-    men: 'Contabilidad',
-    edit: false,
-    ano: [
-      {
-        id_ano: '1',
-        nom_ano: 'primero',
-        num_ano: '1',
-        sec: [
-          {
-            id_ano: '1',
-            sec_nom: 'A',
-            num_sec: '1'
+            id_ano: '',
+            sec_nom: '',
+            nuevo: false
           }
         ]
       }
@@ -152,6 +103,52 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Hubo un error consultando los datos"
   })
+  brunaApi({ s: 'menciones' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      const men:any = []
+      res.data.forEach((m:any) => {
+        if (!men[m.id_men]) {
+          men[m.id_men] = {
+            id_men: m.id_men,
+            men: m.nom_men,
+            edit: false,
+            nuevo: false,
+            ano: []
+          }
+        }
+        if (!men[m.id_men].ano[m.num_ano]) {
+          men[m.id_men].ano[m.num_ano] = {
+            id_ano: m.id_ano,
+            nom_ano: m.nom_ano,
+            num_ano: m.num_ano,
+            nuevo: false,
+            sec: []
+          }
+        }
+        if (!men[m.id_men].ano[m.num_ano].sec[m.id_ano]) {
+          men[m.id_men].ano[m.num_ano].sec[m.id_ano] = {
+            id_ano: m.id_ano,
+            sec_nom: m.sec_ano,
+            nuevo: false
+          }
+        }
+      });
+      res.data.forEach((m:any) => {
+        if (men[m.id_men].ano[m.num_ano]) {
+          men[m.id_men].ano[m.num_ano].sec = men[m.id_men].ano[m.num_ano].sec.filter((s:any) => s != null)
+        }
+      })
+      res.data.forEach((m:any) => {
+        men[m.id_men].ano = men[m.id_men].ano.filter((a:any) => a != null)
+      })
+      menciones.value = men.filter((m:any) => m != null)
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error consultando los datos"
+  })
 }
 function AgregarMaterias() {
   materias.value.push({
@@ -173,42 +170,45 @@ function AgregarModulo() {
 }
 function AgregarMencion() {
   menciones.value.push({
-    id_men: (menciones.value.length+1).toString(),
+    id_men: '0',
     men: '',
     edit: true,
+    nuevo: true,
     ano: [
       {
         id_ano: '0',
         nom_ano: 'Primero',
         num_ano: '1',
+        nuevo: true,
         sec: [
           {
             id_ano: '1',
             sec_nom: 'A',
-            num_sec: '1'
+            nuevo: true
           }
         ]
       }
     ]
   })
 }
-function agregarSeccion(menId:string, anoId: string) {
+function agregarSeccion(menId:any, anoId: any) {
   menciones.value[Number(menId)].ano[Number(anoId)].sec.push({
     id_ano: '1',
     sec_nom: 'A',
-    num_sec: '1'
+    nuevo: true
   })
 }
-function agregarAno(menId: string) {
+function agregarAno(menId: any) {
   menciones.value[Number(menId)].ano.push({
     id_ano: '0',
     nom_ano: 'Primero',
     num_ano: '1',
+    nuevo: true,
     sec: [
       {
         id_ano: '1',
         sec_nom: 'A',
-        num_sec: '1'
+        nuevo: true,
       }
     ]
   })
@@ -223,6 +223,13 @@ function limpiarMateria(m: any) {
 function limpiarModulo(m: any) {
   if (modulos.value[m].nuevo) {
     modulos.value.splice(m, 1)
+  } else {
+    cargaInicial()
+  }
+}
+function limpiarMencion(m: any) {
+  if (menciones.value[m].nuevo) {
+    menciones.value.splice(m, 1)
   } else {
     cargaInicial()
   }
@@ -340,6 +347,63 @@ function eliminarMateria(id: any) {
     alertaMsj.value = "Hubo un error eliminando los datos"
   })
 }
+function guardarMencion(m:any) {
+  const datosApi:any = []
+  if (m.men) {
+    if(m.nuevo) {
+      datosApi.push({
+        id_men: m.id_men,
+        nom_men: m.men,
+        abre_men: m.men.substring(0,1),
+        nuevo: true,
+        ano: m.ano
+      })
+    } else {
+      m.ano.forEach((a:any) => {
+        if (a.nuevo) {
+          if (!datosApi[0]) {
+            datosApi.push({
+              id_men: m.id_men,
+              ano: []
+            })
+          }
+          datosApi[0].ano.push(a)
+        } else {
+          a.sec.forEach((s:any) => {
+            if (s.nuevo) {
+              if (!datosApi[0]) {
+                datosApi.push({
+                  id_men: m.id_men,
+                  ano: []
+                })
+              }
+              datosApi[0].ano.push({
+                nom_ano: a.nom_ano,
+                num_ano: a.num_ano,
+                sec: []
+              })
+              datosApi[0].ano[datosApi[0].ano.length-1].sec.push(s)
+            }
+          })
+        }
+      })
+    }
+  } else {
+    alertaMsj.value = "Rellena todos los campos"
+  }
+  if (datosApi.length) {
+    brunaApi({ s: 'mencionCrear' }, JSON.stringify(datosApi))
+    .then((res:any) => {
+      if (res.data.r) {
+        cargaInicial()
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error eliminando los datos"
+    })
+  }
+}
 </script>
 <template>
   <v-container>
@@ -446,7 +510,7 @@ function eliminarMateria(id: any) {
               />
             </template>
             <v-list-item
-              v-for="men in menciones"
+              v-for="(men, m) in menciones"
               :key="men.id_men"
               class="justify-start"
             >
@@ -455,14 +519,14 @@ function eliminarMateria(id: any) {
                   variant="text"
                   :prepend-icon="men.edit ? 'mdi-check' : 'mdi-pen'"
                   :text="men.edit ? 'Guardar' : 'Editar'"
-                  @click="men.edit = !men.edit"
+                  @click="men.edit ? guardarMencion(men) : men.edit = !men.edit"
                 />
                 <v-btn
                   variant="text"
                   :prepend-icon="men.edit ? 'mdi-cancel' : 'mdi-trash-can'"
                   :text="men.edit ? 'Cancelar' : 'Eliminar'"
                   class="text-error"
-                  @click="men.edit = !men.edit"
+                  @click="men.edit ? limpiarMencion(m) : men.edit = !men.edit"
                 />
               </div>
               <template v-if="men.edit">
@@ -473,14 +537,20 @@ function eliminarMateria(id: any) {
                     variant="underlined"
                     hide-details="auto"
                   />
-                  <v-btn variant="tonal" text="+ año" class="ml-4" @click="agregarAno(men.id_men)" />
+                  <v-btn variant="tonal" text="+ año" class="ml-4" @click="agregarAno(m)" />
                 </v-sheet>
-                <template v-for="anos in men.ano" :key="anos.id_ano">
+                <template v-for="(anos, a) in men.ano" :key="anos.id_ano">
                   <v-row class="d-flex">
                     <v-col cols="12" md="3">
                       <v-text-field
                         v-model="anos.nom_ano"
-                        label="Cantidad de años o cursos"
+                        label="Nombre del año"
+                        hide-details="auto"
+                      />
+                      <v-text-field
+                        v-model="anos.num_ano"
+                        label="Número del año"
+                        type="number"
                         hide-details="auto"
                       />
                     </v-col>
@@ -490,7 +560,7 @@ function eliminarMateria(id: any) {
                           <v-col cols="12" md="6">
                             <v-text-field
                               v-model="secs.sec_nom"
-                              label="Cantidad de años o cursos"
+                              label="NOmbre de la sección"
                               hide-details="auto"
                             />
                           </v-col>
@@ -498,7 +568,7 @@ function eliminarMateria(id: any) {
                       </v-row>
                     </v-col>
                     <v-col cols="auto">
-                      <v-btn variant="tonal" text="+ sección" @click="agregarSeccion(men.id_men, anos.id_ano)" />
+                      <v-btn variant="tonal" text="+ sección" @click="agregarSeccion(m, a)" />
                     </v-col>
                   </v-row>
                 </template>
@@ -506,7 +576,7 @@ function eliminarMateria(id: any) {
               <template v-else>
                 <div>
                   <v-list-item-title class="text-capitalize">{{ men.men }}</v-list-item-title>
-                  <p>Cantidad de cursos: {{ men.ano.length }}</p>
+                  <p>Cantidad de cursos: {{ Object.keys(men.ano).length }}</p>
                 </div>
               </template>
             </v-list-item>
