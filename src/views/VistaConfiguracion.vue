@@ -400,9 +400,48 @@ function guardarMencion(m:any) {
         alertaMsj.value = "Hubo un error: " + res.data.e
       }
     }).catch(() => {
-      alertaMsj.value = "Hubo un error eliminando los datos"
+      alertaMsj.value = "Hubo un error agregando los datos"
     })
   }
+}
+function eliminarSeccion(id: any) {
+  brunaApi({ s: 'seccionEliminar' }, 'id=' + id)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      cargaInicial()
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error eliminando los datos"
+  })
+}
+function eliminarAno(id: any, men:any) {
+  brunaApi({ s: 'anoEliminar' }, 'id=' + id + '&men=' + men)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      cargaInicial()
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error eliminando los datos"
+  })
+}
+function eliminarMencion(id: any) {
+  brunaApi({ s: 'mencionEliminar' }, 'id=' + id )
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      cargaInicial()
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error eliminando los datos"
+  })
 }
 </script>
 <template>
@@ -526,7 +565,7 @@ function guardarMencion(m:any) {
                   :prepend-icon="men.edit ? 'mdi-cancel' : 'mdi-trash-can'"
                   :text="men.edit ? 'Cancelar' : 'Eliminar'"
                   class="text-error"
-                  @click="men.edit ? limpiarMencion(m) : men.edit = !men.edit"
+                  @click="men.edit ? limpiarMencion(m) : eliminarMencion(men.id_men)"
                 />
               </div>
               <template v-if="men.edit">
@@ -553,6 +592,12 @@ function guardarMencion(m:any) {
                         type="number"
                         hide-details="auto"
                       />
+                      <v-btn
+                        variant="text"
+                        prepend-icon="mdi-trash-can"
+                        class="text-error"
+                        @click="eliminarAno(anos.nom_ano, men.id_men)"
+                      />
                     </v-col>
                     <v-col>
                       <v-row>
@@ -560,8 +605,14 @@ function guardarMencion(m:any) {
                           <v-col cols="12" md="6">
                             <v-text-field
                               v-model="secs.sec_nom"
-                              label="NOmbre de la sección"
+                              label="Nombre de la sección"
                               hide-details="auto"
+                            />
+                            <v-btn
+                              variant="text"
+                              prepend-icon="mdi-trash-can"
+                              class="text-error"
+                              @click="eliminarSeccion(secs.id_ano)"
                             />
                           </v-col>
                         </template>
