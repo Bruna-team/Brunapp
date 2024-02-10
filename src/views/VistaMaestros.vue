@@ -4,21 +4,9 @@ import ConfigurarMaestro from '../components/ConfigurarMaestro.vue';
 import { brunaApi } from '../funciones/api.ts';
 const materias = ref([
   {
-    id: 1,
-    materia: 'Biologia',
+    id_mat: '',
+    nom_mat: '',
   },
-  {
-    id: 2,
-    materia: 'Matemática',
-  },
-  {
-    id: 3,
-    materia: 'Ingles',
-  },
-  {
-    id: 4,
-    materia: 'Geografia',
-  }
 ])
 const profes = ref([{
   id_person: '',
@@ -43,6 +31,14 @@ function cargaInicial() {
   .then((res:any) => {
     if (res.data) {
       profes.value = res.data
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+  brunaApi({ s: 'materias' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      materias.value = res.data
     }
   }).catch(() => {
     // message: 'Hubo un error cargando los datos',
@@ -87,8 +83,8 @@ function filtroMaterias() {
           v-model="materiaSeleccionada"
           label="Materia"
           :items="Object.values(materias)"
-          item-title="materia"
-          item-value="id"
+          item-title="nom_mat"
+          item-value="id_mat"
           @update:model-value="filtroMaterias"
         />
       </v-col>
