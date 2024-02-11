@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useDisplay } from 'vuetify'
+import { brunaApi } from '../funciones/api.ts';
+import AlertaMensaje from '../components/AlertaMensaje.vue';
+const alertaMsj = ref<string>('')
 const { smAndUp } = useDisplay()
 const props = defineProps({
   materias: {
@@ -12,7 +15,27 @@ const props = defineProps({
     default: false
   },
 })
+onMounted(() => {
+	cargaInicial();
+});
 const materias = computed(()=> props.materias)
+const menciones = ref<any[]>([{
+  id_men: '',
+  men: '',
+  ano: [
+    {
+      id_ano: '',
+      nom_ano: '',
+      num_ano: '',
+      sec: [
+        {
+          id_ano: '',
+          sec_nom: '',
+        }
+      ]
+    }
+  ]
+}])
 const rols = ref([
   {
     id:0,
@@ -28,10 +51,91 @@ const rols = ref([
   }
 ])
 const rol = ref({id: 0, rol: 'Profesor'})
-const jornadas= ref(1)
+const jornadasPersonal= ref<any[]>([{
+  modulo: '',
+  materia: '',
+  men: '',
+  ano: '',
+  sec: ''
+}])
+const modulos= ref([{
+  id_hor: '',
+  modulo_hor: '',
+  inicio_hor: '',
+  fin_hor: '',
+}])
 const cursos= ref(1)
+function cargaInicial() {
+  brunaApi({ s: 'horarios' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      modulos.value = res.data
+    }
+  }).catch(() => {
+    // message: 'Hubo un error cargando los datos',
+  })
+  brunaApi({ s: 'secciones' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      organizarSecciones(res.data)
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error cargando los datos"
+  })
+}
+function organizarSecciones(data:string[]) {
+  const dataMen:any = {}
+  data.forEach((d:any) => {
+    if (!dataMen[d.id_men]) {
+      dataMen[d.id_men] = {
+        id_men: d.id_men,
+        men: d.nom_men,
+        ano: {}
+      }
+    }
+    if(!dataMen[d.id_men].ano[d.nom_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano] = {
+        id_ano: d.id_ano,
+        nom_ano: d.nom_ano,
+        num_ano: d.num_ano,
+        sec: {}
+      }
+    }
+    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
+        id_ano: d.id_ano,
+        sec_nom: d.sec_ano,
+        semanero: d.pnom_alum + ' ' + d.pape_alum,
+        num_sec: d.num_est
+      }
+    }
+  })
+  menciones.value = dataMen
+}
+function AgregarJornada() {
+  jornadasPersonal.value.push({
+    modulo: '',
+    materia: '',
+    men: '',
+    ano: '',
+    sec: ''
+  })
+}
+function limpiarJornada() {
+  jornadasPersonal.value = [{
+    modulo: '',
+    materia: '',
+    men: '',
+    ano: '',
+    sec: ''
+  }]
+}
+function eliminarJornada(i: any) {
+  jornadasPersonal.value.splice(i, 1)
+}
 </script>
 <template>
+<AlertaMensaje :mensaje="alertaMsj" />
 <v-dialog max-width="850" close-on-back scrollable :fullscreen="!smAndUp">
   <template v-slot:activator="{ props }">
     <v-btn
@@ -51,7 +155,7 @@ const cursos= ref(1)
         <v-btn
           icon="mdi-close"
           dark
-          @click="isActive.value = false"
+          @click="isActive.value = false; limpiarJornada()"
         />
       </v-toolbar-items>
     </v-toolbar>
@@ -114,13 +218,13 @@ const cursos= ref(1)
         </template>
       </v-card-text>
       <v-card-text v-else>
-        <section v-for="jornada in jornadas">
+        <section v-for="(jornada, j) in jornadasPersonal" key="j">
           <v-divider/>
           <p class="d-flex align-center">
             <span class="flex-fill">
-              {{ jornada }} horario
+              {{ j+1 }} horario
             </span>
-            <v-btn icon="mdi-trash-can" color="error" variant="text"/>
+            <v-btn icon="mdi-trash-can" @click="eliminarJornada(j)" color="error" variant="text"/>
           </p>
           <v-divider class="mb-2"/>
           <v-row>
@@ -128,57 +232,62 @@ const cursos= ref(1)
               <v-combobox
                 chips
                 label="Horarios"
-                :items="Object.values(materias)"
-                item-title="materia"
-                item-value="id"
+                v-model="jornada.modulo"
+                :items="Object.values(modulos)"
+                item-title="modulo_hor"
+                item-value="id_mod"
               />
             </v-col>
             <v-col cols="12" sm="6">
               <v-combobox
                 chips
                 label="Materia"
+                v-model="jornada.materia"
                 :items="Object.values(materias)"
-                item-title="materia"
-                item-value="id"
+                item-title="nom_mat"
+                item-value="id_mat"
               />
             </v-col>
             <v-col cols="12" sm="4">
               <v-combobox
                 chips
                 label="Mención"
-                :items="Object.values(materias)"
-                item-title="materia"
-                item-value="id"
-              />
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-combobox
+                v-model="jornada.men"
+                :items="Object.values(menciones)"
+                item-title="men"
+                item-value="id_men"
+                />
+              </v-col>
+              <v-col cols="12" sm="4" v-if="jornada.men">
+                <v-combobox
                 chips
                 label="Año"
-                :items="Object.values(materias)"
-                item-title="materia"
-                item-value="id"
+                v-model="jornada.ano"
+                :items="Object.values(jornada.men.ano)"
+                item-title="nom_ano"
+                item-value="id_ano"
               />
             </v-col>
-            <v-col cols="12" sm="4">
+            <v-col cols="12" sm="4" v-if="jornada.ano">
               <v-combobox
                 chips
                 label="Sección"
-                :items="Object.values(materias)"
-                item-title="materia"
-                item-value="id"
+                v-model="jornada.sec"
+                :items="Object.values(jornada.ano.sec)"
+                item-title="sec_nom"
+                item-value="id_ano"
               />
             </v-col>
           </v-row>
         </section>
-        <v-btn block color="secundario" @click="jornadas++" text="Agregar otra jornada" />
+        <v-btn block color="secundario" @click="AgregarJornada" text="Agregar otra jornada" />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn
           prepend-icon="mdi-close"
           text="Cerrar"
-          @click="isActive.value = false"
+          @click="isActive.value = false; limpiarJornada()"
         />
         <v-btn
           prepend-icon="mdi-check"
