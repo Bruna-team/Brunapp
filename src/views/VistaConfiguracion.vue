@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { formatoFechaYHora } from '../funciones/funciones';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { Menciones } from '../types/interfaceTypes'
 
 const alertaMsj = ref<string>('')
 const periodo = ref({startF: '', endF: '', startS: '', endS: '', edit: false})
@@ -26,29 +27,7 @@ const materias = ref([
   }
 ])
 
-const menciones = ref([
-  {
-    id_men: '',
-    men: '',
-    edit: false,
-    nuevo: false,
-    ano: [
-      {
-        id_ano: '',
-        nom_ano: '',
-        num_ano: '',
-        nuevo: false,
-        sec: [
-          {
-            id_ano: '',
-            sec_nom: '',
-            nuevo: false
-          }
-        ]
-      }
-    ]
-  }
-])
+const menciones = ref<Menciones[]>([]);
 function cargaInicial() {
   brunaApi({ s: 'informacion' }, '')
   .then((res:any) => {
