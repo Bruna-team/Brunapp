@@ -4,6 +4,7 @@ import { useDisplay } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 const alertaMsj = ref<string>('')
+const dialog = ref(false)
 const { smAndUp } = useDisplay()
 const props = defineProps({
   materias: {
@@ -14,6 +15,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  id: {
+    type: String,
+    default: ''
+  }
 })
 onMounted(() => {
 	cargaInicial();
@@ -56,7 +61,8 @@ const jornadasPersonal= ref<any[]>([{
   materia: '',
   men: '',
   ano: '',
-  sec: ''
+  sec: '',
+  dia: ''
 }])
 const modulos= ref([{
   id_hor: '',
@@ -118,7 +124,8 @@ function AgregarJornada() {
     materia: '',
     men: '',
     ano: '',
-    sec: ''
+    sec: '',
+    dia: ''
   })
 }
 function limpiarJornada() {
@@ -127,16 +134,48 @@ function limpiarJornada() {
     materia: '',
     men: '',
     ano: '',
-    sec: ''
+    sec: '',
+    dia: ''
   }]
 }
 function eliminarJornada(i: any) {
   jornadasPersonal.value.splice(i, 1)
 }
+function guardarJornada() {
+  const dataApi:any = []
+  jornadasPersonal.value.forEach((j:any) => {
+    if (j.ano && j.materia && j.men && j.modulo && j.sec && j.dia) {
+      dataApi.push({
+        ano: j.sec.id_ano,
+        mat: j.materia.id_mat,
+        hor: j.modulo.id_hor,
+        dia: j.dia,
+        id: props.id
+      })
+    } else {
+      alertaMsj.value = "Complete la información"
+      return
+    }
+  })
+  if (dataApi.length) {
+    brunaApi({ s: 'jornadaCrear' }, JSON.stringify(dataApi))
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = "Se ha registrado el horario correctamente"
+        dialog.value = false
+        limpiarJornada()
+      } else {
+        alertaMsj.value = "Ha ocurrido un error registrando el horario"
+      }
+    }).catch(() => {
+      alertaMsj.value = "Ha ocurrido un error registrando el horario"
+    })
+  }
+}
 </script>
 <template>
-<AlertaMensaje :mensaje="alertaMsj" />
-<v-dialog max-width="850" close-on-back scrollable :fullscreen="!smAndUp">
+<AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
+<v-dialog v-model="dialog" max-width="850" close-on-back scrollable :fullscreen="!smAndUp">
   <template v-slot:activator="{ props }">
     <v-btn
       v-bind="props"
@@ -228,7 +267,7 @@ function eliminarJornada(i: any) {
           </p>
           <v-divider class="mb-2"/>
           <v-row>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="4">
               <v-combobox
                 chips
                 label="Horarios"
@@ -238,7 +277,7 @@ function eliminarJornada(i: any) {
                 item-value="id_mod"
               />
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="4">
               <v-combobox
                 chips
                 label="Materia"
@@ -246,6 +285,14 @@ function eliminarJornada(i: any) {
                 :items="Object.values(materias)"
                 item-title="nom_mat"
                 item-value="id_mat"
+              />
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-combobox
+                chips
+                label="Día"
+                v-model="jornada.dia"
+                :items="['Lunes','Martes','Miércoles','Jueves','Viernes']"
               />
             </v-col>
             <v-col cols="12" sm="4">
@@ -294,7 +341,7 @@ function eliminarJornada(i: any) {
           text="Guardar"
           variant="tonal"
           color="primario"
-          @click="isActive.value = false"
+          @click="guardarJornada"
         />
       </v-card-actions>
     </v-card>

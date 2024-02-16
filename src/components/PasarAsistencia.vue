@@ -66,7 +66,7 @@ watch(()=>dialog.value, ()=>{
 </script>
 <template>
   <v-row justify="center">
-    <AlertaMensaje :mensaje="alertaMsj" />
+    <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
     <v-dialog
       v-model="dialog"
       scrollable

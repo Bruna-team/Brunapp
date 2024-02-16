@@ -489,7 +489,7 @@ watch(()=>cedRe.value.value, ()=>{
 
 <template>
 <v-card color="transparent">
-  <AlertaMensaje :mensaje="alertaMsj" />
+  <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
   <v-navigation-drawer
     v-model="studentDrawer"
     floating

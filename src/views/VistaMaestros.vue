@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import ConfigurarMaestro from '../components/ConfigurarMaestro.vue';
 import { brunaApi } from '../funciones/api.ts';
+import AlertaMensaje from '../components/AlertaMensaje.vue';
+const alertaMsj = ref<string>('')
 const materias = ref([
   {
     id_mat: '',
@@ -33,7 +35,7 @@ function cargaInicial() {
       profes.value = res.data
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
   brunaApi({ s: 'materias' }, '')
   .then((res:any) => {
@@ -41,7 +43,7 @@ function cargaInicial() {
       materias.value = res.data
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
 function actualizar() {
@@ -49,17 +51,17 @@ function actualizar() {
   .then((res:any) => {
     if (res.data) {
       profes.value = res.data
+    } else {
+      alertaMsj.value = "Hubo un error cargando los datos"
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
 function filtroMaterias() {
-  let materiaFiltro:any = ''
-  let coma = ''
+  let materiaFiltro:any = []
   materiaSeleccionada.value.forEach((m: any) => {
-    materiaFiltro += `${coma}'${m.materia}'`
-    coma = ", "
+    materiaFiltro.push(m.id_mat)
   })
   materiaABuscar.value = materiaFiltro
   actualizar()
@@ -67,6 +69,7 @@ function filtroMaterias() {
 </script>
 <template>
   <v-container>
+    <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
     <h2>Maestros</h2>
     <v-row>
       <v-col>
@@ -100,8 +103,8 @@ function filtroMaterias() {
             horario
           </v-card-text>
           <v-card-actions class="justify-center">
-            <configurar-maestro :materias="materias" />
-            <configurar-maestro :materias="materias" :asignar-rol="true" />
+            <configurar-maestro :materias="materias" :id="p.id_person"/>
+            <configurar-maestro :materias="materias" :asignar-rol="true" :id="p.id_person"/>
           </v-card-actions>
         </v-card>
       </v-col>
