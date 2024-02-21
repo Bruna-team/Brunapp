@@ -31,5 +31,25 @@ interface Pase {
   representante: string,
   type?: string,
 }
-
-export type {Menciones, Pase}
+interface Modulos {
+  id_mod: string,
+  name_mod: string,
+  timeStart: string,
+  timeEnd: string,
+  edit?: boolean,
+  nuevo?: boolean
+}
+interface Materias {
+  id_mat: string,
+  title: string,
+  edit?: boolean,
+  nuevo?: boolean,
+}
+interface Periodos {
+  startF: string,
+  endF: string,
+  startS: string,
+  endS: string,
+  edit?: boolean,
+}
+export type {Menciones, Pase, Modulos, Materias, Periodos}
