@@ -3,7 +3,9 @@ import { ref, watch } from 'vue';
 const props = defineProps({
   dialog: Boolean,
   message: String,
+  subtitle: String,
   icon: String,
+  btnicon: String,
   colorBtn: {
     type: String,
     default: 'error'
@@ -25,18 +27,21 @@ watch(props, (value) => {
   width="auto"
 >
   <v-card>
-    <v-card-title>
+    <v-card-title class="text-wrap text-center">
       ¿Esta seguro que {{ message }}?
     </v-card-title>
-    <v-card-actions class="justify-center">
+    <v-card-subtitle v-if="subtitle" class="text-center text-wrap">
+      <v-icon v-if="icon" :icon="icon" class="d-block mx-auto" size="x-large"/>
+      {{ subtitle }}
+    </v-card-subtitle>
+    <v-card-actions class="justify-center flex-column flex-sm-row">
       <v-btn
-        color="primario"
         @click="$emit('confirmar', false), dialog = false"
       >Cancelar</v-btn>
       <v-btn
         :color="colorBtn"
         variant="tonal"
-        :append-icon="props.icon"
+        :append-icon="props.btnicon"
         @click="$emit('confirmar', true), dialog = false"
       >Si, estoy seguro</v-btn>
     </v-card-actions>

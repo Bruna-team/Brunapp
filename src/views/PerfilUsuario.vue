@@ -152,7 +152,7 @@ function cerrarSesion() {
         <span class="d-none d-md-inline">Cerrar sesión</span>
         <VentanaConfirmar
           :message="'desea cerrar sesión'"
-          icon="mdi-logout"
+          btnicon="mdi-logout"
           @confirmar="(e) => { e ? cerrarSesion() : '' }"
         />
       </v-btn>

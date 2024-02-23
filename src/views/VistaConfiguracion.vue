@@ -396,19 +396,65 @@ function eliminarSeccion(idSec: any) {
     <v-sheet color="transparent" class="d-flex flex-wrap align-start">
       <v-row class="mt-2">
         <v-col cols="12">
-          <p class="text-caption text-uppercase text-medium-emphasis my-0">Estudiantes y periodo académico</p>
+          <p class="text-caption text-uppercase text-medium-emphasis my-0">Periodo académico</p>
         </v-col>
         <v-col cols="12" sm="">
-          <v-card title="Año académico" class="pb-3">
-            <template #append>
-              <v-btn
-                variant="text"
-                text="Subir un año"
-                prepend-icon="mdi-human-handsup"
-                color="secundario"
-              />
-            </template>
-            <v-list-item title="Inicio y fin del año académico">
+          <v-card class="pb-3">
+            <v-row no-gutters justify="center" align="center">
+              <v-col cols="">
+                <v-card-title>
+                  Año académico
+                </v-card-title>
+              </v-col>
+              <v-col cols="auto" :class="['order-sm-1', {'d-flex flex-column d-sm-block': periodo.edit}]">
+                <v-btn
+                  variant="text"
+                  :prepend-icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'"
+                  @click="periodo.edit ? limpiarPeriodo() : periodo.edit = !periodo.edit"
+                >
+                  <span class="d-none d-sm-inline">
+                   {{ periodo.edit ? 'Cancelar' : ''}}
+                  </span>
+                  {{ periodo.edit ? '' : 'Editar'}}
+                </v-btn>
+                <v-btn
+                  v-if="periodo.edit"
+                  variant="tonal"
+                  prepend-icon="mdi-check"
+                  color="primario"
+                  @click="guardaPeriodo"
+                >
+                  <span class="d-none d-sm-inline">
+                   Guardar
+                  </span>
+                </v-btn>
+              </v-col>
+              <v-col
+                v-if="!periodo.edit"
+                cols="12" sm="auto"
+                class="text-center"
+              >
+                <v-btn
+                  variant="text"
+                  prepend-icon="mdi-human-handsup"
+                  color="secundario"
+                >
+                  Subir un año
+                  <VentanaConfirmar
+                    :message="'desea subir un año del periodo'"
+                    :subtitle="'Al realizar esta operación todos los alumnos aumentaran un año'"
+                    icon="mdi-human-handsup"
+                    btnicon="mdi-check"
+                    color-btn="primario"
+                    @confirmar="(e) => { e ? console.log('aumento') : '' }"
+                  />
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-list-item>
+              <v-list-item-title>
+                Inicio y fin del año académico
+              </v-list-item-title>
               <template v-if="periodo.edit">
                 <v-row>
                   <v-col cols="12" sm="6" lg="3">
@@ -446,7 +492,7 @@ function eliminarSeccion(idSec: any) {
                 </v-row>
               </template>
               <template v-else>
-                <v-list-item-title class="text-capitalize">
+                <div class="text-capitalize">
                   <p class="text-caption text-medium-emphasis">
                     Octubre - Diciembre
                   </p>
@@ -455,11 +501,7 @@ function eliminarSeccion(idSec: any) {
                     Enero - Julio
                   </p>
                   {{ periodo.startS }} - {{ periodo.endS }}
-                </v-list-item-title>
-              </template>
-              <template #append>
-                <v-btn flat :icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'" @click="periodo.edit ? limpiarPeriodo() : periodo.edit = !periodo.edit" />
-                <v-btn v-if="periodo.edit" flat icon="mdi-check" @click="guardaPeriodo" />
+                </div>
               </template>
             </v-list-item>
           </v-card>
@@ -483,156 +525,169 @@ function eliminarSeccion(idSec: any) {
           <p class="text-caption text-uppercase text-medium-emphasis my-0">Menciones y cursos/años de la institución</p>
         </v-col>
         <v-col cols="12">
-          <v-card title="Menciones" class="pb-3">
-            <template #append>
+          <v-card class="pb-3">
+            <div class="d-flex align-center justify-space-between">
+              <v-card-title>
+                Menciones
+              </v-card-title>
               <v-btn
                 variant="text"
                 prepend-icon="mdi-account-school"
-                text="Agregar mención"
+                text="Agregar"
                 color="secundario"
                 @click="AgregarMencion()"
               />
-            </template>
+            </div>
             <p v-if="editMen" class="text-center text-medium-emphasis">Solo puedes editar una mención a la vez</p>
             <v-list-item
               v-for="(men, m) in menciones"
               :key="men.id_men"
               class="justify-start"
             >
-              <div class="float-right mt-3">
-                <v-btn
-                  :variant="men.edit ? 'tonal': 'text'"
-                  :color="men.edit ? 'primario': ''"
-                  :prepend-icon="men.edit ? 'mdi-check' : 'mdi-pen'"
-                  :text="men.edit ? 'Guardar' : 'Editar'"
-                  :disabled="editMen && !men.edit"
-                  @click="men.edit ? guardarMencion(men) : (men.edit = !men.edit, editMen = true)"
-                />
-                <v-btn
-                  variant="text"
-                  :prepend-icon="men.edit ? 'mdi-cancel' : 'mdi-trash-can'"
-                  :disabled="editMen && !men.edit"
-                  class="text-error"
-                  @click="men.edit ? (limpiarMencion(m), editMen = false) : ''"
-                >
-                  <span>{{ men.edit ? 'Cancelar' : 'Eliminar' }}</span>
-                  <VentanaConfirmar
-                    v-if="!men.edit"
-                    :message="'desea eliminar esta mención'"
-                    icon="mdi-trash-can"
-                    @confirmar="(e) => { e ? eliminarMencion(men.id_men) : '' }"
-                  />
-                </v-btn>
-              </div>
-              <template v-if="men.edit">
-                <v-sheet class="d-flex align-center mb-3 mx-auto px-4 py-2" rounded="sm">
-                  <v-text-field
-                    v-model="men.men"
-                    label="Nombre de la mención"
-                    variant="underlined"
-                    hide-details="auto"
-                    class="flex-fill"
-                  />
-                  <v-btn variant="text" text="Agregar año" prepend-icon="mdi-plus" class="ml-4" @click="agregarAno(m)" />
-                </v-sheet>
-                <template v-for="(anos, a) in men.ano" :key="anos.id_ano">
-                  <v-sheet class="d-flex justify-space-between align-center" color="muted">
-                    <v-row no-gutters>
-                      <v-col cols="2">
-                        <v-text-field
-                          v-model="anos.num_ano"
-                          prefix="#"
-                          type="number"
-                          hide-details="auto"
-                        />
-                      </v-col>
-                      <v-col>
-                        <v-text-field
-                          v-model="anos.nom_ano"
-                          label="Nombre del año"
-                          hide-details="auto"
-                          class="flex-1-1"
-                          />
-                      </v-col>
-                    </v-row>
-                    <div>
-                      <v-btn
-                        variant="text"
-                        prepend-icon="mdi-trash-can"
-                      >
-                        Eliminar año
-                        <VentanaConfirmar
-                          :message="'desea eliminar este año'"
-                          icon="mdi-trash-can"
-                          @confirmar="(e) => { e ? eliminarAno(anos.nom_ano, men.id_men) : '' }"
-                        />
-                      </v-btn>
-                    </div>
-                  </v-sheet>
-                  <v-row no-gutters>
-                    <v-col cols="12" class="d-flex align-center">
-                      <p class="flex-fill">Secciones</p>
-                      <v-btn
-                        variant="text"
-                        text="Agregar sección"
-                        prepend-icon="mdi-plus"
-                        @click="agregarSeccion(m, a)"
-                      />
-                    </v-col>
-                    <v-col>
-                      <v-row>
-                        <template v-for="(secs) in anos.sec" :key="secs.id_ano">
-                          <v-col cols="12" sm="6" md="3">
-                            <v-text-field
-                              v-model="secs.sec_nom"
-                              label="Nombre"
-                              hide-details="auto"
-                            >
-                              <template #append>
-                                <v-btn
-                                  variant="text"
-                                  color="text-error"
-                                >
-                                  <v-icon icon="mdi-trash-can"  size="x-large" />
-                                  <VentanaConfirmar
-                                    :message="'desea eliminar esta sección'"
-                                    icon="mdi-trash-can"
-                                    @confirmar="(e) => { e ? eliminarSeccion(secs.id_ano) : '' }"
-                                  />
-                                </v-btn>
-                              </template>
-                            </v-text-field>
-                          </v-col>
-                        </template>
-                      </v-row>
-                    </v-col>
-                  </v-row>
-                  <v-divider class="mb-2 mt-1" />
-                </template>
-              </template>
-              <template v-else>
-                <div>
+              <div :class="['d-sm-flex', {'flex-column': men.edit}]">
+                <div v-if="!men.edit" class="flex-fill">
                   <v-list-item-title class="text-capitalize">{{ men.men }}</v-list-item-title>
                   <p>Cantidad de cursos: {{ Object.keys(men.ano).length }}</p>
                 </div>
-              </template>
+                <div class="mt-3 text-center">
+                  <v-btn
+                    :variant="men.edit ? 'tonal': 'text'"
+                    :color="men.edit ? 'primario': ''"
+                    :prepend-icon="men.edit ? 'mdi-check' : 'mdi-pen'"
+                    :text="men.edit ? 'Guardar' : 'Editar'"
+                    :disabled="editMen && !men.edit"
+                    @click="men.edit ? guardarMencion(men) : (men.edit = !men.edit, editMen = true)"
+                  />
+                  <v-btn
+                    variant="text"
+                    :prepend-icon="men.edit ? 'mdi-cancel' : 'mdi-trash-can'"
+                    :disabled="editMen && !men.edit"
+                    class="text-error"
+                    @click="men.edit ? (limpiarMencion(m), editMen = false) : ''"
+                  >
+                    <span>{{ men.edit ? 'Cancelar' : 'Eliminar' }}</span>
+                    <VentanaConfirmar
+                      v-if="!men.edit"
+                      :message="'desea eliminar esta mención'"
+                      :subtitle="'Al realizar esta operación se perderán los estudiantes relacionados con esta mención'"
+                      icon="mdi-alert"
+                      btnicon="mdi-trash-can"
+                      @confirmar="(e) => { e ? eliminarMencion(men.id_men) : '' }"
+                    />
+                  </v-btn>
+                </div>
+                <div v-if="men.edit">
+                  <v-sheet class="d-sm-flex align-center mb-3 mx-auto px-sm-4 py-2 text-center" rounded="sm">
+                    <v-text-field
+                      v-model="men.men"
+                      label="Nombre de la mención"
+                      variant="underlined"
+                      hide-details="auto"
+                      class="flex-fill"
+                    />
+                    <v-btn variant="text" text="Agregar año" prepend-icon="mdi-plus" class="ml-sm-4" @click="agregarAno(m)" />
+                  </v-sheet>
+                  <template v-for="(anos, a) in men.ano" :key="anos.id_ano">
+                    <v-sheet class="d-sm-flex justify-space-between align-center" color="muted">
+                      <v-row no-gutters>
+                        <v-col cols="3" sm="2">
+                          <v-text-field
+                            v-model="anos.num_ano"
+                            prefix="#"
+                            type="number"
+                            hide-details="auto"
+                          />
+                        </v-col>
+                        <v-col>
+                          <v-text-field
+                            v-model="anos.nom_ano"
+                            label="Nombre del año"
+                            hide-details="auto"
+                            class="flex-1-1 text-field-pa-0"
+                          >
+                          <template #append-inner>
+                            <v-btn
+                              variant="text"
+                            >
+                              <v-icon icon="mdi-trash-can" />
+                              <VentanaConfirmar
+                                :message="'desea eliminar este año'"
+                                :subtitle="'Al realizar esta operación se perderán los estudiantes relacionados con este año'"
+                                btnicon="mdi-trash-can"
+                                icon="mdi-alert"
+                                @confirmar="(e) => { e ? eliminarAno(anos.nom_ano, men.id_men) : '' }"
+                              />
+                            </v-btn>
+                          </template>
+                          </v-text-field>
+                        </v-col>
+                      </v-row>
+                    </v-sheet>
+                    <v-row no-gutters>
+                      <v-col cols="12" class="d-flex align-center">
+                        <p class="flex-fill">Secciones</p>
+                        <v-btn
+                          variant="text"
+                          text="Agregar"
+                          prepend-icon="mdi-plus"
+                          @click="agregarSeccion(m, a)"
+                        />
+                      </v-col>
+                      <v-col>
+                        <v-row>
+                          <template v-for="(secs) in anos.sec" :key="secs.id_ano">
+                            <v-col cols="12" sm="6" md="3">
+                              <v-text-field
+                                v-model="secs.sec_nom"
+                                label="Nombre"
+                                hide-details="auto"
+                                class="text-field__append-ma-0"
+                              >
+                                <template #append>
+                                  <v-btn
+                                    variant="text"
+                                    color="text-error"
+                                  >
+                                    <v-icon icon="mdi-trash-can"  size="large" />
+                                    <VentanaConfirmar
+                                      :message="'desea eliminar esta sección'"
+                                      :subtitle="'Al realizar esta operación se perderán los estudiantes relacionados con esta sección'"
+                                      btnicon="mdi-trash-can"
+                                      icon="mdi-alert"
+                                      @confirmar="(e) => { e ? eliminarSeccion(secs.id_ano) : '' }"
+                                    />
+                                  </v-btn>
+                                </template>
+                              </v-text-field>
+                            </v-col>
+                          </template>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                    <v-divider class="mb-2 mt-1" />
+                  </template>
+                </div>
+              </div>
             </v-list-item>
           </v-card>
         </v-col>
         <v-col cols="12">
           <p class="text-caption text-uppercase text-medium-emphasis my-0">Horarios y materias que se cursan</p>
         </v-col>
-        <v-col cols="12" sm="7">
-          <v-card title="Módulos" class="pb-3">
-            <template #append>
+        <v-col cols="12" sm="6" md="7">
+          <v-card class="pb-3">
+            <div class="d-flex align-center justify-space-between">
+              <v-card-title>
+                Módulos
+              </v-card-title>
               <v-btn
                 variant="text"
                 prepend-icon="mdi-store-clock"
-                text="Agregar modulo"
+                text="Agregar"
                 color="secundario"
                 @click="AgregarModulo()"
               />
-            </template>
+            </div>
             <v-list-item
               v-for="(modulo, m) in modulos"
               :key="m"
@@ -674,46 +729,51 @@ function eliminarSeccion(idSec: any) {
                 <v-list-item-subtitle>{{ modulo.timeStart }} a {{ modulo.timeEnd }}</v-list-item-subtitle>
               </template>
               <template #append>
-                <v-btn
-                  v-if="modulo.nuevo"
-                  variant="text"
-                  :icon="modulo.edit ? 'mdi-check' : 'mdi-pen'"
-                  @click="modulo.edit ? guardaModulo(m) : modulo.edit = !modulo.edit"
-                />
-                <v-btn
-                  v-else
-                  variant="text"
-                  :icon="modulo.edit ? 'mdi-check' : 'mdi-pen'"
-                  @click="modulo.edit ? editarModulo(m) : modulo.edit = !modulo.edit"
-                />
-                <v-btn
-                  variant="text"
-                  class="text-error"
-                  @click="modulo.edit ? limpiarModulo(m) : ''"
-                >
-                  <v-icon :icon="modulo.edit ? 'mdi-cancel' : 'mdi-trash-can'"  size="x-large"/>
-                  <VentanaConfirmar
-                    v-if="!modulo.edit"
-                    :message="'desea eliminar este módulo'"
-                    icon="mdi-trash-can"
-                    @confirmar="(e) => { e ? eliminarModulo(m) : '' }"
+                <div :class="{'d-flex flex-column align-center': modulo.edit}">
+                  <v-btn
+                    v-if="modulo.nuevo"
+                    variant="text"
+                    :icon="modulo.edit ? 'mdi-check' : 'mdi-pen'"
+                    @click="modulo.edit ? guardaModulo(m) : modulo.edit = !modulo.edit"
                   />
-                </v-btn>
+                  <v-btn
+                    v-else
+                    variant="text"
+                    :icon="modulo.edit ? 'mdi-check' : 'mdi-pen'"
+                    @click="modulo.edit ? editarModulo(m) : modulo.edit = !modulo.edit"
+                  />
+                  <v-btn
+                    variant="text"
+                    class="text-error"
+                    @click="modulo.edit ? limpiarModulo(m) : ''"
+                  >
+                    <v-icon :icon="modulo.edit ? 'mdi-cancel' : 'mdi-trash-can'"  size="x-large"/>
+                    <VentanaConfirmar
+                      v-if="!modulo.edit"
+                      :message="'desea eliminar este módulo'"
+                      btnicon="mdi-trash-can"
+                      @confirmar="(e) => { e ? eliminarModulo(m) : '' }"
+                    />
+                  </v-btn>
+                </div>
               </template>
             </v-list-item>
           </v-card>
         </v-col>
-        <v-col cols="12" sm="5">
-          <v-card title="Materias" class="pb-3">
-            <template #append>
+        <v-col cols="12" sm="6" md="5">
+          <v-card class="pb-3">
+            <div class="d-flex align-center justify-space-between">
+              <v-card-title>
+                Materias
+              </v-card-title>
               <v-btn
                 variant="text"
                 prepend-icon="mdi-book"
-                text="Agregar materia"
+                text="Agregar"
                 color="secundario"
                 @click="AgregarMaterias()"
               />
-            </template>
+            </div>
             <v-list-item
               v-for="(materia, m) in materias"
               :key="m"
@@ -752,7 +812,7 @@ function eliminarSeccion(idSec: any) {
                   <VentanaConfirmar
                     v-if="!materia.edit"
                     :message="'desea eliminar esta materia'"
-                    icon="mdi-trash-can"
+                    btnicon="mdi-trash-can"
                     @confirmar="(e) => { e ? eliminarMateria(m) : '' }"
                   />
                 </v-btn>
@@ -766,6 +826,16 @@ function eliminarSeccion(idSec: any) {
 </template>
 
 <style>
+.text-field__append-ma-0 {
+  .v-input__append {
+    margin: 0;
+  }
+}
+.text-field-pa-0 {
+  .v-field {
+    padding: 0;
+  }
+}
 .grid-column {
   display: grid;
   grid-template-areas:
