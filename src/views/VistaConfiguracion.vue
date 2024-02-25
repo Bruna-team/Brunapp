@@ -292,15 +292,56 @@ function AgregarMencion() {
 }
 function guardarMencion(m:any) {
   const datosApi:any = []
+  const datosEditarApi:any = []
   if (m.men) {
-    datosApi.push({
-      id_men: m.id_men,
-      nom_men: m.men,
-      abre_men: m.men.substring(0,1),
-      nuevo: true,
-      ano: m.ano
-    })
-    eliminarMencion(m.id_men)
+    if(m.nuevo) {
+      datosApi.push({
+        id_men: m.id_men,
+        nom_men: m.men,
+        abre_men: m.men.substring(0,1),
+        nuevo: true,
+        ano: m.ano
+      })
+    } else {
+      m.ano.forEach((a:any) => {
+        if (a.nuevo) {
+          if (!datosApi[0]) {
+            datosApi.push({
+              id_men: m.id_men,
+              ano: []
+            })
+          }
+          datosApi[0].ano.push(a)
+        } else {
+          a.sec.forEach((s:any) => {
+            if (s.nuevo) {
+              if (!datosApi[0]) {
+                datosApi.push({
+                  id_men: m.id_men,
+                  ano: []
+                })
+              }
+              datosApi[0].ano.push({
+                nom_ano: a.nom_ano,
+                num_ano: a.num_ano,
+                sec: []
+              })
+              datosApi[0].ano[datosApi[0].ano.length-1].sec.push(s)
+            } else {
+              datosEditarApi.push({
+                id_men: m.id_men,
+                nom_men: m.men,
+                abre_men: m.men.substring(0,1),
+                nom_ano: a.nom_ano,
+                num_ano: a.num_ano,
+                id_ano: s.id_ano,
+                sec_ano: s.sec_nom
+              })
+            }
+          })
+        }
+      })
+    }
   } else {
     alertaMsj.value = "Rellena todos los campos"
   }
@@ -309,6 +350,20 @@ function guardarMencion(m:any) {
     .then((res:any) => {
       if (res.data.r) {
         cargaInicial()
+        alertaMsj.value = res.data.e
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error agregando los datos"
+    })
+  }
+  if (datosEditarApi.length) {
+    brunaApi({ s: 'mencionEditar' }, JSON.stringify(datosEditarApi))
+    .then((res:any) => {
+      if (res.data.r) {
+        cargaInicial()
+        alertaMsj.value = res.data.e
       } else {
         alertaMsj.value = "Hubo un error: " + res.data.e
       }
