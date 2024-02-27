@@ -372,12 +372,12 @@ function guardarMencion(m:any) {
     })
   }
 }
-function eliminarMencion(id: any) {
+function eliminarMencion(id: any, m: any) {
   brunaApi({ s: 'mencionEliminar' }, 'id=' + id )
   .then((res:any) => {
     if (res.data.r) {
       alertaMsj.value = res.data.e
-      cargaInicial()
+      menciones.value.splice(m, 1)
     } else {
       alertaMsj.value = "Hubo un error: " + res.data.e
     }
@@ -408,12 +408,12 @@ function agregarAno(menId: any) {
     ]
   })
 }
-function eliminarAno(id: any, men:any) {
+function eliminarAno(id: any, men:any, m: any,  a: any) {
   brunaApi({ s: 'anoEliminar' }, 'id=' + id + '&men=' + men)
   .then((res:any) => {
     if (res.data.r) {
       alertaMsj.value = res.data.e
-      cargaInicial()
+      menciones.value[m].ano.splice(a, 1)
     } else {
       alertaMsj.value = "Hubo un error: " + res.data.e
     }
@@ -429,13 +429,13 @@ function agregarSeccion(menId:any, anoId: any) {
     nuevo: true
   })
 }
-function eliminarSeccion(idSec: any) {
+function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
   // menciones.value[men].ano[ano].sec.splice(sec, 1)
   brunaApi({ s: 'seccionEliminar' }, 'id=' + idSec)
   .then((res:any) => {
     if (res.data.r) {
       alertaMsj.value = res.data.e
-      cargaInicial()
+      menciones.value[m].ano[a].sec.splice(s, 1)
     } else {
       alertaMsj.value = "Hubo un error: " + res.data.e
     }
@@ -627,7 +627,7 @@ function eliminarSeccion(idSec: any) {
                       :subtitle="'Al realizar esta operación se perderán los estudiantes relacionados con esta mención'"
                       icon="mdi-alert"
                       btnicon="mdi-trash-can"
-                      @confirmar="(e) => { e ? eliminarMencion(men.id_men) : '' }"
+                      @confirmar="(e) => { e ? eliminarMencion(men.id_men, m) : '' }"
                     />
                   </v-btn>
                 </div>
@@ -670,7 +670,7 @@ function eliminarSeccion(idSec: any) {
                                 :subtitle="'Al realizar esta operación se perderán los estudiantes relacionados con este año'"
                                 btnicon="mdi-trash-can"
                                 icon="mdi-alert"
-                                @confirmar="(e) => { e ? eliminarAno(anos.nom_ano, men.id_men) : '' }"
+                                @confirmar="(e) => { e ? eliminarAno(anos.nom_ano, men.id_men, m, a) : '' }"
                               />
                             </v-btn>
                           </template>
@@ -690,7 +690,7 @@ function eliminarSeccion(idSec: any) {
                       </v-col>
                       <v-col>
                         <v-row>
-                          <template v-for="(secs) in anos.sec" :key="secs.id_ano">
+                          <template v-for="(secs, s) in anos.sec" :key="secs.id_ano">
                             <v-col cols="12" sm="6" md="3">
                               <v-text-field
                                 v-model="secs.sec_nom"
@@ -709,7 +709,7 @@ function eliminarSeccion(idSec: any) {
                                       :subtitle="'Al realizar esta operación se perderán los estudiantes relacionados con esta sección'"
                                       btnicon="mdi-trash-can"
                                       icon="mdi-alert"
-                                      @confirmar="(e) => { e ? eliminarSeccion(secs.id_ano) : '' }"
+                                      @confirmar="(e) => { e ? eliminarSeccion(secs.id_ano, m, a, s) : '' }"
                                     />
                                   </v-btn>
                                 </template>
