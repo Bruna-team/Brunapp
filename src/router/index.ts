@@ -24,20 +24,20 @@ const router = createRouter({
           component: () => import("../views/VistaMaestros.vue"),
         },
         {
-          path: "/diario",
-          name: "diario",
-          component: () => import("../views/VistaDiario.vue"),
+          path: "/reportes",
+          name: "reportes",
+          component: () => import("../views/VistaReportes.vue"),
+        },
+        {
+          path: "/configuracion",
+          name: "configuracion",
+          component: () => import("../views/VistaConfiguracion.vue"),
         },
         {
           path: "/usuario",
           name: "Perfil",
           component: () => import("../views/PerfilUsuario.vue"),
-        },
-        {
-          path: "/reportes",
-          name: "reportes",
-          component: () => import("../views/VistaReportes.vue"),
-        },
+        }
       ]
     },
     {
