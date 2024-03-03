@@ -620,7 +620,7 @@ watch(()=>cedRe.value.value, ()=>{
           <VentanaConfirmar
             v-if="!editItem"
             :message="'desea eliminar esta observación'"
-            icon="mdi-trash-can"
+            btnicon="mdi-trash-can"
             @confirmar="(e) => { e ? eliminarItem(selectedItem) : '' }"
           />
         </v-btn>

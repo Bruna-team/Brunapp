@@ -96,7 +96,7 @@ i.logo {
       background-color: #2f2f2f;
     }
     .cv-day.past, .cv-day.outsideOfMonth {
-      background-color: rgb(var(--v-theme-dark));
+      background-color: rgb(var(--v-theme-surface));
     }
     .cv-item {
       border: none;

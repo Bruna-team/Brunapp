@@ -30,11 +30,10 @@ watch(props, (value)=> {
       {{ mensaje }}
       <template v-slot:actions>
         <v-btn
+          icon="mdi-close"
           variant="text"
           @click="$emit('limpiarMsj')"
-        >
-          Close
-        </v-btn>
+        />
       </template>
     </v-snackbar>
   </Teleport>

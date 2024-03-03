@@ -125,6 +125,7 @@ function cerrarSesion() {
   brunaApi({ s: 'salir' }, '')
   .then((r:any) => {
     if (r.data.r) {
+      localStorage.removeItem("bruna");
       router.push('LogIn')
     }
   }).catch(() => {
@@ -151,7 +152,7 @@ function cerrarSesion() {
         <span class="d-none d-md-inline">Cerrar sesión</span>
         <VentanaConfirmar
           :message="'desea cerrar sesión'"
-          icon="mdi-logout"
+          btnicon="mdi-logout"
           @confirmar="(e) => { e ? cerrarSesion() : '' }"
         />
       </v-btn>

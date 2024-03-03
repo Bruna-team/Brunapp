@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 const drawer = ref(false)
+const car = ref(localStorage.getItem("bruna"))
 </script>
 <template>
 <v-app-bar color="primario" prominent>
@@ -19,7 +20,8 @@ const drawer = ref(false)
 
   <v-row no-gutters justify="end" align="center">
     <v-col>
-      <p class="font-bruna text-white">Coordinación</p>
+      <p v-if="car == '2'" class="font-bruna text-white">Coordinación</p>
+      <p v-else class="font-bruna text-white">Profesor</p>
     </v-col>
   </v-row>
 </v-app-bar>
@@ -29,7 +31,7 @@ const drawer = ref(false)
       <v-icon icon="mdi-chair-school" />
       Secciones
     </RouterLink>
-    <RouterLink to="/maestros" class="ma-2 nav-link">
+    <RouterLink v-if="car == '2' || car == '1'" to="/maestros" class="ma-2 nav-link">
       <v-icon icon="mdi-human-male-board" />
       Maestros
     </RouterLink>
@@ -37,9 +39,9 @@ const drawer = ref(false)
       <v-icon icon="mdi-file-chart" />
       Reportes
     </RouterLink>
-    <RouterLink to="/diario" class="ma-2 nav-link">
-      <v-icon icon="mdi-notebook" />
-      Diario
+    <RouterLink to="/configuracion" class="ma-2 nav-link">
+      <v-icon icon="mdi-cog" />
+      Configuración
     </RouterLink>
     <RouterLink to="/usuario" class="ma-2 nav-link">
       <v-icon icon="mdi-account" />
