@@ -76,8 +76,18 @@ function limpiarJornada() {
   }
   jornadasPersonal.value = data
 }
-function eliminarJornada(i: any) {
-  jornadasPersonal.value.splice(i, 1)
+function eliminarJornada(id: any) {
+  brunaApi({ s: 'jornadaEliminar' }, 'id=' + jornadasPersonal.value[id].id_jor)
+  .then((res:any) => {
+    if (res.data.r) {
+      alertaMsj.value = res.data.e
+      delete jornadasPersonal.value[id]
+    } else {
+      alertaMsj.value = "Hubo un error: " + res.data.e
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error eliminando los datos"
+  })
 }
 function guardarJornada() {
   const dataApi:any = []
