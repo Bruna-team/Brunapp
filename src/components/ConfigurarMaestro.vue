@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
+const emit = defineEmits([
+	'recargar'
+]);
 const alertaMsj = ref<string>('')
 const dialog = ref(false)
 const { smAndUp } = useDisplay()
@@ -18,29 +21,22 @@ const props = defineProps({
   id: {
     type: String,
     default: ''
+  },
+  modulos: {
+    type: Object,
+    default: {}
+  },
+  menciones: {
+    type: Object,
+    default: {}
+  },
+  jornadas: {
+    type: Object,
+    default: {}
   }
 })
-onMounted(() => {
-	cargaInicial();
-});
 const materias = computed(()=> props.materias)
-const menciones = ref<any[]>([{
-  id_men: '',
-  men: '',
-  ano: [
-    {
-      id_ano: '',
-      nom_ano: '',
-      num_ano: '',
-      sec: [
-        {
-          id_ano: '',
-          sec_nom: '',
-        }
-      ]
-    }
-  ]
-}])
+const jornadasPersonal = ref(props.jornadas)
 const rols = ref([
   {
     id:0,
@@ -56,113 +52,56 @@ const rols = ref([
   }
 ])
 const rol = ref({id: 0, rol: 'Profesor'})
-const jornadasPersonal= ref<any[]>([{
-  modulo: '',
-  materia: '',
-  men: '',
-  ano: '',
-  sec: '',
-  dia: ''
-}])
-const modulos= ref([{
-  id_hor: '',
-  modulo_hor: '',
-  inicio_hor: '',
-  fin_hor: '',
-}])
 const cursos= ref(1)
-function cargaInicial() {
-  brunaApi({ s: 'horarios' }, '')
-  .then((res:any) => {
-    if (res.data) {
-      modulos.value = res.data
-    }
-  }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
-  })
-  brunaApi({ s: 'secciones' }, '')
-  .then((res:any) => {
-    if (res.data) {
-      organizarSecciones(res.data)
-    }
-  }).catch(() => {
-    alertaMsj.value = "Hubo un error cargando los datos"
-  })
-}
-function organizarSecciones(data:string[]) {
-  const dataMen:any = {}
-  data.forEach((d:any) => {
-    if (!dataMen[d.id_men]) {
-      dataMen[d.id_men] = {
-        id_men: d.id_men,
-        men: d.nom_men,
-        ano: {}
-      }
-    }
-    if(!dataMen[d.id_men].ano[d.nom_ano]) {
-      dataMen[d.id_men].ano[d.nom_ano] = {
-        id_ano: d.id_ano,
-        nom_ano: d.nom_ano,
-        num_ano: d.num_ano,
-        sec: {}
-      }
-    }
-    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
-      dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
-        id_ano: d.id_ano,
-        sec_nom: d.sec_ano,
-        semanero: d.pnom_alum + ' ' + d.pape_alum,
-        num_sec: d.num_est
-      }
-    }
-  })
-  menciones.value = dataMen
-}
 function AgregarJornada() {
-  jornadasPersonal.value.push({
+  jornadasPersonal.value[Object.keys(jornadasPersonal.value).length + 1] = {
     modulo: '',
     materia: '',
     men: '',
     ano: '',
     sec: '',
-    dia: ''
-  })
+    dia: '',
+    edit: true,
+  }
 }
 function limpiarJornada() {
-  jornadasPersonal.value = [{
-    modulo: '',
-    materia: '',
-    men: '',
-    ano: '',
-    sec: '',
-    dia: ''
-  }]
+  const data:any = {}
+  for (const j in jornadasPersonal.value) {
+    if (jornadasPersonal.value[j].ano && jornadasPersonal.value[j].materia && jornadasPersonal.value[j].men
+    && jornadasPersonal.value[j].modulo && jornadasPersonal.value[j].sec && jornadasPersonal.value[j].dia) {
+      if (!jornadasPersonal.value[j].edit) {
+        data[j] = jornadasPersonal.value[j]
+      }
+    }
+  }
+  jornadasPersonal.value = data
 }
 function eliminarJornada(i: any) {
   jornadasPersonal.value.splice(i, 1)
 }
 function guardarJornada() {
   const dataApi:any = []
-  jornadasPersonal.value.forEach((j:any) => {
-    if (j.ano && j.materia && j.men && j.modulo && j.sec && j.dia) {
-      dataApi.push({
-        ano: j.sec.id_ano,
-        mat: j.materia.id_mat,
-        hor: j.modulo.id_hor,
-        dia: j.dia,
-        id: props.id
-      })
-    } else {
-      alertaMsj.value = "Complete la información"
-      return
+  for (const j in jornadasPersonal.value) {
+    if (jornadasPersonal.value[j].ano && jornadasPersonal.value[j].materia && jornadasPersonal.value[j].men
+    && jornadasPersonal.value[j].modulo && jornadasPersonal.value[j].sec && jornadasPersonal.value[j].dia) {
+      if (jornadasPersonal.value[j].edit) {
+        dataApi.push({
+          ano: jornadasPersonal.value[j].sec.id_ano,
+          mat: jornadasPersonal.value[j].materia.id_mat,
+          hor: jornadasPersonal.value[j].modulo.id_hor,
+          dia: jornadasPersonal.value[j].dia,
+          id: props.id
+        })
+      }
     }
-  })
+  }
   if (dataApi.length) {
     brunaApi({ s: 'jornadaCrear' }, JSON.stringify(dataApi))
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = "Se ha registrado el horario correctamente"
         dialog.value = false
+        emit('recargar')
         limpiarJornada()
       } else {
         alertaMsj.value = "Ha ocurrido un error registrando el horario"
@@ -170,6 +109,8 @@ function guardarJornada() {
     }).catch(() => {
       alertaMsj.value = "Ha ocurrido un error registrando el horario"
     })
+  } else {
+    alertaMsj.value = "Complete la información"
   }
 }
 </script>
@@ -261,7 +202,7 @@ function guardarJornada() {
           <v-divider/>
           <p class="d-flex align-center">
             <span class="flex-fill">
-              {{ j+1 }} horario
+              Horario
             </span>
             <v-btn icon="mdi-trash-can" @click="eliminarJornada(j)" color="error" variant="text"/>
           </p>
@@ -272,9 +213,10 @@ function guardarJornada() {
                 chips
                 label="Horarios"
                 v-model="jornada.modulo"
-                :items="Object.values(modulos)"
+                :items="Object.values(props.modulos)"
                 item-title="modulo_hor"
                 item-value="id_mod"
+                :disabled="!jornada.edit"
               />
             </v-col>
             <v-col cols="12" sm="4">
@@ -285,6 +227,7 @@ function guardarJornada() {
                 :items="Object.values(materias)"
                 item-title="nom_mat"
                 item-value="id_mat"
+                :disabled="!jornada.edit"
               />
             </v-col>
             <v-col cols="12" sm="4">
@@ -292,6 +235,7 @@ function guardarJornada() {
                 chips
                 label="Día"
                 v-model="jornada.dia"
+                :disabled="!jornada.edit"
                 :items="['Lunes','Martes','Miércoles','Jueves','Viernes']"
               />
             </v-col>
@@ -300,9 +244,10 @@ function guardarJornada() {
                 chips
                 label="Mención"
                 v-model="jornada.men"
-                :items="Object.values(menciones)"
+                :items="Object.values(props.menciones)"
                 item-title="men"
                 item-value="id_men"
+                :disabled="!jornada.edit"
                 />
               </v-col>
               <v-col cols="12" sm="4" v-if="jornada.men">
@@ -313,6 +258,7 @@ function guardarJornada() {
                 :items="Object.values(jornada.men.ano)"
                 item-title="nom_ano"
                 item-value="id_ano"
+                :disabled="!jornada.edit"
               />
             </v-col>
             <v-col cols="12" sm="4" v-if="jornada.ano">
@@ -323,6 +269,7 @@ function guardarJornada() {
                 :items="Object.values(jornada.ano.sec)"
                 item-title="sec_nom"
                 item-value="id_ano"
+                :disabled="!jornada.edit"
               />
             </v-col>
           </v-row>
@@ -334,7 +281,7 @@ function guardarJornada() {
         <v-btn
           prepend-icon="mdi-close"
           text="Cerrar"
-          @click="isActive.value = false; limpiarJornada()"
+          @click="limpiarJornada(); isActive.value = false"
         />
         <v-btn
           prepend-icon="mdi-check"
