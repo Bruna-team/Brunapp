@@ -65,22 +65,14 @@ function AgregarJornada() {
   }
 }
 function limpiarJornada() {
-  const data:any = {}
-  for (const j in jornadasPersonal.value) {
-    if (jornadasPersonal.value[j].ano && jornadasPersonal.value[j].materia && jornadasPersonal.value[j].men
-    && jornadasPersonal.value[j].modulo && jornadasPersonal.value[j].sec && jornadasPersonal.value[j].dia) {
-      if (!jornadasPersonal.value[j].edit) {
-        data[j] = jornadasPersonal.value[j]
-      }
-    }
-  }
-  jornadasPersonal.value = data
+  emit('recargar')
+  jornadasPersonal.value = props.jornadas
 }
 function obtenerUltimoId() {
     let ultimoId = Object.keys(jornadasPersonal.value).length;
     for (const object in jornadasPersonal.value) {
       if (jornadasPersonal.value[object].id_jor && jornadasPersonal.value[object].id_jor > ultimoId) {
-        ultimoId = jornadasPersonal.value[object].id_jor ;
+        ultimoId += Number(jornadasPersonal.value[object].id_jor) ;
       }
     }
     return ultimoId;
@@ -157,7 +149,7 @@ function guardarJornada() {
   if (!dataEditApi.length && !dataApi.length) {
     alertaMsj.value = "Complete la información"
   } else {
-    emit('recargar')
+    limpiarJornada()
     dialog.value = false
   }
 }
