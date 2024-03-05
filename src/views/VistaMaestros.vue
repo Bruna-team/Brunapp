@@ -101,8 +101,14 @@ function organizarJornadas(data:string[]) {
           dia: d.dia_jor,
           fin: d.fin_hor,
           inicio: d.inicio_hor,
-          modulo: d.modulo_hor,
-          materia: d.nom_mat,
+          modulo: {
+            modulo_hor: d.modulo_hor,
+            id_hor: d.id_hor
+          },
+          materia: {
+            nom_mat: d.nom_mat,
+            id_mat: d.id_mat
+          },
           men: {
             men:d.nom_men,
             ano: {
@@ -119,7 +125,10 @@ function organizarJornadas(data:string[]) {
               }
             }
           },
-          sec: d.sec_ano,
+          sec: {
+            sec_nom: d.sec_ano,
+            id_ano: d.id_ano
+          },
           nuevo: false,
           edit: false
         }

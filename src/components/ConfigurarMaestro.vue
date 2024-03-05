@@ -104,17 +104,29 @@ function eliminarJornada(id: any) {
 }
 function guardarJornada() {
   const dataApi:any = []
+  const dataEditApi:any = []
   for (const j in jornadasPersonal.value) {
     if (jornadasPersonal.value[j].ano && jornadasPersonal.value[j].materia && jornadasPersonal.value[j].men
     && jornadasPersonal.value[j].modulo && jornadasPersonal.value[j].sec && jornadasPersonal.value[j].dia) {
       if (jornadasPersonal.value[j].edit) {
-        dataApi.push({
-          ano: jornadasPersonal.value[j].sec.id_ano,
-          mat: jornadasPersonal.value[j].materia.id_mat,
-          hor: jornadasPersonal.value[j].modulo.id_hor,
-          dia: jornadasPersonal.value[j].dia,
-          id: props.id
-        })
+        if (jornadasPersonal.value[j].id_jor) {
+          dataEditApi.push({
+            ano: jornadasPersonal.value[j].sec.id_ano,
+            mat: jornadasPersonal.value[j].materia.id_mat,
+            hor: jornadasPersonal.value[j].modulo.id_hor,
+            dia: jornadasPersonal.value[j].dia,
+            jor: jornadasPersonal.value[j].id_jor,
+            id: props.id
+          })
+        } else {
+          dataApi.push({
+            ano: jornadasPersonal.value[j].sec.id_ano,
+            mat: jornadasPersonal.value[j].materia.id_mat,
+            hor: jornadasPersonal.value[j].modulo.id_hor,
+            dia: jornadasPersonal.value[j].dia,
+            id: props.id
+          })
+        }
       }
     }
   }
@@ -123,17 +135,30 @@ function guardarJornada() {
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = "Se ha registrado el horario correctamente"
-        dialog.value = false
-        emit('recargar')
-        limpiarJornada()
       } else {
         alertaMsj.value = "Ha ocurrido un error registrando el horario"
       }
     }).catch(() => {
       alertaMsj.value = "Ha ocurrido un error registrando el horario"
     })
-  } else {
+  }
+  if (dataEditApi.length) {
+    brunaApi({ s: 'jornadaEditar' }, JSON.stringify(dataEditApi))
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = "Se ha actualizado el horario correctamente"
+      } else {
+        alertaMsj.value = "Ha ocurrido un error actualizando el horario"
+      }
+    }).catch(() => {
+      alertaMsj.value = "Ha ocurrido un error actualizando el horario"
+    })
+  }
+  if (!dataEditApi.length && !dataApi.length) {
     alertaMsj.value = "Complete la información"
+  } else {
+    emit('recargar')
+    dialog.value = false
   }
 }
 </script>
@@ -227,6 +252,12 @@ function guardarJornada() {
             <span class="flex-fill">
               Horario
             </span>
+            <v-btn
+              :variant="jornada.edit ? 'tonal' : 'text'"
+              :prepend-icon="jornada.edit ? 'mdi-close' :'mdi-pen'"
+              :color="jornada.edit ? 'error' : ''"
+              @click="jornada.edit = !jornada.edit"
+            />
             <v-btn icon="mdi-trash-can" @click="eliminarJornada(j)" color="error" variant="text"/>
           </p>
           <v-divider class="mb-2"/>
