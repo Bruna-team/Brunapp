@@ -54,7 +54,7 @@ const rols = ref([
 const rol = ref({id: 0, rol: 'Profesor'})
 const cursos= ref(1)
 function AgregarJornada() {
-  jornadasPersonal.value[Object.keys(jornadasPersonal.value).length + 1] = {
+  jornadasPersonal.value[obtenerUltimoId() + 1] = {
     modulo: '',
     materia: '',
     men: '',
@@ -76,18 +76,31 @@ function limpiarJornada() {
   }
   jornadasPersonal.value = data
 }
-function eliminarJornada(id: any) {
-  brunaApi({ s: 'jornadaEliminar' }, 'id=' + jornadasPersonal.value[id].id_jor)
-  .then((res:any) => {
-    if (res.data.r) {
-      alertaMsj.value = res.data.e
-      delete jornadasPersonal.value[id]
-    } else {
-      alertaMsj.value = "Hubo un error: " + res.data.e
+function obtenerUltimoId() {
+    let ultimoId = Object.keys(jornadasPersonal.value).length;
+    for (const object in jornadasPersonal.value) {
+      if (jornadasPersonal.value[object].id_jor && jornadasPersonal.value[object].id_jor > ultimoId) {
+        ultimoId = jornadasPersonal.value[object].id_jor ;
+      }
     }
-  }).catch(() => {
-    alertaMsj.value = "Hubo un error eliminando los datos"
-  })
+    return ultimoId;
+}
+function eliminarJornada(id: any) {
+  if (jornadasPersonal.value[id].id_jor) {
+    brunaApi({ s: 'jornadaEliminar' }, 'id=' + jornadasPersonal.value[id].id_jor)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+        delete jornadasPersonal.value[id]
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error eliminando los datos"
+    })
+  } else {
+    delete jornadasPersonal.value[id]
+  }
 }
 function guardarJornada() {
   const dataApi:any = []
