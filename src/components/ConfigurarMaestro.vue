@@ -294,6 +294,7 @@ function guardarJornada() {
                 item-title="men"
                 item-value="id_men"
                 :disabled="!jornada.edit"
+                @click="jornada.ano = ''; jornada.sec = ''"
                 />
               </v-col>
               <v-col cols="12" sm="4" v-if="jornada.men">
@@ -305,6 +306,7 @@ function guardarJornada() {
                 item-title="nom_ano"
                 item-value="id_ano"
                 :disabled="!jornada.edit"
+                @click="jornada.sec = ''"
               />
             </v-col>
             <v-col cols="12" sm="4" v-if="jornada.ano">
