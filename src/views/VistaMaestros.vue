@@ -2,55 +2,20 @@
 import { ref, onMounted } from 'vue';
 import ConfigurarMaestro from '../components/ConfigurarMaestro.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { Materias, Maestros, Menciones, Modulos } from '../types/interfaceTypes.ts'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 const alertaMsj = ref<string>('')
-const materias = ref([
-  {
-    id_mat: '',
-    nom_mat: '',
-  },
-])
-const profes = ref([{
-  id_person: '',
-  dia_hor: '',
-  fin_hor: '',
-  inicio_hor: '',
-  nom_mat: '',
-  nom_men: '',
-  num_ano: '',
-  profesor: '',
-  sec_ano: '',
-  id_car: '',
-  nom_car: ''
-}])
+
+const materias = ref<Materias[]>([])
+const profes = ref<Maestros[]>([])
+const modulos= ref<Modulos[]>([])
+const menciones = ref<Menciones[]>([])
+
 const nombreABuscar = ref('')
 const materiaABuscar = ref('')
 const materiaSeleccionada = ref([])
 const jornadas = ref<any>([])
 const cargos = ref<any>([])
-const modulos= ref([{
-  id_hor: '',
-  modulo_hor: '',
-  inicio_hor: '',
-  fin_hor: '',
-}])
-const menciones = ref<any[]>([{
-  id_men: '',
-  men: '',
-  ano: [
-    {
-      id_ano: '',
-      nom_ano: '',
-      num_ano: '',
-      sec: [
-        {
-          id_ano: '',
-          sec_nom: '',
-        }
-      ]
-    }
-  ]
-}])
 onMounted(() => {
 	cargaInicial();
 });
@@ -231,8 +196,21 @@ function filtroMaterias() {
             <v-card-title>{{ p.profesor }}</v-card-title>
             <v-card-subtitle>{{ p.nom_mat }}</v-card-subtitle>
           </v-card-item>
-          <v-card-text>
-            horario
+          <v-card-text v-for="jor in jornadas[p.id_person]" class="pb-1">
+            {{jor.dia}}
+            <span class="d-block text-medium-emphasis">
+              {{jor.inicio}} - {{jor.fin}}
+            </span>
+            {{jor.modulo.modulo_hor}}
+            <span :class="[jor.materia.nom_mat ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.materia.nom_mat || 'Sin materia asignada'}}
+            </span>
+            <span :class="[jor.men.men ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.men.men || 'Sin mención asignada'}}
+            </span>
+            <span :class="[jor.men.ano.ano.nom_ano ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.men.ano.ano.nom_ano || 'Sin año asignado'}}
+            </span>
           </v-card-text>
           <v-card-actions class="justify-center">
             <configurar-maestro
