@@ -236,10 +236,10 @@ watch(()=>cedRe.value.value, ()=>{
   <template #default="{ isActive }">
     <v-card>
       <v-toolbar dark>
-      <v-toolbar-title>
-        {{ agregar.ano && agregar.id_ano
-          ? `Agrega un estudiante para ${agregar.ano}`
-          : 'Agrega un estudiante'}}
+        <v-toolbar-title>
+          {{ agregar.ano && agregar.id_ano
+            ? `Agrega un estudiante para ${agregar.ano}`
+            : 'Agrega un estudiante'}}
         </v-toolbar-title>
         <v-toolbar-items>
           <v-btn

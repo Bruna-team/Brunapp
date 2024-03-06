@@ -19,6 +19,15 @@ interface Menciones {
   nuevo? : boolean,
   ano: [Anos]
 }
+interface MencionesReportes {
+  id_men: string,
+  men: string,
+  edit?: Boolean,
+  nuevo? : boolean,
+  ano: {
+    [key: string]: Anos
+  }
+}
 interface Pase {
   ano: string,
   mencion: string,
@@ -32,16 +41,16 @@ interface Pase {
   type?: string,
 }
 interface Modulos {
-  id_mod: string,
-  name_mod: string,
-  timeStart: string,
-  timeEnd: string,
+  id_hor: string,
+  modulo_hor: string,
+  inicio_hor: string,
+  fin_hor: string,
   edit?: boolean,
   nuevo?: boolean
 }
 interface Materias {
   id_mat: string,
-  title: string,
+  nom_mat: string,
   edit?: boolean,
   nuevo?: boolean,
 }
@@ -52,4 +61,17 @@ interface Periodos {
   endS: string,
   edit?: boolean,
 }
-export type {Menciones, Pase, Modulos, Materias, Periodos}
+interface Maestros {
+  id_person: string,
+  dia_hor: string,
+  fin_hor: string,
+  inicio_hor: string,
+  nom_mat: string,
+  nom_men: string,
+  num_ano: string,
+  profesor: string,
+  sec_ano: string,
+  id_car: string,
+  nom_car: string
+}
+export type {Menciones, MencionesReportes, Pase, Modulos, Materias, Periodos, Maestros}

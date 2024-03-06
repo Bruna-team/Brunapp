@@ -76,7 +76,7 @@ function imprimirPdf (
     });
   const docDefinition: any = {
     info: {
-      title: `${header.title} - ${header.subtitle}`,
+      title: `${header.title} ${header.subtitle ? '-'+header.subtitle : ''}`,
       author: "Bruna. E.T.C. 'Madre Rafols'"
     },
     content: quill ? JSON.parse(JSON.stringify(pdfmakeImgStack(ret.content))) : JSON.parse(JSON.stringify(content)),
