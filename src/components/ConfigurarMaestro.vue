@@ -150,7 +150,12 @@ function guardarJornada() {
 </script>
 <template>
 <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
-<v-dialog v-model="dialog" max-width="850" close-on-back scrollable :fullscreen="!smAndUp">
+<v-dialog
+  v-model="dialog"
+  :max-width="smAndUp ? '850' : 'auto'"
+  close-on-back scrollable
+  :fullscreen="!smAndUp"
+>
   <template v-slot:activator="{ props }">
     <v-btn
       v-bind="props"
@@ -173,7 +178,7 @@ function guardarJornada() {
         />
       </v-toolbar-items>
     </v-toolbar>
-    <v-card>
+    <v-card class="pb-16 pb-sm-2">
       <v-card-text v-if="asignarRol">
         <v-row>
           <v-col cols="12" md="6">
@@ -306,7 +311,12 @@ function guardarJornada() {
             </v-col>
           </v-row>
         </section>
-        <v-btn block color="secundario" @click="AgregarJornada" text="Agregar otra jornada" />
+        <v-btn
+          block
+          color="secundario"
+          @click="AgregarJornada"
+          text="Agregar otra jornada"
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
