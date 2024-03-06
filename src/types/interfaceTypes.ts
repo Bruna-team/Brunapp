@@ -19,6 +19,15 @@ interface Menciones {
   nuevo? : boolean,
   ano: [Anos]
 }
+interface MencionesReportes {
+  id_men: string,
+  men: string,
+  edit?: Boolean,
+  nuevo? : boolean,
+  ano: {
+    [key: string]: Anos
+  }
+}
 interface Pase {
   ano: string,
   mencion: string,
@@ -63,4 +72,4 @@ interface Maestros {
   profesor: string,
   sec_ano: string
 }
-export type {Menciones, Pase, Modulos, Materias, Periodos, Maestros}
+export type {Menciones, MencionesReportes, Pase, Modulos, Materias, Periodos, Maestros}

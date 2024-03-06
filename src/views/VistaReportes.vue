@@ -6,6 +6,7 @@ import ReportesInasistencias from './reportes/ReportesInasistencias.vue';
 import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
 import ReportesPases from './reportes/ReportesPases.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { MencionesReportes } from '../types/interfaceTypes'
 import { formatoFechaYHora } from '../funciones/funciones';
 import { useTheme, useDisplay } from 'vuetify'
 const { lgAndUp } = useDisplay()
@@ -37,7 +38,7 @@ const estudiante = ref<any>({
 })
 
 const estudiantes = ref<[{id_estd: String, nombre: String}] | []>([]);
-const menciones = ref<any[any]>()
+const menciones = ref<MencionesReportes[]>([]);
 const inasistencias = ref<any[]>([])
 const observaciones = ref<any[]>([])
 
@@ -216,12 +217,12 @@ onMounted(() => {
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <v-row class="d-flex flex-wrap">
           <v-col cols="12" sm="5" lg="auto" class="px-0">
-              <v-radio-group
-                v-model="mencion"
-                :inline="lgAndUp"
-                label="Mención"
-                hide-details
-              >
+            <v-radio-group
+              v-model="mencion"
+              :inline="lgAndUp"
+              label="Mención"
+              hide-details
+            >
               <v-radio
                 v-for="menc in menciones"
                 :key="menc.id_men"
@@ -239,7 +240,7 @@ onMounted(() => {
             >
               <v-radio
                 v-if="mencion"
-                v-for="ano in menciones[mencion].ano"
+                v-for="ano in menciones[Number(mencion)]?.ano"
                 :key="ano.id_ano"
                 :label="ano.num_ano"
                 :value="ano.nom_ano"
@@ -254,7 +255,7 @@ onMounted(() => {
             >
               <v-radio
                 v-if="ano"
-                v-for="sec in menciones[mencion]?.ano[ano]?.sec"
+                v-for="sec in menciones[Number(mencion)]?.ano[ano]?.sec"
                 :key="sec.id_ano"
                 :label="sec.sec_nom"
                 :value="sec.id_ano"
