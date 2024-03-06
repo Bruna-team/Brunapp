@@ -32,10 +32,10 @@ function cargaInicial() {
       let hor:any = []
       res.data.forEach((h: any) => {
         hor.push({
-          id_mod: h.id_hor,
-          name_mod: h.modulo_hor,
-          timeStart: h.inicio_hor,
-          timeEnd: h.fin_hor,
+          id_hor: h.id_hor,
+          modulo_hor: h.modulo_hor,
+          inicio_hor: h.inicio_hor,
+          fin_hor: h.fin_hor,
           edit: false,
           nuevo: false
         })
@@ -54,7 +54,7 @@ function cargaInicial() {
       res.data.forEach((h: any) => {
         mat.push({
           id_mat: h.id_mat,
-          title: h.nom_mat,
+          nom_mat: h.nom_mat,
           edit: false,
           nuevo: false
         })
@@ -138,14 +138,14 @@ const materias = ref<Materias[]>([])
 function AgregarMaterias() {
   materias.value.push({
     id_mat: '0',
-    title: '',
+    nom_mat: '',
     edit: true,
     nuevo: true,
   })
 }
 function guardarMateria(id: any) {
-  if (materias.value[id].title) {
-    brunaApi({ s: 'materiasCrear' }, 'mat=' + materias.value[id].title)
+  if (materias.value[id].nom_mat) {
+    brunaApi({ s: 'materiasCrear' }, 'mat=' + materias.value[id].nom_mat)
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = res.data.e
@@ -161,8 +161,8 @@ function guardarMateria(id: any) {
   }
 }
 function editarMateria(id: any) {
-  if (materias.value[id].title) {
-    brunaApi({ s: 'materiaEditar' }, 'mat=' + materias.value[id].title + '&id=' + materias.value[id].id_mat)
+  if (materias.value[id].nom_mat) {
+    brunaApi({ s: 'materiaEditar' }, 'mat=' + materias.value[id].nom_mat + '&id=' + materias.value[id].id_mat)
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = res.data.e
@@ -201,17 +201,17 @@ function limpiarMateria(m: any) {
 const modulos = ref<Modulos[]>([])
 function AgregarModulo() {
   modulos.value.push({
-    id_mod: '0',
-    name_mod: '',
-    timeStart: formatoFechaYHora(new Date(), 'hora'),
-    timeEnd: formatoFechaYHora(new Date(), 'hora'),
+    id_hor: '0',
+    modulo_hor: '',
+    inicio_hor: formatoFechaYHora(new Date(), 'hora'),
+    fin_hor: formatoFechaYHora(new Date(), 'hora'),
     edit: true,
     nuevo: true,
   })
 }
 function guardaModulo(id: any) {
-  if (modulos.value[id].name_mod) {
-    brunaApi({ s: 'horarioCrear' }, 'mod=' + modulos.value[id].name_mod + '&ini=' + modulos.value[id].timeStart + '&fin=' + modulos.value[id].timeEnd)
+  if (modulos.value[id].modulo_hor) {
+    brunaApi({ s: 'horarioCrear' }, 'mod=' + modulos.value[id].modulo_hor + '&ini=' + modulos.value[id].inicio_hor + '&fin=' + modulos.value[id].fin_hor)
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = res.data.e
@@ -227,9 +227,9 @@ function guardaModulo(id: any) {
   }
 }
 function editarModulo(id: any) {
-  if (modulos.value[id].name_mod) {
-    brunaApi({ s: 'editarHorario' }, 'mod=' + modulos.value[id].name_mod + '&ini=' + modulos.value[id].timeStart 
-    + '&fin=' + modulos.value[id].timeEnd + '&id=' + modulos.value[id].id_mod)
+  if (modulos.value[id].modulo_hor) {
+    brunaApi({ s: 'editarHorario' }, 'mod=' + modulos.value[id].modulo_hor + '&ini=' + modulos.value[id].inicio_hor
+    + '&fin=' + modulos.value[id].fin_hor + '&id=' + modulos.value[id].id_hor)
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = res.data.e
@@ -245,7 +245,7 @@ function editarModulo(id: any) {
   }
 }
 function eliminarModulo(id: any) {
-  brunaApi({ s: 'horarioEliminar' }, 'id=' + modulos.value[id].id_mod)
+  brunaApi({ s: 'horarioEliminar' }, 'id=' + modulos.value[id].id_hor)
   .then((res:any) => {
     if (res.data.r) {
       alertaMsj.value = res.data.e
@@ -752,16 +752,16 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                   <v-col cols="12" lg="">
                     <v-text-field
                       v-if="modulo.edit"
-                      v-model="modulo.name_mod"
+                      v-model="modulo.modulo_hor"
                       label="Modulo"
                       variant="underlined"
                       hide-details="auto"
                     />
-                    <p v-else class="text-body">{{ modulo.name_mod }}</p>
+                    <p v-else class="text-body">{{ modulo.modulo_hor }}</p>
                   </v-col>
                   <v-col cols="6" lg="">
                     <v-text-field
-                      v-model="modulo.timeStart"
+                      v-model="modulo.inicio_hor"
                       type="time"
                       label="De"
                       variant="underlined"
@@ -770,7 +770,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                   </v-col>
                   <v-col cols="6" lg="">
                     <v-text-field
-                      v-model="modulo.timeEnd"
+                      v-model="modulo.fin_hor"
                       type="time"
                       label="Hasta"
                       variant="underlined"
@@ -780,8 +780,8 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                 </v-row>
               </template>
               <template v-else>
-                <v-list-item-title class="text-capitalize">{{ modulo.name_mod }}</v-list-item-title>
-                <v-list-item-subtitle>{{ modulo.timeStart }} a {{ modulo.timeEnd }}</v-list-item-subtitle>
+                <v-list-item-title class="text-capitalize">{{ modulo.modulo_hor }}</v-list-item-title>
+                <v-list-item-subtitle>{{ modulo.inicio_hor }} a {{ modulo.fin_hor }}</v-list-item-subtitle>
               </template>
               <template #append>
                 <div :class="{'d-flex flex-column align-center': modulo.edit}">
@@ -835,7 +835,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
             >
               <template v-if="materia.edit">
                 <v-text-field
-                  v-model="materia.title"
+                  v-model="materia.nom_mat"
                   label="Nombre de la materia"
                   variant="underlined"
                   hide-details="auto"
@@ -843,7 +843,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                 />
               </template>
               <template v-else>
-                <v-list-item-title class="text-capitalize"> {{ materia.title }}</v-list-item-title>
+                <v-list-item-title class="text-capitalize"> {{ materia.nom_mat }}</v-list-item-title>
               </template>
               <template #append>
                 <v-btn

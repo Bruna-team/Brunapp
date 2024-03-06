@@ -32,16 +32,16 @@ interface Pase {
   type?: string,
 }
 interface Modulos {
-  id_mod: string,
-  name_mod: string,
-  timeStart: string,
-  timeEnd: string,
+  id_hor: string,
+  modulo_hor: string,
+  inicio_hor: string,
+  fin_hor: string,
   edit?: boolean,
   nuevo?: boolean
 }
 interface Materias {
   id_mat: string,
-  title: string,
+  nom_mat: string,
   edit?: boolean,
   nuevo?: boolean,
 }
@@ -52,4 +52,15 @@ interface Periodos {
   endS: string,
   edit?: boolean,
 }
-export type {Menciones, Pase, Modulos, Materias, Periodos}
+interface Maestros {
+  id_person: string,
+  dia_hor: string,
+  fin_hor: string,
+  inicio_hor: string,
+  nom_mat: string,
+  nom_men: string,
+  num_ano: string,
+  profesor: string,
+  sec_ano: string
+}
+export type {Menciones, Pase, Modulos, Materias, Periodos, Maestros}

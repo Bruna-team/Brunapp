@@ -184,7 +184,6 @@ function guardarJornada() {
         <v-row>
           <v-col cols="12" md="6">
             <v-combobox
-              chips
               label="Asignar rol"
               v-model="rol"
               :items="Object.values(rols)"
@@ -207,7 +206,6 @@ function guardarJornada() {
             <v-row>
               <v-col cols="12" md="4">
                 <v-combobox
-                  chips
                   label="Mención"
                   :items="Object.values(materias)"
                   item-title="materia"
@@ -216,7 +214,6 @@ function guardarJornada() {
               </v-col>
               <v-col cols="12" md="4">
                 <v-combobox
-                  chips
                   label="Año"
                   :items="Object.values(materias)"
                   item-title="materia"
@@ -225,7 +222,6 @@ function guardarJornada() {
               </v-col>
               <v-col cols="12" md="4">
                 <v-combobox
-                  chips
                   label="Sección"
                   :items="Object.values(materias)"
                   item-title="materia"
@@ -245,9 +241,9 @@ function guardarJornada() {
               Horario
             </span>
             <v-btn
-              :variant="jornada.edit ? 'tonal' : 'text'"
+              :variant="jornada.edit ? 'text' : 'tonal'"
               :prepend-icon="jornada.edit ? 'mdi-close' :'mdi-pen'"
-              :color="jornada.edit ? 'error' : ''"
+              :text="jornada.edit ? 'Cancelar' :'Editar'"
               @click="jornada.edit = !jornada.edit"
             />
             <v-btn icon="mdi-trash-can" @click="eliminarJornada(j)" color="error" variant="text"/>
@@ -256,7 +252,6 @@ function guardarJornada() {
           <v-row>
             <v-col cols="12" sm="4">
               <v-combobox
-                chips
                 label="Horarios"
                 v-model="jornada.modulo"
                 :items="Object.values(props.modulos)"
@@ -267,7 +262,14 @@ function guardarJornada() {
             </v-col>
             <v-col cols="12" sm="4">
               <v-combobox
-                chips
+                label="Día"
+                v-model="jornada.dia"
+                :disabled="!jornada.edit"
+                :items="['Lunes','Martes','Miércoles','Jueves','Viernes']"
+              />
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-combobox
                 label="Materia"
                 v-model="jornada.materia"
                 :items="Object.values(materias)"
@@ -278,16 +280,6 @@ function guardarJornada() {
             </v-col>
             <v-col cols="12" sm="4">
               <v-combobox
-                chips
-                label="Día"
-                v-model="jornada.dia"
-                :disabled="!jornada.edit"
-                :items="['Lunes','Martes','Miércoles','Jueves','Viernes']"
-              />
-            </v-col>
-            <v-col cols="12" sm="4">
-              <v-combobox
-                chips
                 label="Mención"
                 v-model="jornada.men"
                 :items="Object.values(props.menciones)"
@@ -299,7 +291,6 @@ function guardarJornada() {
               </v-col>
               <v-col cols="12" sm="4" v-if="jornada.men">
                 <v-combobox
-                chips
                 label="Año"
                 v-model="jornada.ano"
                 :items="Object.values(jornada.men.ano)"
@@ -311,7 +302,6 @@ function guardarJornada() {
             </v-col>
             <v-col cols="12" sm="4" v-if="jornada.ano">
               <v-combobox
-                chips
                 label="Sección"
                 v-model="jornada.sec"
                 :items="Object.values(jornada.ano.sec)"

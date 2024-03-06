@@ -2,52 +2,20 @@
 import { ref, onMounted } from 'vue';
 import ConfigurarMaestro from '../components/ConfigurarMaestro.vue';
 import { brunaApi } from '../funciones/api.ts';
+import { Materias, Maestros, Menciones, Modulos } from '../types/interfaceTypes.ts'
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 const alertaMsj = ref<string>('')
-const materias = ref([
-  {
-    id_mat: '',
-    nom_mat: '',
-  },
-])
-const profes = ref([{
-  id_person: '',
-  dia_hor: '',
-  fin_hor: '',
-  inicio_hor: '',
-  nom_mat: '',
-  nom_men: '',
-  num_ano: '',
-  profesor: '',
-  sec_ano: ''
-}])
+
+const materias = ref<Materias[]>([])
+const profes = ref<Maestros[]>([])
+  const modulos= ref<Modulos[]>([])
+
+const menciones = ref<Menciones[]>([])
 const nombreABuscar = ref('')
 const materiaABuscar = ref('')
 const materiaSeleccionada = ref([])
 const jornadas = ref<any>([])
-const modulos= ref([{
-  id_hor: '',
-  modulo_hor: '',
-  inicio_hor: '',
-  fin_hor: '',
-}])
-const menciones = ref<any[]>([{
-  id_men: '',
-  men: '',
-  ano: [
-    {
-      id_ano: '',
-      nom_ano: '',
-      num_ano: '',
-      sec: [
-        {
-          id_ano: '',
-          sec_nom: '',
-        }
-      ]
-    }
-  ]
-}])
+
 onMounted(() => {
 	cargaInicial();
 });
