@@ -169,14 +169,14 @@ function filtroMaterias() {
     <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
     <h2>Maestros</h2>
     <v-row>
-      <v-col>
+      <v-col cols="12" sm="6">
         <v-text-field
           v-model="nombreABuscar"
           label="Buscar maestro"
           @input="actualizar"
         />
       </v-col>
-      <v-col>
+      <v-col cols="12" sm="6">
         <v-combobox
           multiple
           chips
