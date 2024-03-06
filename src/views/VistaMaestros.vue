@@ -208,8 +208,8 @@ function filtroMaterias() {
             <span :class="[jor.men.men ? 'pr-2' : 'd-block text-medium-emphasis']">
               {{jor.men.men || 'Sin mención asignada'}}
             </span>
-            <span :class="[jor.men.ano.ano.nom_ano ? 'pr-2' : 'd-block text-medium-emphasis']">
-              {{jor.men.ano.ano.nom_ano || 'Sin año asignado'}}
+            <span :class="[jor.men?.ano?.ano?.nom_ano ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.men?.ano?.ano?.nom_ano || 'Sin año asignado'}}
             </span>
           </v-card-text>
           <v-card-actions class="justify-center">
