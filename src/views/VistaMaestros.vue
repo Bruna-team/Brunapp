@@ -19,12 +19,15 @@ const profes = ref([{
   nom_men: '',
   num_ano: '',
   profesor: '',
-  sec_ano: ''
+  sec_ano: '',
+  id_car: '',
+  nom_car: ''
 }])
 const nombreABuscar = ref('')
 const materiaABuscar = ref('')
 const materiaSeleccionada = ref([])
 const jornadas = ref<any>([])
+const cargos = ref<any>([])
 const modulos= ref([{
   id_hor: '',
   modulo_hor: '',
@@ -81,6 +84,14 @@ function cargaInicial() {
   .then((res:any) => {
     if (res.data) {
       organizarSecciones(res.data)
+    }
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error cargando los datos"
+  })
+  brunaApi({ s: 'cargos' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      cargos.value = res.data
     }
   }).catch(() => {
     alertaMsj.value = "Hubo un error cargando los datos"
@@ -171,7 +182,7 @@ function actualizar() {
   brunaApi({ s: 'maestros' }, 'nom=' + (nombreABuscar.value !== 'null' ? nombreABuscar.value : '') + '&mat=' + materiaABuscar.value)
   .then((res:any) => {
     if (res.data) {
-      profes.value = res.data
+      organizarJornadas(res.data)
     } else {
       alertaMsj.value = "Hubo un error cargando los datos"
     }
@@ -232,7 +243,7 @@ function filtroMaterias() {
               :id="p.id_person"
               @recargar="cargaInicial"
             />
-            <configurar-maestro :materias="materias" :modulos="modulos" :menciones="menciones" :asignar-rol="true" :id="p.id_person"/>
+            <configurar-maestro :rols="cargos" :menciones="menciones" :rol="{id_car: p.id_car, nom_car: p.nom_car}" :asignar-rol="true" :id="p.id_person"/>
           </v-card-actions>
         </v-card>
       </v-col>
