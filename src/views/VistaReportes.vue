@@ -60,9 +60,7 @@ const dataPase = computed(()=> {
   }
 })
 const printSubtitle = computed(() => {
-  if (estudiante.value) {
-    return `${estudiante.value.nombre}`
-  } else if (mencion.value && ano.value && seccion.value.id_ano) {
+  if (mencion.value && ano.value && seccion.value.id_ano) {
     return `${menciones.value[Number(mencion.value)].men} ${ano.value} ${seccion.value.sec_nom}`
   } else if (mencion.value && ano.value) {
     return `${menciones.value[Number(mencion.value)].men} ${ano.value}`
