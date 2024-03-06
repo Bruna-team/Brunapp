@@ -188,8 +188,21 @@ function filtroMaterias() {
             <v-card-title>{{ p.profesor }}</v-card-title>
             <v-card-subtitle>{{ p.nom_mat }}</v-card-subtitle>
           </v-card-item>
-          <v-card-text>
-            horario
+          <v-card-text v-for="jor in jornadas[p.id_person]" class="pb-1">
+            {{jor.dia}}
+            <span class="d-block text-medium-emphasis">
+              {{jor.inicio}} - {{jor.fin}}
+            </span>
+            {{jor.modulo.modulo_hor}}
+            <span :class="[jor.materia.nom_mat ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.materia.nom_mat || 'Sin materia asignada'}}
+            </span>
+            <span :class="[jor.men.men ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.men.men || 'Sin mención asignada'}}
+            </span>
+            <span :class="[jor.men.ano.ano.nom_ano ? 'pr-2' : 'd-block text-medium-emphasis']">
+              {{jor.men.ano.ano.nom_ano || 'Sin año asignado'}}
+            </span>
           </v-card-text>
           <v-card-actions class="justify-center">
             <configurar-maestro
