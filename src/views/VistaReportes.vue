@@ -30,7 +30,10 @@ const fechasFiltrar = ref()
 const fechas = ref([''])
 const ano = ref('')
 const mencion = ref('')
-const seccion = ref('')
+const seccion = ref({
+  sec_nom: '',
+  id_ano: ''
+})
 
 const estudiantes = ref<[{id_estd: String, nombre: String}] | []>([]);
 const menciones = ref<MencionesReportes[]>([]);
@@ -44,7 +47,7 @@ const dataPase = computed(()=> {
   return {
     ano: ano.value || estudiante.value.num_ano,
     mencion: mencion.value ? menciones.value[Number(mencion.value)].men : estudiante.value.nom_men,
-    seccion: seccion.value || estudiante.value.sec_ano,
+    seccion: seccion.value.id_ano || estudiante.value.sec_ano,
     pasefecha: hor[0],
     pasehor: hor[1],
     id: estudiante.value.id_estd,
@@ -57,11 +60,15 @@ const dataPase = computed(()=> {
   }
 })
 const printSubtitle = computed(() => {
-  if (inasistencias.value.length || observaciones.value.length) {
-    if (mencion.value && ano.value && seccion.value) {
-      return `${mencion.value ? menciones.value[Number(mencion.value)].men : estudiante.value.nom_men} ${ano.value} - ${seccion.value}`
-    } else ''
-  } else ''
+  if (estudiante.value) {
+    return `${estudiante.value.nombre}`
+  } else if (mencion.value && ano.value && seccion.value.id_ano) {
+    return `${menciones.value[Number(mencion.value)].men} ${ano.value} ${seccion.value.sec_nom}`
+  } else if (mencion.value && ano.value) {
+    return `${menciones.value[Number(mencion.value)].men} ${ano.value}`
+  } else if (mencion.value) {
+    return `${menciones.value[Number(mencion.value)].men}`
+  }
 })
 function cargaInicial() {
   brunaApi({ s: 'menciones' }, '')
@@ -101,7 +108,7 @@ function organizarSecciones(data:string[]) {
 }
 function buscarEstudiante() {
   const hor = paseFecha.value.split('T')
-  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + estudiante.value + '&ano=' + seccion.value + '&hor=' + hor[1])
+  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + estudiante.value + '&ano=' + seccion.value.id_ano + '&hor=' + hor[1])
   .then((res:any) => {
     if (res.data) {
       estudiantes.value = res.data
@@ -110,7 +117,7 @@ function buscarEstudiante() {
   })
 }
 function cargaInasistencias() {
-  brunaApi({ s: 'inasistencias' }, 'desde=' + fechas.value[0] + '&hasta=' + fechas.value[1] + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
+  brunaApi({ s: 'inasistencias' }, 'desde=' + fechas.value[0] + '&hasta=' + fechas.value[1] + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value.id_ano)
   .then((res:any) => {
     if (res.data) {
       organizarDatosInasistencias(res.data)
@@ -134,7 +141,7 @@ function organizarDatosInasistencias(data:any) {
   })
 }
 function cargaObservaciones() {
-  brunaApi({ s: 'observaciones' }, 'desde=' + fechas.value[0] + '&hasta=' + fechas.value[1] + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value)
+  brunaApi({ s: 'observaciones' }, 'desde=' + fechas.value[0] + '&hasta=' + fechas.value[1] + '&men=' + mencion.value + '&ano=' + ano.value + '&sec=' + seccion.value.id_ano)
   .then((res:any) => {
     if (res.data) {
       organizarDatosObservaciones(res.data)
@@ -198,7 +205,7 @@ onMounted(() => {
 <template>
   <v-container class="px-0 px-md-2">
     <h2 class="pl-3">Reportes</h2>
-    <v-card>
+    <v-card class="overflow-visible">
       <v-tabs
         show-arrows
         v-model="tabActiva"
@@ -228,7 +235,7 @@ onMounted(() => {
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" sm="7" class="px-0 d-lg-flex">
+          <v-col cols="12" sm="7" lg="12" class="px-0 d-lg-flex">
             <v-radio-group
               v-model="ano"
               inline
@@ -255,7 +262,7 @@ onMounted(() => {
                 v-for="sec in menciones[Number(mencion)]?.ano[ano]?.sec"
                 :key="sec.id_ano"
                 :label="sec.sec_nom"
-                :value="sec.id_ano"
+                :value="sec"
               />
               <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
               <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
@@ -296,12 +303,6 @@ onMounted(() => {
                 @input="buscarEstudiante"
               ></v-combobox>
             </v-col>
-            <!-- <v-col cols="12" md="4">
-              <v-combobox
-                label="Materia"
-                :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-              ></v-combobox>
-            </v-col> -->
           </template>
           <v-col cols="12" sm="" :md="tabActiva !== 'pases' ? '' : '12'">
             <v-window v-model="tabActiva" >

@@ -68,6 +68,7 @@ const contentPrint = computed(() => {
         <ModalImpresion
           :title="'Observaciones'"
           :subtitle="props.subtitle"
+          :datos-validos="!!props.students?.length"
           :content="contentPrint"
         />
       </v-sheet>

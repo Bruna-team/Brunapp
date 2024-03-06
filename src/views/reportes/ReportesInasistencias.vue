@@ -79,7 +79,7 @@ const contentPrint = computed(() => {
         <ModalImpresion
           :title="'Inasistencias'"
           :subtitle="props.subtitle"
-          :datos-validos="!!props.subtitle?.length"
+          :datos-validos="!!props.students?.length"
           :content="contentPrint"
         />
       </v-sheet>

@@ -26,7 +26,6 @@ const pageOrientations = ref([
     title: 'Personalizada'
   },
 ])
-const header = ref({title: printProps.title, subtitle: printProps.subtitle})
 const docConfiguration = ref({
   orientation: 'landscape',
   margins: {
@@ -49,14 +48,12 @@ const docConfiguration = ref({
   >
     <template v-slot:activator>
       <v-btn
-        @click="printProps.datosValidos ? dialog = true : (alertaMsj = 'Faltan datos por ingresar para poder imprimir')"
+        @click="printProps.datosValidos ? dialog = true : (alertaMsj = 'Faltan información para poder imprimir')"
         variant="tonal"
         prepend-icon="mdi-printer"
         text="Imprimir"
         class="mb-2"
       />
-        <!-- :disabled="!printProps.datosValidos" -->
-        <!-- :v-bind="props" -->
     </template>
     <v-card>
       <v-card-title>
@@ -141,7 +138,7 @@ const docConfiguration = ref({
           color="primario"
           prepend-icon="mdi-printer"
           variant="tonal"
-          @click="imprimirPdf(header, content, docConfiguration, printProps.quill)"
+          @click="imprimirPdf({title: printProps.title, subtitle: printProps.subtitle}, content, docConfiguration, printProps.quill)"
         >
           Imprimir
         </v-btn>
