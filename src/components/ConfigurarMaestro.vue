@@ -33,25 +33,19 @@ const props = defineProps({
   jornadas: {
     type: Object,
     default: {}
+  },
+  rols: {
+    type: Array,
+    default: []
+  },
+  rol: {
+    type: Object,
+    default: {}
   }
 })
 const materias = computed(()=> props.materias)
 const jornadasPersonal = ref(props.jornadas)
-const rols = ref([
-  {
-    id:0,
-    rol: 'Profesor',
-  },
-  {
-    id:1,
-    rol: 'Coordinación',
-  },
-  {
-    id:2,
-    rol: 'Guía',
-  }
-])
-const rol = ref({id: 0, rol: 'Profesor'})
+const rol = ref(props.rol)
 const cursos= ref(1)
 function AgregarJornada() {
   jornadasPersonal.value[obtenerUltimoId() + 1] = {
@@ -186,14 +180,14 @@ function guardarJornada() {
             <v-combobox
               label="Asignar rol"
               v-model="rol"
-              :items="Object.values(rols)"
+              :items="Object.values(props.rols)"
               return-object
-              item-title="rol"
-              item-value="id"
+              item-title="nom_car"
+              item-value="id_car"
             />
           </v-col>
         </v-row>
-        <template v-if="rol.id == 2">
+        <template v-if="rol.id_car == 4">
           <section v-for="curso in cursos" :key="curso">
             <v-divider/>
             <p class="d-flex align-center">

@@ -31,16 +31,12 @@ const fechas = ref([''])
 const ano = ref('')
 const mencion = ref('')
 const seccion = ref('')
-const estudiante = ref<any>({
-  ced_alum: '',
-  nombre: '',
-  representantes: '',
-})
 
 const estudiantes = ref<[{id_estd: String, nombre: String}] | []>([]);
 const menciones = ref<MencionesReportes[]>([]);
 const inasistencias = ref<any[]>([])
 const observaciones = ref<any[]>([])
+const estudiante = ref<any>('')
 
 const paseFecha = ref(formatoFechaYHora(new Date(), 'FechayHora'))
 const dataPase = computed(()=> {
@@ -55,9 +51,9 @@ const dataPase = computed(()=> {
     estudiante: estudiante.value.nombre,
     estudianteCedula: estudiante.value.ced_alum,
     representante: estudiante.value.representantes,
-    // modulo: '',
-    // profesor: '',
-    // materia: '',
+    modulo: estudiante.value.modulo_hor,
+    profesor: estudiante.value.profesor,
+    materia: estudiante.value.nom_mat,
   }
 })
 const printSubtitle = computed(() => {
@@ -104,7 +100,8 @@ function organizarSecciones(data:string[]) {
   menciones.value = dataMen
 }
 function buscarEstudiante() {
-  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + estudiante.value.nombre + '&ano=' + seccion.value)
+  const hor = paseFecha.value.split('T')
+  brunaApi({ s: 'burcarEstudiante' }, 'nom=' + estudiante.value + '&ano=' + seccion.value + '&hor=' + hor[1])
   .then((res:any) => {
     if (res.data) {
       estudiantes.value = res.data
@@ -289,17 +286,15 @@ onMounted(() => {
               />
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-autocomplete
+              <v-combobox
                 label="Escribe el nombre del estudiante"
                 v-model="estudiante"
                 :items="Object.values(estudiantes)"
                 item-value="nombre"
                 item-title="nombre"
-                return-object
-                hide-details
                 no-data-text="Sin estudiantes que coincidan "
                 @input="buscarEstudiante"
-              ></v-autocomplete>
+              ></v-combobox>
             </v-col>
             <!-- <v-col cols="12" md="4">
               <v-combobox

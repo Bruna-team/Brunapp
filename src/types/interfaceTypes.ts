@@ -70,6 +70,8 @@ interface Maestros {
   nom_men: string,
   num_ano: string,
   profesor: string,
-  sec_ano: string
+  sec_ano: string,
+  id_car: string,
+  nom_car: string
 }
 export type {Menciones, MencionesReportes, Pase, Modulos, Materias, Periodos, Maestros}
