@@ -27,6 +27,26 @@ const router = createRouter({
           path: "/reportes",
           name: "reportes",
           component: () => import("../views/VistaReportes.vue"),
+          children: [
+            {
+              path: "pases",
+              name: "pases",
+              props: true,
+              component: () => import("../views/reportes/ReportesPases.vue"),
+            },
+            {
+              path: "observaciones",
+              name: "observaciones",
+              props: true,
+              component: () => import("../views/reportes/ReportesObservaciones.vue"),
+            },
+            {
+              path: "inasistencias",
+              name: "inasistencias",
+              props: true,
+              component: () => import("../views/reportes/ReportesInasistencias.vue"),
+            }
+          ]
         },
         {
           path: "/configuracion",

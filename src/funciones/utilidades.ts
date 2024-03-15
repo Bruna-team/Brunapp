@@ -1,5 +1,6 @@
-import * as pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// import * as pdfMake from "pdfmake/build/pdfmake";
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
 // @ts-ignore
 import htmlToPdfmake from 'html-to-pdfmake';
@@ -166,14 +167,16 @@ function imprimirPdf (
     ],
     images: ret.images ? ret.images : [],
   }
-  pdfMake.createPdf(docDefinition, {}, {
-    Roboto: {
-      normal: 'Roboto-Regular.ttf',
-      bold: 'Roboto-Medium.ttf',
-      italics: 'Roboto-Italic.ttf',
-      bolditalics: 'Roboto-MediumItalic.ttf'
-    }
-  }, pdfFonts.pdfMake.vfs).open()
+  return docDefinition
+  // pdfMake.createPdf(docDefinition).open()
+  // pdfMake.createPdf(docDefinition, {}, {
+  //   Roboto: {
+  //     normal: 'Roboto-Regular.ttf',
+  //     bold: 'Roboto-Medium.ttf',
+  //     italics: 'Roboto-Italic.ttf',
+  //     bolditalics: 'Roboto-MediumItalic.ttf'
+  //   }
+  // }, pdfFonts.pdfMake.vfs).open()
 }
 
 export default imprimirPdf
