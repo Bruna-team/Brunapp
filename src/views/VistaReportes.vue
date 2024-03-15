@@ -165,9 +165,9 @@ function actualizar() {
     nombre: '',
     representantes: '',
   }
-  if (tabActiva.value == 'ast') {
+  if (tabActiva.value == 'inasistencias') {
     cargaInasistencias()
-  } else if (tabActiva.value == 'obs') {
+  } else if (tabActiva.value == 'observaciones') {
     cargaObservaciones()
   }
 }

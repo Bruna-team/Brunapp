@@ -9,6 +9,7 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       manifest: {
         display_override: ['window-controls-overlay'],
         lang: 'es-ES',
@@ -55,20 +56,21 @@ export default defineConfig({
           }
         ]
       },
-      // workbox: {
-      //   runtimeCaching: [{
-      //     urlPattern: ({url}) => {
-      //       return url.pathname.startsWith('/api')
-      //     },
-      //     handler: 'CacheFirst' as const,
-      //     options: {
-      //       cacheName: 'api-cache',
-      //       cacheableResponse: {
-      //         statuses: [0, 200]
-      //       }
-      //     }
-      //   }]
-      // }
+       workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [{
+          urlPattern: ({url}) => {
+            return url.pathname.startsWith('/')
+          },
+          handler: 'CacheFirst' as const,
+          options: {
+            cacheName: 'Bunaapi-cache',
+            cacheableResponse: {
+              statuses: [0, 200]
+            }
+          }
+        }]
+       }
     })
   ],
   build: {
