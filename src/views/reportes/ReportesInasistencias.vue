@@ -3,7 +3,11 @@ import ModalImpresion from "../../components/ModalImpresion.vue"
 import {ref, computed} from 'vue'
 const props = defineProps({
   students: {type: Array, default: []},
-  subtitle: String
+  subtitle: String,
+  dataPase: {
+    type: Object,
+    default: {}
+  },
 })
 const headers = ref([
   {
@@ -60,29 +64,31 @@ const contentPrint = computed(() => {
 })
 </script>
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="props.students"
-    density="compact"
-    :sort-by="[{ key: 'pases', order: 'desc' }]"
-  >
-    <template v-slot:top>
-      <v-sheet flat color="muted" class="d-flex align-center pa-3 rounded-t-lg">
-        <p class="text-h6 flex-1-1-100 flex-md-fill">
-          Inasistencias
-        </p>
-        <v-divider
-          class="mx-4"
-          inset
-          vertical
-        />
-        <ModalImpresion
-          :title="'Inasistencias'"
-          :subtitle="props.subtitle"
-          :datos-validos="!!props.students?.length"
-          :content="contentPrint"
-        />
-      </v-sheet>
-    </template>
-  </v-data-table>
+  <section class="d-inline">
+    <v-data-table
+      :headers="headers"
+      :items="props.students"
+      density="compact"
+      :sort-by="[{ key: 'pases', order: 'desc' }]"
+    >
+      <template v-slot:top>
+        <v-sheet flat color="muted" class="d-flex align-center pa-3 rounded-t-lg">
+          <p class="text-h6 flex-1-1-100 flex-md-fill">
+            Inasistencias
+          </p>
+          <v-divider
+            class="mx-4"
+            inset
+            vertical
+          />
+          <ModalImpresion
+            :title="'Inasistencias'"
+            :subtitle="props.subtitle"
+            :datos-validos="!!props.students?.length"
+            :content="contentPrint"
+          />
+        </v-sheet>
+      </template>
+    </v-data-table>
+  </section>
 </template>

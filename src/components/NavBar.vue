@@ -35,7 +35,7 @@ const car = ref(localStorage.getItem("bruna"))
       <v-icon icon="mdi-human-male-board" />
       Maestros
     </RouterLink>
-    <RouterLink to="/reportes" class="ma-2 nav-link">
+    <RouterLink to="/reportes/pases" class="ma-2 nav-link">
       <v-icon icon="mdi-file-chart" />
       Reportes
     </RouterLink>

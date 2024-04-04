@@ -2,27 +2,26 @@
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { ref, onMounted, watch, computed } from 'vue'
-import ReportesInasistencias from './reportes/ReportesInasistencias.vue';
-import ReportesObservaciones from './reportes/ReportesObservaciones.vue';
-import ReportesPases from './reportes/ReportesPases.vue';
 import { brunaApi } from '../funciones/api.ts';
 import { MencionesReportes } from '../types/interfaceTypes'
 import { formatoFechaYHora } from '../funciones/funciones';
 import { useTheme, useDisplay } from 'vuetify'
+import { useRoute } from 'vue-router'
 const { lgAndUp } = useDisplay()
 const theme = ref(useTheme().name)
-const tabActiva = ref('pases')
+const route = useRoute()
+const tabActiva = ref(route.name?.toString())
 const tabs = ref([
   {
-    value: 'pases',
+    link: 'pases' ,
     title: 'Pases de entrada y salida',
   },
   {
-    value: 'obs',
+    link: 'observaciones' ,
     title: 'Observaciones',
   },
   {
-    value: 'ast',
+    link: 'inasistencias' ,
     title: 'Inasistencias',
   }
 ])
@@ -166,9 +165,9 @@ function actualizar() {
     nombre: '',
     representantes: '',
   }
-  if (tabActiva.value == 'ast') {
+  if (tabActiva.value == 'inasistencias') {
     cargaInasistencias()
-  } else if (tabActiva.value == 'obs') {
+  } else if (tabActiva.value == 'observaciones') {
     cargaObservaciones()
   }
 }
@@ -211,9 +210,14 @@ onMounted(() => {
       >
         <div
           v-for="tab in tabs"
-          :key="'t'+tab.value"
+          :key="'t'+tab.link"
         >
-          <v-tab :value="tab.value">{{ tab.title }}</v-tab>
+          <RouterLink :to="tab.link">
+            <v-tab
+              :value="tab.link">
+              {{ tab.title }}
+            </v-tab>
+          </RouterLink>
         </div>
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
@@ -303,23 +307,16 @@ onMounted(() => {
             </v-col>
           </template>
           <v-col cols="12" sm="" :md="tabActiva !== 'pases' ? '' : '12'">
-            <v-window v-model="tabActiva" >
-              <v-window-item value="pases">
-                <ReportesPases :dataPase="dataPase" />
-              </v-window-item>
-              <v-window-item value="ast">
-                <ReportesInasistencias
-                  :students="inasistencias"
+            <RouterView v-slot="{Component}">
+              <v-slide-x-transition hide-on-leave>
+                <component
+                  :is="Component"
+                  :dataPase="dataPase"
+                  :students="tabActiva == 'inasistencias' ? inasistencias : observaciones"
                   :subtitle="printSubtitle"
-                  />
-              </v-window-item>
-              <v-window-item value="obs">
-                <ReportesObservaciones
-                  :students="observaciones"
-                  :subtitle="printSubtitle"
-                  />
-              </v-window-item>
-            </v-window>
+                />
+              </v-slide-x-transition>
+            </RouterView>
           </v-col>
         </v-row>
       </v-card-text>
