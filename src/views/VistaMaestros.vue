@@ -221,7 +221,13 @@ function filtroMaterias() {
               :id="p.id_person"
               @recargar="cargaInicial"
             />
-            <configurar-maestro :rols="cargos" :menciones="menciones" :rol="{id_car: p.id_car, nom_car: p.nom_car}" :asignar-rol="true" :id="p.id_person"/>
+            <!-- <configurar-maestro
+              :rols="cargos"
+              :menciones="menciones"
+              :rol="{id_car: p.id_car, nom_car: p.nom_car}"
+              :asignar-rol="true"
+              :id="p.id_person"
+            /> -->
           </v-card-actions>
         </v-card>
       </v-col>
