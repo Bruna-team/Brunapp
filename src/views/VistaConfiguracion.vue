@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { formatoFechaYHora } from '../funciones/funciones';
 import AlertaMensaje from '../components/AlertaMensaje.vue';
 import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+import AgregarEstudiante from '../components/AgregarEstudiante.vue'
 import { brunaApi } from '../funciones/api.ts';
 import { Menciones, Modulos, Materias, Periodos } from '../types/interfaceTypes'
 
@@ -430,7 +431,6 @@ function agregarSeccion(menId:any, anoId: any) {
   })
 }
 function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
-  // menciones.value[men].ano[ano].sec.splice(sec, 1)
   brunaApi({ s: 'seccionEliminar' }, 'id=' + idSec)
   .then((res:any) => {
     if (res.data.r) {
@@ -561,21 +561,39 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
             </v-list-item>
           </v-card>
         </v-col>
-        <!-- <v-col>
-          <v-card title="Estudiantes" class="pb-3">
-            <template #append>
-              <v-btn
-                variant="text"
-                prepend-icon="mdi-file-excel"
-                text="Agregar estudiantes como excel"
-                color="secundario"
-              />
-            </template>
+        <v-col>
+          <v-card class="pb-3">
+            <v-row no-gutters align="center">
+              <v-col cols="">
+                <v-card-title>
+                  Estudiantes
+                </v-card-title>
+              </v-col>
+              <v-col cols="auto">
+                <v-btn
+                  variant="text"
+                  prepend-icon="mdi-file-excel"
+                  text="Agregar con excel"
+                  color="secundario"
+                />
+              </v-col>
+              <v-col cols="auto">
+                <AgregarEstudiante
+                  :menciones="menciones"
+                  :classBtn="'ml-2'"
+                  @recargar="cargaInicial"
+                  @alerta="alertaMsj = $event"
+                />
+              </v-col>
+            </v-row>
             <v-list-item>
-              Total de estudiantes: 650
+              <p class="text-caption text-medium-emphasis">
+                Total de estudiantes
+              </p>
+              650
             </v-list-item>
           </v-card>
-        </v-col> -->
+        </v-col>
         <v-col cols="12">
           <p class="text-caption text-uppercase text-medium-emphasis my-0">Menciones y cursos/años de la institución</p>
         </v-col>

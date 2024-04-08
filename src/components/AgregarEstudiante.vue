@@ -285,8 +285,8 @@ watch(()=>cedRe.value.value, ()=>{
                             v-if="alumno.men.value"
                             v-for="ano in props.menciones[alumno.men.value].ano"
                             :key="ano.id_ano"
-                            :label="ano.num_ano"
-                            :value="ano.nom_ano"
+                            :label="ano.nom_ano"
+                            :value="ano.num_ano"
                           />
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                         </v-radio-group>

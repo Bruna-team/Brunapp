@@ -92,13 +92,13 @@ const items = ref([
 ])
 
 // Funcionalidades del calendario
-function onDrop(item: any, date: any) {
-  // Determine the delta between the old start date and the date chosen,
-  // and apply that delta to both the start and end date to move the item.
-  const eLength = CalendarMath.dayDiff(item.startDate, date)
-  item.originalItem.startDate = CalendarMath.addDays(item.startDate, eLength)
-  item.originalItem.endDate = CalendarMath.addDays(item.endDate, eLength)
-}
+// function onDrop(item: any, date: any) {
+//   // Determine the delta between the old start date and the date chosen,
+//   // and apply that delta to both the start and end date to move the item.
+//   const eLength = CalendarMath.dayDiff(item.startDate, date)
+//   item.originalItem.startDate = CalendarMath.addDays(item.startDate, eLength)
+//   item.originalItem.endDate = CalendarMath.addDays(item.endDate, eLength)
+// }
 function onClickDay(d: any) {
   calendarNav.value = true
   selectedDate.value = d
@@ -926,9 +926,8 @@ watch(()=>cedRe.value.value, ()=>{
           :starting-day-of-week="1"
           show-times
           :show-date="showDate"
-          :enable-drag-drop="true"
+          :enable-drag-drop="false"
           :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
-          @drop-on-date="onDrop"
           @click-date="onClickDay"
           @click-item="onClickItem"
           class="calendar theme-default holiday-us-traditional holiday-us-official"
