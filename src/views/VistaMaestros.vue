@@ -37,8 +37,9 @@ function cargaInicial() {
     if (res.data) {
       organizarJornadas(res.data)
     }
-  }).catch(() => {
+  }).catch((e) => {
     alertaMsj.value = "Hubo un error cargando los datos"
+    console.log(e)
   })
   brunaApi({ s: 'materias' }, '')
   .then((res:any) => {

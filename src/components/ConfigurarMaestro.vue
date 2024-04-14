@@ -168,24 +168,15 @@ function guardarJornada() {
 }
 function guardarRol() {
   const dataApi:any = []
-  const dataEditApi:any = []
   if (rol.value.id_car == "4") {
     for (const j in jornadasPersonal.value) {
       if (jornadasPersonal.value[j].ano && jornadasPersonal.value[j].men && jornadasPersonal.value[j].sec) {
         if (jornadasPersonal.value[j].edit) {
-          if (jornadasPersonal.value[j].id_jor) {
-            dataEditApi.push({
-              ano: jornadasPersonal.value[j].sec.id_ano,
-              id: props.id,
-              rol: rol.value.id_car
-            })
-          } else {
-            dataApi.push({
-              ano: jornadasPersonal.value[j].sec.id_ano,
-              id: props.id,
-              rol: rol.value.id_car
-            })
-          }
+          dataApi.push({
+            ano: jornadasPersonal.value[j].sec.id_ano,
+            id: props.id,
+            rol: rol.value.id_car
+          })
         }
       }
     }
@@ -197,12 +188,11 @@ function guardarRol() {
     })
   }
   if (dataApi) {
-    brunaApi({ s: 'rolCambiar' }, dataApi)
+    brunaApi({ s: 'rolCambiar' }, JSON.stringify(dataApi))
       .then((res:any) => {
         if (res.data.r) {
           alertaMsj.value = "Se ha modificado el rol correctamente"
           dialog.value = false
-          limpiarJornada()
         } else {
           alertaMsj.value = "Ha ocurrido un error modificando el rol"
         }
@@ -210,10 +200,16 @@ function guardarRol() {
         alertaMsj.value = "Hubo un error modificando los datos"
       })
   }
+  if (!dataApi.length) {
+    alertaMsj.value = "Complete la información"
+  } else {
+    limpiarJornada()
+    dialog.value = false
+  }
 }
 function eliminarRol(id: any) {
   if (jornadasPersonal.value[id].id_ano_guia) {
-    brunaApi({ s: 'rolEliminar' }, 'ano=' + jornadasPersonal.value[id].id_ano_guia)
+    brunaApi({ s: 'rolGuiaEliminar' }, 'ano=' + jornadasPersonal.value[id].id_ano_guia)
     .then((res:any) => {
       if (res.data.r) {
         alertaMsj.value = res.data.e
@@ -280,12 +276,6 @@ function eliminarRol(id: any) {
               <span class="flex-fill">
                 Curso asignado
               </span>
-              <v-btn
-              :variant="curso.edit ? 'text' : 'tonal'"
-              :prepend-icon="curso.edit ? 'mdi-close' :'mdi-pen'"
-              :text="curso.edit ? 'Cancelar' :'Editar'"
-              @click="curso.edit = !curso.edit"
-            />
               <v-btn icon="mdi-trash-can" color="error" variant="text" @click="eliminarRol(i)"/>
             </p>
             <v-divider class="mb-2"/>
