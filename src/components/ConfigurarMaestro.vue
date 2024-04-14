@@ -46,9 +46,19 @@ const props = defineProps({
 const materias = computed(()=> props.materias)
 const jornadasPersonal = ref(props.jornadas)
 const rol = ref(props.rol)
-const cursos= ref(1)
+function AgregarRol() {
+  jornadasPersonal.value[obtenerUltimoIdRol() + 1] = {
+    modulo: '',
+    materia: '',
+    men: '',
+    ano: '',
+    sec: '',
+    dia: '',
+    edit: true,
+  }
+}
 function AgregarJornada() {
-  jornadasPersonal.value[obtenerUltimoId() + 1] = {
+  jornadasPersonal.value[obtenerUltimoIdJor() + 1] = {
     modulo: '',
     materia: '',
     men: '',
@@ -62,10 +72,19 @@ function limpiarJornada() {
   emit('recargar')
   jornadasPersonal.value = props.jornadas
 }
-function obtenerUltimoId() {
+function obtenerUltimoIdRol() {
     let ultimoId = Object.keys(jornadasPersonal.value).length;
     for (const object in jornadasPersonal.value) {
-      if (jornadasPersonal.value[object].id_jor && jornadasPersonal.value[object].id_jor > ultimoId) {
+      if (jornadasPersonal.value[object].id_ano_guia && Number(jornadasPersonal.value[object].id_ano_guia)> ultimoId) {
+        ultimoId += Number(jornadasPersonal.value[object].id_ano_guia) ;
+      }
+    }
+    return ultimoId;
+}
+function obtenerUltimoIdJor() {
+    let ultimoId = Object.keys(jornadasPersonal.value).length;
+    for (const object in jornadasPersonal.value) {
+      if (jornadasPersonal.value[object].id_jor && Number(jornadasPersonal.value[object].id_jor) > ultimoId) {
         ultimoId += Number(jornadasPersonal.value[object].id_jor) ;
       }
     }
@@ -147,6 +166,51 @@ function guardarJornada() {
     dialog.value = false
   }
 }
+function guardarRol() {
+  const dataApi:any = []
+  const dataEditApi:any = []
+  if (rol.value.id_car == "4") {
+    for (const j in jornadasPersonal.value) {
+      if (jornadasPersonal.value[j].ano && jornadasPersonal.value[j].men && jornadasPersonal.value[j].sec) {
+        if (jornadasPersonal.value[j].edit) {
+          if (jornadasPersonal.value[j].id_jor) {
+            dataEditApi.push({
+              ano: jornadasPersonal.value[j].sec.id_ano,
+              id: props.id,
+              rol: rol.value.id_car
+            })
+          } else {
+            dataApi.push({
+              ano: jornadasPersonal.value[j].sec.id_ano,
+              id: props.id,
+              rol: rol.value.id_car
+            })
+          }
+        }
+      }
+    }
+  } else {
+    dataApi.push({
+      ano: '',
+      id: props.id,
+      rol: rol.value.id_car
+    })
+  }
+  if (dataApi) {
+    brunaApi({ s: 'rolCambiar' }, dataApi)
+      .then((res:any) => {
+        if (res.data.r) {
+          alertaMsj.value = "Se ha modificado el rol correctamente"
+          dialog.value = false
+          limpiarJornada()
+        } else {
+          alertaMsj.value = "Ha ocurrido un error modificando el rol"
+        }
+      }).catch(() => {
+        alertaMsj.value = "Hubo un error modificando los datos"
+      })
+  }
+}
 </script>
 <template>
 <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
@@ -193,43 +257,57 @@ function guardarJornada() {
           </v-col>
         </v-row>
         <template v-if="rol.id_car == 4">
-          <section v-for="curso in cursos" :key="curso">
+          <section v-for="curso in jornadasPersonal" :key="curso">
             <v-divider/>
             <p class="d-flex align-center">
               <span class="flex-fill">
-                {{ curso }} curso asignado
+                Curso asignado
               </span>
+              <v-btn
+              :variant="curso.edit ? 'text' : 'tonal'"
+              :prepend-icon="curso.edit ? 'mdi-close' :'mdi-pen'"
+              :text="curso.edit ? 'Cancelar' :'Editar'"
+              @click="curso.edit = !curso.edit"
+            />
               <v-btn icon="mdi-trash-can" color="error" variant="text"/>
             </p>
             <v-divider class="mb-2"/>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col cols="12" sm="4">
                 <v-combobox
                   label="Mención"
-                  :items="Object.values(materias)"
-                  item-title="materia"
-                  item-value="id"
+                  v-model="curso.men"
+                  :items="Object.values(props.menciones)"
+                  item-title="men"
+                  item-value="id_men"
+                  @click="curso.ano = ''; curso.sec = ''"
+                  :disabled="!curso.edit"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" sm="4" v-if="curso.men">
                 <v-combobox
                   label="Año"
-                  :items="Object.values(materias)"
-                  item-title="materia"
-                  item-value="id"
+                  v-model="curso.ano"
+                  :items="Object.values(curso.men.ano)"
+                  item-title="nom_ano"
+                  item-value="id_ano"
+                  @click="curso.sec = ''"
+                  :disabled="!curso.edit"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" sm="4" v-if="curso.ano">
                 <v-combobox
                   label="Sección"
-                  :items="Object.values(materias)"
-                  item-title="materia"
-                  item-value="id"
+                  v-model="curso.sec"
+                  :items="Object.values(curso.ano.sec)"
+                  item-title="sec_nom"
+                  item-value="id_ano"
+                  :disabled="!curso.edit"
                 />
               </v-col>
             </v-row>
           </section>
-          <v-btn block color="secundario" @click="cursos++" text="Asignar otra sección" />
+          <v-btn block color="secundario" @click="AgregarRol" text="Asignar otra sección" />
         </template>
       </v-card-text>
       <v-card-text v-else>
@@ -286,10 +364,10 @@ function guardarJornada() {
                 item-value="id_men"
                 :disabled="!jornada.edit"
                 @click="jornada.ano = ''; jornada.sec = ''"
-                />
-              </v-col>
-              <v-col cols="12" sm="4" v-if="jornada.men">
-                <v-combobox
+              />
+            </v-col>
+            <v-col cols="12" sm="4" v-if="jornada.men">
+              <v-combobox
                 label="Año"
                 v-model="jornada.ano"
                 :items="Object.values(jornada.men.ano)"
@@ -330,7 +408,7 @@ function guardarJornada() {
           text="Guardar"
           variant="tonal"
           color="primario"
-          @click="guardarJornada"
+          @click="asignarRol ? guardarRol() : guardarJornada()"
         />
       </v-card-actions>
     </v-card>
