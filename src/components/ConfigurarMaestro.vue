@@ -211,6 +211,23 @@ function guardarRol() {
       })
   }
 }
+function eliminarRol(id: any) {
+  if (jornadasPersonal.value[id].id_ano_guia) {
+    brunaApi({ s: 'rolEliminar' }, 'ano=' + jornadasPersonal.value[id].id_ano_guia)
+    .then((res:any) => {
+      if (res.data.r) {
+        alertaMsj.value = res.data.e
+        delete jornadasPersonal.value[id]
+      } else {
+        alertaMsj.value = "Hubo un error: " + res.data.e
+      }
+    }).catch(() => {
+      alertaMsj.value = "Hubo un error eliminando los datos"
+    })
+  } else {
+    delete jornadasPersonal.value[id]
+  }
+}
 </script>
 <template>
 <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
@@ -257,7 +274,7 @@ function guardarRol() {
           </v-col>
         </v-row>
         <template v-if="rol.id_car == 4">
-          <section v-for="curso in jornadasPersonal" :key="curso">
+          <section v-for="(curso, i) in jornadasPersonal" :key="curso">
             <v-divider/>
             <p class="d-flex align-center">
               <span class="flex-fill">
@@ -269,7 +286,7 @@ function guardarRol() {
               :text="curso.edit ? 'Cancelar' :'Editar'"
               @click="curso.edit = !curso.edit"
             />
-              <v-btn icon="mdi-trash-can" color="error" variant="text"/>
+              <v-btn icon="mdi-trash-can" color="error" variant="text" @click="eliminarRol(i)"/>
             </p>
             <v-divider class="mb-2"/>
             <v-row>
