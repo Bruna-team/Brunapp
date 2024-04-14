@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import { useDisplay } from 'vuetify'
 import { brunaApi } from '../funciones/api.ts';
 import { capitalizar } from "../funciones/funciones.ts";
+import EstudiantesExcel from './EstudiantesExcel.vue'
 const { mobile, smAndUp } = useDisplay()
 const emit = defineEmits([
 	'recargar', 'alerta'
@@ -26,17 +27,29 @@ const props = defineProps({
   menciones: {
     type: Object,
     default: {}
+  },
+  excelMode: {
+    type: Boolean,
+    default: false,
   }
 })
 const agregar = computed(()=>{return props.dataAcademica})
 const steps = computed(()=>{
-  if(props.dataAcademica.id_ano) return [{title:'Datos del estudiante', value:1}, {title:'Datos del representante', value:2}]
-  return [{title:'Información estudiantil', value:0}, {title:'Datos del estudiante', value:1}, {title:'Datos del representante', value:2}]
+  if(props.dataAcademica.id_ano) return [
+    {title:'Datos del estudiante', value:2},
+    {title:'Datos del representante', value:3}
+  ]
+  return [
+    {title:'Información estudiantil', value:1},
+    {title:'Datos del estudiante', value:2},
+    {title:'Datos del representante', value:3}
+  ]
 })
-const step = ref(steps.value.length == 2 ? 1 : 0)
+const step = ref(steps.value.length == 2 ? 2 : 1)
 const loading = ref(false)
 const dialog = ref(false)
 const form = ref()
+const formExcel = ref()
 const disabled = ref(false)
 const cedRe = ref({
   value: '',
@@ -152,10 +165,31 @@ const alumno = ref<any>({
     ],
   },
 })
+const curso = ref({
+  men: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La mención es necesaria',
+    ]
+  },
+  ano: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El año que cursa es necesario',
+    ]
+  },
+  sec: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'La sección es necesaria',
+    ]
+  },
+  alumnos: []
+})
 async function validacion () {
   loading.value = true
   const { valid } = await form.value.validate()
-  if ((step.value == 2) && valid) {
+  if ((step.value == 3) && valid) {
     guardarAlumno()
   }
   else if (valid) step.value++
@@ -222,24 +256,38 @@ watch(()=>cedRe.value.value, ()=>{
 })
 </script>
 <template>
-<v-dialog v-model="dialog" :fullscreen="!smAndUp">
+<v-dialog v-model="dialog" :fullscreen="!smAndUp" max-width="768">
   <template #activator="{ props }">
-    <v-btn
-      v-bind="props"
-      append-icon="mdi-account-school-outline"
-      :variant="variant ? 'text' : 'tonal'"
-      :class="classBtn"
-    >
-      Agregar
-    </v-btn>
+    <template v-if="!excelMode">
+      <v-btn
+        v-bind="props"
+        prepend-icon="mdi-account-school-outline"
+        :variant="variant ? 'text' : 'tonal'"
+        :class="classBtn"
+      >
+        Agregar
+      </v-btn>
+    </template>
+    <template v-else>
+      <v-btn
+        v-bind="props"
+        variant="text"
+        prepend-icon="mdi-file-excel"
+        text="excel"
+        color="secundario"
+      />
+    </template>
   </template>
   <template #default="{ isActive }">
     <v-card>
       <v-toolbar dark>
-        <v-toolbar-title>
+        <v-toolbar-title v-if="!excelMode">
           {{ agregar.ano && agregar.id_ano
             ? `Agrega un estudiante para ${agregar.ano}`
             : 'Agrega un estudiante'}}
+        </v-toolbar-title>
+        <v-toolbar-title v-else>
+          Agrega estudiantes por tabla de excel
         </v-toolbar-title>
         <v-toolbar-items>
           <v-btn
@@ -249,17 +297,23 @@ watch(()=>cedRe.value.value, ()=>{
           />
         </v-toolbar-items>
       </v-toolbar>
-      <v-sheet class="pa-md-3">
+      <v-sheet v-if="!excelMode" class="pa-md-3">
         <v-form ref="form">
-          <v-stepper v-model="step" :mobile="mobile" :items="steps" item-title="title" item-value="value">
+          <v-stepper
+            v-model="step"
+            :mobile="mobile"
+            :items="steps"
+            item-title="title"
+            item-value="value"
+          >
             <v-stepper-window>
               <Transition mode="out-in" name="rotate" type="animation">
-                <v-stepper-window-item key="0" :value="0" v-if="step==0">
+                <v-stepper-window-item key="1" :value="1" v-if="step==1">
                   <v-card class="box-shadow-none" flat>
                     <v-card-title class="text-wrap text-center text-sm-start">Ingresa la información estudiantil</v-card-title>
                     <v-divider></v-divider>
                     <v-row class="mt-2" justify="space-around">
-                      <v-col cols="12" md="">
+                      <v-col cols="12">
                         <v-radio-group
                           v-model="alumno.men.value"
                           :rules="alumno.men.rules"
@@ -274,7 +328,7 @@ watch(()=>cedRe.value.value, ()=>{
                           />
                         </v-radio-group>
                       </v-col>
-                      <v-col cols="12" sm="8" md="4">
+                      <v-col cols="12" sm="7">
                         <v-radio-group
                           v-model="alumno.ano.value"
                           :rules="alumno.ano.rules"
@@ -291,7 +345,7 @@ watch(()=>cedRe.value.value, ()=>{
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                         </v-radio-group>
                       </v-col>
-                      <v-col cols="12" sm="4" md="2">
+                      <v-col cols="12" sm="5">
                         <v-radio-group
                           v-model="alumno.sec.value"
                           :rules="alumno.sec.rules"
@@ -312,7 +366,7 @@ watch(()=>cedRe.value.value, ()=>{
                     </v-row>
                   </v-card>
                 </v-stepper-window-item>
-                <v-stepper-window-item key="1" :value="1" v-else-if="step==1">
+                <v-stepper-window-item key="2" :value="2" v-else-if="step==2">
                   <v-card class="box-shadow-none" title="Ingresa los datos del estudiante" flat>
                     <v-divider></v-divider>
                     <v-row class="mt-2">
@@ -371,7 +425,7 @@ watch(()=>cedRe.value.value, ()=>{
                     </v-row>
                   </v-card>
                 </v-stepper-window-item>
-                <v-stepper-window-item key="2" :value="2" v-else-if="step==2">
+                <v-stepper-window-item key="3" :value="3" v-else-if="step==3">
                   <v-card title="Ingresa los datos del representante" flat>
                     <v-divider></v-divider>
                     <v-row class="mt-2">
@@ -441,17 +495,15 @@ watch(()=>cedRe.value.value, ()=>{
               <v-card-actions class="d-flex justify-space-around">
                 <v-btn
                   text="Atrás"
-                  flat
                   prepend-icon="mdi-arrow-left"
-                  :disabled="step==0"
+                  :disabled="step==1"
                   @click="step--"
                 />
                 <v-btn
                   :loading="loading"
-                  flat
-                  :append-icon="step == 2 ? 'mdi-check' : 'mdi-arrow-right'"
-                  :text="step !== 2 ? 'Siguiente' : 'Agregar'"
-                  :color="step == 2 ? 'primario' : ''"
+                  :append-icon="step == 3 ? 'mdi-check' : 'mdi-arrow-right'"
+                  :text="step !== 3 ? 'Siguiente' : 'Agregar'"
+                  :color="step == 3 ? 'primario' : ''"
                   @click="validacion"
                 />
               </v-card-actions>
@@ -459,11 +511,75 @@ watch(()=>cedRe.value.value, ()=>{
           </v-stepper>
         </v-form>
       </v-sheet>
+      <v-sheet v-else class="pa-md-3">
+        <v-form ref="formExcel">
+          <v-card title="Selecciona los datos del curso para agregar los estudiantes" flat>
+            <v-row class="mt-2" justify="space-around">
+              <v-col cols="12">
+                <v-radio-group
+                  v-model="curso.men.value"
+                  :rules="curso.men.rules"
+                  inline
+                  label="Mención"
+                >
+                  <v-radio
+                    v-for="menc in props.menciones"
+                    :key="menc.id_men"
+                    :label="menc.men"
+                    :value="menc.id_men"
+                  />
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12" sm="7">
+                <v-radio-group
+                  v-model="curso.ano.value"
+                  :rules="curso.ano.rules"
+                  inline
+                  label="Año"
+                >
+                  <v-radio
+                    v-if="curso.men.value"
+                    v-for="ano in props.menciones[curso.men.value].ano"
+                    :key="ano.id_ano"
+                    :label="ano.nom_ano"
+                    :value="ano.num_ano"
+                  />
+                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12" sm="5">
+                <v-radio-group
+                  v-model="curso.sec.value"
+                  :rules="curso.sec.rules"
+                  inline
+                  label="Sección"
+                >
+                  <v-radio
+                    v-if="curso.ano.value"
+                    v-for="sec in props.menciones[curso.men.value]?.ano[curso.ano.value]?.sec"
+                    :key="sec.id_ano"
+                    :label="sec.sec_nom"
+                    :value="sec.id_ano"
+                  />
+                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+            <EstudiantesExcel />
+          </v-card>
+        </v-form>
+      </v-sheet>
     </v-card>
   </template>
 </v-dialog>
 </template>
 <style>
+#drop_zone {
+  border: 5px solid blue;
+  width: 200px;
+  height: 100px;
+}
 .v-stepper-window {
    margin-top: 0;
    margin-bottom: 0;

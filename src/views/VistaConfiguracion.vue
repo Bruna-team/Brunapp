@@ -451,14 +451,14 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
     <v-sheet color="transparent" class="d-flex flex-wrap align-start">
       <v-row class="mt-2">
         <v-col cols="12">
-          <p class="text-caption text-uppercase text-medium-emphasis my-0">Periodo académico</p>
+          <p class="text-caption text-uppercase text-medium-emphasis my-0">Periodo académico y estudiantes cursantes</p>
         </v-col>
         <v-col cols="12" sm="">
           <v-card class="pb-3">
             <v-row no-gutters justify="center" align="center">
               <v-col cols="">
                 <v-card-title>
-                  Año académico
+                  Periodo
                 </v-card-title>
               </v-col>
               <v-col cols="auto" :class="['order-sm-1', {'d-flex flex-column d-sm-block': periodo.edit}]">
@@ -561,25 +561,28 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
             </v-list-item>
           </v-card>
         </v-col>
-        <v-col>
+        <v-col cols="12" sm="6">
           <v-card class="pb-3">
-            <v-row no-gutters align="center">
-              <v-col cols="">
+            <v-row no-gutters justify="center" align="center">
+              <v-col>
                 <v-card-title>
                   Estudiantes
                 </v-card-title>
               </v-col>
               <v-col cols="auto">
-                <v-btn
-                  variant="text"
-                  prepend-icon="mdi-file-excel"
-                  text="Agregar con excel"
-                  color="secundario"
+                <AgregarEstudiante
+                  :menciones="menciones"
+                  :variant="true"
+                  :excel-mode="true"
+                  :classBtn="'ml-2'"
+                  @recargar="cargaInicial"
+                  @alerta="alertaMsj = $event"
                 />
               </v-col>
               <v-col cols="auto">
                 <AgregarEstudiante
                   :menciones="menciones"
+                  :variant="true"
                   :classBtn="'ml-2'"
                   @recargar="cargaInicial"
                   @alerta="alertaMsj = $event"
