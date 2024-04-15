@@ -257,64 +257,67 @@ function eliminarRol(id: any) {
     </v-toolbar>
     <v-card class="pb-16 pb-sm-2">
       <v-card-text v-if="asignarRol">
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-combobox
-              label="Asignar rol"
-              v-model="rol"
-              :items="Object.values(props.rols)"
-              return-object
-              item-title="nom_car"
-              item-value="id_car"
-            />
-          </v-col>
-        </v-row>
+        <v-combobox
+          label="Asignar rol"
+          v-model="rol"
+          :items="Object.values(props.rols)"
+          return-object
+          item-title="nom_car"
+          item-value="id_car"
+          class="w-50"
+        />
         <template v-if="rol.id_car == 4">
           <section v-for="(curso, i) in jornadasPersonal" :key="curso">
-            <v-divider/>
-            <p class="d-flex align-center">
-              <span class="flex-fill">
-                Curso asignado
-              </span>
-              <v-btn icon="mdi-trash-can" color="error" variant="text" @click="eliminarRol(i)"/>
-            </p>
-            <v-divider class="mb-2"/>
-            <v-row>
-              <v-col cols="12" sm="4">
-                <v-combobox
-                  label="Mención"
-                  v-model="curso.men"
-                  :items="Object.values(props.menciones)"
-                  item-title="men"
-                  item-value="id_men"
-                  @click="curso.ano = ''; curso.sec = ''"
-                  :disabled="!curso.edit"
-                />
+            <v-row align="center">
+              <v-col v-if="!curso.edit">
+                {{curso.men.men}} {{curso.ano.nom_ano}} {{curso.ano.sec.sec.sec_nom}}
               </v-col>
-              <v-col cols="12" sm="4" v-if="curso.men">
-                <v-combobox
-                  label="Año"
-                  v-model="curso.ano"
-                  :items="Object.values(curso.men.ano)"
-                  item-title="nom_ano"
-                  item-value="id_ano"
-                  @click="curso.sec = ''"
-                  :disabled="!curso.edit"
-                />
-              </v-col>
-              <v-col cols="12" sm="4" v-if="curso.ano">
-                <v-combobox
-                  label="Sección"
-                  v-model="curso.sec"
-                  :items="Object.values(curso.ano.sec)"
-                  item-title="sec_nom"
-                  item-value="id_ano"
-                  :disabled="!curso.edit"
-                />
+              <template v-if="curso.edit">
+                <v-col cols="12" sm="4">
+                  <v-combobox
+                    label="Mención"
+                    v-model="curso.men"
+                    :items="Object.values(props.menciones)"
+                    item-title="men"
+                    item-value="id_men"
+                    hide-details
+                    @click="curso.ano = ''; curso.sec = ''"
+                  />
+                </v-col>
+                <v-col cols="12" sm="4" v-if="curso.men">
+                  <v-combobox
+                    label="Año"
+                    v-model="curso.ano"
+                    :items="Object.values(curso.men.ano)"
+                    item-title="nom_ano"
+                    item-value="id_ano"
+                    hide-details
+                    @click="curso.sec = ''"
+                  />
+                </v-col>
+                <v-col cols="12" sm="3" v-if="curso.ano">
+                  <v-combobox
+                    label="Sección"
+                    v-model="curso.sec"
+                    :items="Object.values(curso.ano.sec)"
+                    item-title="sec_nom"
+                    item-value="id_ano"
+                    hide-details
+                  />
+                </v-col>
+              </template>
+              <v-col cols="1">
+                <v-btn icon="mdi-trash-can" color="error" variant="text" @click="eliminarRol(i)"/>
               </v-col>
             </v-row>
+            <v-divider class="my-3"/>
           </section>
-          <v-btn block color="secundario" @click="AgregarRol" text="Asignar otra sección" />
+          <v-btn
+            block
+            color="secundario"
+            :text="Object.values(jornadas).length ? 'Asignar otra sección' : 'Asignar sección'"
+            @click="AgregarRol"
+          />
         </template>
       </v-card-text>
       <v-card-text v-else>

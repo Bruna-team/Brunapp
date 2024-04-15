@@ -233,8 +233,26 @@ function buscarAno(id:string) {
       <v-col v-for="p in profes" :key="p.id_person">
         <v-card>
           <v-card-item>
-            <v-card-title>{{ p.profesor }}</v-card-title>
-            <v-card-subtitle>{{ p.nom_mat }}</v-card-subtitle>
+            <v-card-title>
+              {{ p.profesor }}
+            </v-card-title>
+            <v-card-subtitle>
+              {{ p.nom_mat }}
+            </v-card-subtitle>
+            <template v-if="Object.values(prof_guias[p.id_person]).length">
+              <small>
+                Maestro guia en
+              </small>
+              <v-chip-group column>
+                <v-chip
+                  v-for="secGuia in prof_guias[p.id_person]"
+                  :key="secGuia.id_ano_guia"
+                  :size="'small'"
+                >
+                  {{ secGuia.men.men }} {{ secGuia.ano.nom_ano }} {{ secGuia.sec.sec_nom }}
+                </v-chip>
+              </v-chip-group>
+            </template>
           </v-card-item>
           <v-card-text v-for="jor in jornadas[p.id_person]" class="pb-1">
             {{jor?.dia}}
