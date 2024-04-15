@@ -21,10 +21,10 @@ function cargaInicial() {
       periodo.value.startS = res.data[0].ano_ene_inf
       periodo.value.endS = res.data[0].ano_jul_inf
     } else {
-      alertaMsj.value = "Hubo un error: " + res.data.e
+      alertaMsj.value = "Asigna una fecha de inicio y cierre de año escolar"
     }
   }).catch(() => {
-    alertaMsj.value = "Hubo un error consultando los datos"
+    alertaMsj.value = "Asigna una fecha de inicio y cierre de año escolar"
   })
   brunaApi({ s: 'horarios' }, '')
   .then((res:any) => {
