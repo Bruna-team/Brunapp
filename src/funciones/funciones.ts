@@ -10,8 +10,8 @@ function capitalizar (string: string) {
    )
    const textoSinEspacios = textoCapitalize.trim().replace(/\s+/g, ' ')
    string = textoSinEspacios
-   return string
- }
+  }
+  return string
 }
 /**
  * @param {date} Date
