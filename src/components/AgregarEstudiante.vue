@@ -184,8 +184,8 @@ const curso = ref({
       (v: string) => !!v || 'La sección es necesaria',
     ]
   },
-  alumnos: []
 })
+const estudiantes = ref<any[]>([])
 async function validacion () {
   loading.value = true
   const { valid } = await form.value.validate()
@@ -566,7 +566,19 @@ watch(()=>cedRe.value.value, ()=>{
                 </v-radio-group>
               </v-col>
             </v-row>
-            <EstudiantesExcel />
+            <EstudiantesExcel
+              :estudiantes="estudiantes"
+            />
+            <v-card-actions>
+              <v-btn
+                block
+                type="submit"
+                text="Agregar estudiantes"
+                color="primario"
+                prepend-icon="mdi-plus"
+                :disabled="!estudiantes"
+              />
+            </v-card-actions>
           </v-card>
         </v-form>
       </v-sheet>

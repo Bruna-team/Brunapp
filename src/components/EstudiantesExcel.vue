@@ -4,6 +4,10 @@ import * as XLSX from 'xlsx';
 /* load 'fs' for readFile and writeFile support */
 import * as fs from 'fs';
 XLSX.set_fs(fs);
+const emit = defineEmits([
+	'estudiantes',
+]);
+
 const estudiantes = ref<any[]>([])
 const alertMSJ = ref<any[]>([])
 
@@ -19,6 +23,9 @@ function handleFileUpload(e: any) {
     datosEstudiantes(estudiantesXLS)
   }
   reader.readAsArrayBuffer(file)
+  if (!alertMSJ.value.length) {
+    emit('estudiantes', estudiantes)
+  }
 }
 
 function datosEstudiantes(estudiantesXLS: any[] ) {
@@ -104,6 +111,7 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
       estudiantes.value.push(estudiante)
     }
   });
+
 }
 
 </script>
