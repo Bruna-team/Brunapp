@@ -344,7 +344,7 @@ function guardarMencion(m:any) {
       })
     }
   } else {
-    alertaMsj.value = "Rellena todos los campos"
+    alertaMsj.value = "Por favor, llena todos los campos"
   }
   if (datosApi.length) {
     brunaApi({ s: 'mencionCrear' }, JSON.stringify(datosApi))
@@ -447,7 +447,24 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
 <template>
   <v-container>
     <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
-    <h2 class="flex-fill">Configuración</h2>
+    <div>
+      <h2 class="d-inline">
+        Configuración
+      </h2>
+      <v-btn
+        prepend-icon="mdi-download"
+        variant=tonal
+        class="float-right"
+        @click.prepend
+        >
+        <a
+          href="https://drive.google.com/file/d/1vzYjx_U2skRZ3wCfDBN1WXLEwtTJV21L/view?usp=sharing"
+          download="Manual de usuario BRUNA.pdf"
+        >
+          Descargar manual
+        </a>
+      </v-btn>
+    </div>
     <v-sheet color="transparent" class="d-flex flex-wrap align-start">
       <v-row class="mt-2">
         <v-col cols="12">
