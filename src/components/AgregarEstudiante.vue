@@ -505,6 +505,7 @@ watch(()=>cedRe.value.value, ()=>{
                   :text="step !== 3 ? 'Siguiente' : 'Agregar'"
                   :color="step == 3 ? 'primario' : ''"
                   @click="validacion"
+                  :variant="step == 3 ? 'elevated' : 'text'"
                 />
               </v-card-actions>
             </template>

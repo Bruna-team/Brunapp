@@ -180,19 +180,18 @@ function cerrarSesion() {
       :class="temaLight ? 'icon-moon' : 'icon-sun'"
     />
     <v-btn
-      :variant="edit ? 'tonal' : 'text'"
+      variant="text"
       :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
       :text="edit ? 'Cancelar' : 'Editar'"
-      :color="edit ? 'error' : ''"
       @click="edit = !edit"
     />
     <v-btn
       v-if="edit"
       :loading="loading"
-      variant="tonal"
+      variant="elevated"
       prepend-icon="mdi-sync"
       text="Guardar"
-      color="secundario"
+      color="primario"
       @click="validar"
     />
   </div>

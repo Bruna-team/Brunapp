@@ -475,32 +475,37 @@ watch(()=>cedRe.value.value, ()=>{
 
 <template>
   <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
-  <v-layout>
+  <v-layout style="height: auto;">
     <!-- SIDENAV de estudiantes desktop -->
     <v-navigation-drawer
       v-model="studentDrawer"
       floating
       :location="mobile ? 'bottom' : 'left'"
-      :class="mobile ? 'h-75' : ''"
+      :class="mobile ? 'h-75' : 'fixed-navigation'"
       touchless
     >
-      <v-list-item class="text-center item-text-inline item-sticky px-0">
-        <template v-if="mobile" #prepend>
-          <v-btn variant="text" icon="mdi-arrow-down" class="d-inline" @click="studentDrawer = false"/>
-        </template>
-        <span class="d-inline-block">
-          {{  alumno.men_abre }}
-          <span class="text-caption d-block">
-          {{  alumno.men }}
-          </span>
-        </span>
-      </v-list-item>
       <v-list
         v-if="estudiantes[0]?.id_estd"
         lines="one"
         density="compact"
         nav
       >
+        <v-list-item class="text-center item-text-inline item-sticky px-0">
+          <template v-if="mobile" #prepend>
+            <v-btn
+              variant="text"
+              icon="mdi-arrow-down"
+              class="d-inline"
+              @click="studentDrawer = false"
+            />
+          </template>
+          <span class="d-inline-block">
+            {{  alumno.men_abre }}
+            <span class="text-caption d-block">
+            {{  alumno.men }}
+            </span>
+          </span>
+        </v-list-item>
         <v-list-item
           v-for="estudiante in estudiantes"
           :key="estudiante.id_estd"
@@ -510,7 +515,7 @@ watch(()=>cedRe.value.value, ()=>{
                   ${estudiante.sape_alum !== 'undefined' ? estudiante.sape_alum : ''}`"
           :subtitle="estudiante.ced_alum"
           class="my-3"
-          @click="buscarEstudiante(estudiante.id_estd), studentDrawer = !studentDrawer"
+          @click="buscarEstudiante(estudiante.id_estd), !mobile || (studentDrawer = !studentDrawer)"
         >
           <template #prepend>
             <v-icon color="brown">
@@ -521,7 +526,9 @@ watch(()=>cedRe.value.value, ()=>{
       </v-list>
     </v-navigation-drawer>
     <!-- Nav mobile de estudiantes -->
-    <v-bottom-navigation v-if="mobile && estudiantes[0]?.id_estd">
+    <v-bottom-navigation
+      v-if="mobile && estudiantes[0]?.id_estd"
+    >
       <v-btn @click="studentDrawer = !studentDrawer">
         <v-icon icon="mdi-account-school-outline" />
         Lista de estudiantes
@@ -532,10 +539,15 @@ watch(()=>cedRe.value.value, ()=>{
       v-model="calendarNav"
       temporary
       location="right"
-      class="sidebar-width"
+      class="sidebar-width h-screen fixed-navigation"
     >
       <v-sheet class="pa-2">
-        <v-btn variant="plain" prepend-icon="mdi-close" text="Cerrar" block @click="calendarNav = !calendarNav" />
+        <v-btn
+          variant="plain"
+          prepend-icon="mdi-close"
+          class="float-right"
+          @click="calendarNav = !calendarNav"
+        />
         <template v-if="selectedItem.id && !editItem">
           <p class="text-center text-capitalize text-medium-emphasis">
             {{new Date(selectedItem.startDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
@@ -555,7 +567,11 @@ watch(()=>cedRe.value.value, ()=>{
             <p class="text-h5 text-center text-capitalize mb-4">
               {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
             </p>
-            <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
+            <v-text-field
+              v-model="newItemTitle"
+              label="Titulo de la observación"
+              hide-details
+            />
             <v-text-field
               v-if="editItem"
               v-model="newItemStartDate"
@@ -590,7 +606,11 @@ watch(()=>cedRe.value.value, ()=>{
               persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
               class="mb-3"
             />
-            <v-textarea label="Observación" v-model="newItemObservacion"/>
+            <v-textarea
+              label="Observación"
+              v-model="newItemObservacion"
+              hide-details
+            />
           </v-form>
         </template>
       </v-sheet>
@@ -600,7 +620,7 @@ watch(()=>cedRe.value.value, ()=>{
             class="flex-fill py-3"
             variant="tonal"
             block
-            :append-icon="editItem ? 'mdi-cancel' : 'mdi-trash-can'"
+            :append-icon="editItem ? 'madi-close' : 'mdi-trash-can'"
             color="error"
             @click="editItem ? (editItem = false, limpiarItems()) : ''"
           >
@@ -627,7 +647,7 @@ watch(()=>cedRe.value.value, ()=>{
       </template>
     </v-navigation-drawer>
     <!-- Vista -->
-    <v-main>
+    <v-main :class="{'main-content': mobile}">
       <v-container
         class="px-0"
       >
@@ -653,7 +673,6 @@ watch(()=>cedRe.value.value, ()=>{
           <v-btn
             v-if="edit"
             :loading="loading"
-            variant="tonal"
             prepend-icon="mdi-sync"
             text="Guardar"
             color="primario"
@@ -910,22 +929,24 @@ watch(()=>cedRe.value.value, ()=>{
               </v-radio-group>
             </v-col>
           </v-row>
-          <calendar-view
-            :items="items"
-            :display-period-uom="periodo"
-            :starting-day-of-week="1"
-            show-times
-            :show-date="showDate"
-            :enable-drag-drop="false"
-            :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
-            @click-date="onClickDay"
-            @click-item="onClickItem"
-            class="calendar theme-default holiday-us-traditional holiday-us-official"
-          >
-            <template #header="{ headerProps }">
-              <calendar-view-header :header-props="headerProps" @input="setShowDate" />
-            </template>
-          </calendar-view>
+          <v-sheet>
+            <calendar-view
+              :items="items"
+              :display-period-uom="periodo"
+              :starting-day-of-week="1"
+              show-times
+              :show-date="showDate"
+              :enable-drag-drop="false"
+              :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
+              @click-date="onClickDay"
+              @click-item="onClickItem"
+              class="calendar theme-default holiday-us-traditional holiday-us-official"
+            >
+              <template #header="{ headerProps }">
+                <calendar-view-header :header-props="headerProps" @input="setShowDate" />
+              </template>
+            </calendar-view>
+          </v-sheet>
         </template>
         <template v-else>
           <v-sheet
@@ -942,6 +963,16 @@ watch(()=>cedRe.value.value, ()=>{
 </template>
 
 <style>
+.fixed-navigation {
+  position: fixed !important;
+  top: 4rem !important;
+  height: calc(100vh - 4rem) !important;
+}
+.main-content {
+  height: calc(100vh - 4rem);
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 .v-navigation-drawer--temporary.sidebar-width {
   min-width: 300px;
   width: fit-content !important;

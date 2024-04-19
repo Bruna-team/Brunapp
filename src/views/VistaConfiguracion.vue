@@ -481,7 +481,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
               <v-col cols="auto" :class="['order-sm-1', {'d-flex flex-column d-sm-block': periodo.edit}]">
                 <v-btn
                   variant="text"
-                  :prepend-icon="periodo.edit ? 'mdi-cancel' : 'mdi-pen'"
+                  :prepend-icon="periodo.edit ? 'madi-close' : 'mdi-pen'"
                   @click="periodo.edit ? limpiarPeriodo() : periodo.edit = !periodo.edit"
                 >
                   <span class="d-none d-sm-inline">
@@ -653,7 +653,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                   />
                   <v-btn
                     variant="text"
-                    :prepend-icon="men.edit ? 'mdi-cancel' : 'mdi-trash-can'"
+                    :prepend-icon="men.edit ? 'madi-close' : 'mdi-trash-can'"
                     :disabled="editMen && !men.edit"
                     class="text-error"
                     @click="men.edit ? (limpiarMencion(m), editMen = false) : ''"
@@ -840,7 +840,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                     class="text-error"
                     @click="modulo.edit ? limpiarModulo(m) : ''"
                   >
-                    <v-icon :icon="modulo.edit ? 'mdi-cancel' : 'mdi-trash-can'"  size="x-large"/>
+                    <v-icon :icon="modulo.edit ? 'madi-close' : 'mdi-trash-can'"  size="x-large"/>
                     <VentanaConfirmar
                       v-if="!modulo.edit"
                       :message="'desea eliminar este módulo'"
@@ -901,7 +901,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                   class="text-error"
                   @click="materia.edit ? limpiarMateria(m) : ''"
                 >
-                  <v-icon :icon="materia.edit ? 'mdi-cancel' : 'mdi-trash-can'"  size="x-large"/>
+                  <v-icon :icon="materia.edit ? 'madi-close' : 'mdi-trash-can'"  size="x-large"/>
                   <VentanaConfirmar
                     v-if="!materia.edit"
                     :message="'desea eliminar esta materia'"

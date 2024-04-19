@@ -125,19 +125,20 @@ const docConfiguration = ref({
           </div>
         </v-container>
       </v-card-text>
+      <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          color="error"
+          prepend-icon="madi-close"
           variant="text"
           @click="dialog = false"
         >
-          Cancel
+          Cancelar
         </v-btn>
         <v-btn
           color="primario"
           prepend-icon="mdi-printer"
-          variant="tonal"
+          variant="elevated"
           @click="imprimirPdf({title: printProps.title, subtitle: printProps.subtitle}, content, docConfiguration, printProps.quill)"
         >
           Imprimir

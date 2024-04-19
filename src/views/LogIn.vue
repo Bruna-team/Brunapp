@@ -140,17 +140,17 @@ watch(router.currentRoute, (value) => {
     name="slide-fade"
     mode="out-in"
   >
-    <v-sheet
+    <v-card
       v-if="logType == 'LogIn'"
       class="d-flex flex-column align-center justify-center text-center mx-auto px-4"
-      elevation="4"
-      height="400"
       rounded
-      max-width="800"
-      width="100%"
+      max-width="500"
     >
-      <h2 class="font-weight-black text-primario font-bruna mb-4">Inicia Sesión</h2>
+      <v-card-title class="font-weight-black text-primario font-bruna">
+        Inicia Sesión
+      </v-card-title>
       <v-form ref="form" validate-on="submit lazy" @submit.prevent>
+      <v-card-text class="w-100">
         <v-text-field
           v-model="logData.cedula.value"
           :rules="logData.cedula.rules"
@@ -168,128 +168,139 @@ watch(router.currentRoute, (value) => {
           label="Contraseña"
         />
         <v-checkbox label="Recordar" title="Mantener la sesión iniciada" v-model="recSesion"/>
-        <v-divider class="my-2"></v-divider>
+      </v-card-text>
+      <v-divider class="my-2"></v-divider>
+      <v-card-actions>
         <v-btn
-          class="my-2 mx-1"
+          class="d-block my-2 mx-1"
           rounded
-          variant="flat"
+          variant="outlined"
           @click="router.push('SingIn')"
         >
-          <span class="text-caption">
-            ¿No tienes cuenta? crea la tuya aquí
-          </span>
-        </v-btn>
-        <v-btn
-          :loading="loading"
-          class="my-2 mx-1"
-          prepend-icon="mdi-check"
-          variant="tonal"
-          color="primario"
-          type="submit"
-          @click="validar('log')"
-        >Iniciar sesión</v-btn>
+        <span class="text-caption">
+          ¿No tienes cuenta? crea la tuya aquí
+        </span>
+      </v-btn>
+      <v-btn
+        :loading="loading"
+        class="my-2 mx-1"
+        prepend-icon="mdi-check"
+        variant="elevated"
+        color="primario"
+        type="submit"
+        text="Iniciar sesión"
+        @click="validar('log')"
+      />
+    </v-card-actions>
       </v-form>
-    </v-sheet>
-    <v-sheet
+    </v-card>
+    <v-card
       v-else
       class="d-flex flex-column align-center justify-center text-center mx-auto px-4"
-      elevation="4"
       rounded
-      max-width="800"
-      width="100%"
+      max-width="500"
     >
-      <h2 class="font-weight-black text-primario font-bruna mb-4">¡Crea tu cuenta profesor!</h2>
+      <v-card-title
+        class="font-weight-black text-primario font-bruna"
+      >
+        ¡Crea tu cuenta profesor!
+      </v-card-title>
       <v-form ref="form" validate-on="submit lazy" @submit.prevent>
-        <v-text-field
-          v-model="regData.nombre.value"
-          :rules="regData.nombre.rules"
-          prepend-icon="mdi-account"
-          label="Nombre"
-        ></v-text-field>
-        <v-text-field
-          v-model="regData.apellido.value"
-          :rules="regData.apellido.rules"
-          prepend-icon="mdi-account"
-          label="Apellido"
-        ></v-text-field>
-        <v-text-field
-          v-model="regData.cedula.value"
-          :rules="regData.cedula.rules"
-          prefix="V-"
-          hint="Ej: V-12345678"
-          prepend-icon="mdi-id-card"
-          label="Cédula"
-        ></v-text-field>
-        <v-text-field
-          v-model="regData.telefono.value"
-          :rules="regData.telefono.rules"
-          hint="Ej: 04121234567"
-          prepend-icon="mdi-phone"
-          label="N° telefónico"
-        ></v-text-field>
-        <v-text-field
-          v-model="regData.email.value"
-          :rules="regData.email.rules"
-          hint="Ej: ejemplo@gmail.com"
-          prepend-icon="mdi-email"
-          label="Correo"
-        ></v-text-field>
-        <v-text-field
-          v-model="regData.direccion.value"
-          :rules="regData.direccion.rules"
-          prepend-icon="mdi-map-marker"
-          label="Dirección"
-        ></v-text-field>
-        <v-text-field
-          v-model="regData.password.value"
-          prepend-icon="mdi-lock"
-          :rules="regData.password.rules"
-          :append-inner-icon="seePassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="seePassword ? 'text' : 'password'"
-          hint="Debe tener una letra mayúscula, un numero y un signo"
-          @click:append-inner="seePassword = !seePassword"
-          label="Contraseña"
-        ></v-text-field>
-        <v-radio-group
-          v-model="regData.rol.value"
-          :rules="regData.rol.rules"
-          inline
-          label="Rol de docente"
-        >
-          <v-radio label="Profesor" value="3"></v-radio>
-          <v-radio label="Guía de sección" value="4"></v-radio>
-          <v-radio label="Coordinador" value="2"></v-radio>
-        </v-radio-group>
-        <v-text-field
-          v-model="segurityCode"
-          prepend-icon="mdi-key"
-          :rules="[(v) => !!v || 'El código de seguridad es necesario para crear una cuenta']"
-          type="password"
-          label="Código de seguridad"
-          hint="Este te lo debe dar la institución para crear tu cuenta"
-        ></v-text-field>
+        <v-card-text>
+          <v-text-field
+            v-model="regData.nombre.value"
+            :rules="regData.nombre.rules"
+            prepend-icon="mdi-account"
+            label="Nombre"
+          ></v-text-field>
+          <v-text-field
+            v-model="regData.apellido.value"
+            :rules="regData.apellido.rules"
+            prepend-icon="mdi-account"
+            label="Apellido"
+          ></v-text-field>
+          <v-text-field
+            v-model="regData.cedula.value"
+            :rules="regData.cedula.rules"
+            prefix="V-"
+            hint="Ej: V-12345678"
+            prepend-icon="mdi-id-card"
+            label="Cédula"
+          ></v-text-field>
+          <v-text-field
+            v-model="regData.telefono.value"
+            :rules="regData.telefono.rules"
+            hint="Ej: 04121234567"
+            prepend-icon="mdi-phone"
+            label="N° telefónico"
+          ></v-text-field>
+          <v-text-field
+            v-model="regData.email.value"
+            :rules="regData.email.rules"
+            hint="Ej: ejemplo@gmail.com"
+            prepend-icon="mdi-email"
+            label="Correo"
+          ></v-text-field>
+          <v-text-field
+            v-model="regData.direccion.value"
+            :rules="regData.direccion.rules"
+            prepend-icon="mdi-map-marker"
+            label="Dirección"
+          ></v-text-field>
+          <v-text-field
+            v-model="regData.password.value"
+            prepend-icon="mdi-lock"
+            :rules="regData.password.rules"
+            :append-inner-icon="seePassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="seePassword ? 'text' : 'password'"
+            hint="Debe tener una letra mayúscula, un numero y un signo"
+            @click:append-inner="seePassword = !seePassword"
+            label="Contraseña"
+          ></v-text-field>
+          <v-radio-group
+            v-model="regData.rol.value"
+            :rules="regData.rol.rules"
+            inline
+            label="Rol de docente"
+          >
+            <v-radio label="Profesor" value="3"></v-radio>
+            <v-radio label="Guía de sección" value="4"></v-radio>
+            <v-radio label="Coordinador" value="2"></v-radio>
+          </v-radio-group>
+          <v-text-field
+            v-model="segurityCode"
+            prepend-icon="mdi-key"
+            :rules="[(v) => !!v || 'El código de seguridad es necesario para crear una cuenta']"
+            type="password"
+            label="Código de seguridad"
+            hint="Este te lo debe dar la institución para crear tu cuenta"
+          ></v-text-field>
+        </v-card-text>
         <v-divider class="my-4"></v-divider>
-        <v-btn
-          class="my-2 mx-1"
-          rounded
-          variant="flat"
-          @click="router.push('LogIn')"
-        >
-          <span class="text-caption">
-            ¿Ya tienes cuenta? Inicia sesión aquí
-          </span>
-        </v-btn>
-        <v-btn
-          :loading="loading"
-          class="my-2 mx-1"
-          prepend-icon="mdi-check"
-          variant="tonal"
-          color="primario"
-          type="submit"
-          @click="validar('reg')"
-        >Crear Cuenta</v-btn>
+        <v-card-actions>
+          <v-btn
+            class="my-2 mx-1"
+            rounded
+            variant="outlined"
+            @click="router.push('LogIn')"
+          >
+            <span class="text-caption">
+              ¿Ya tienes cuenta? Inicia sesión aquí
+            </span>
+          </v-btn>
+          <v-btn
+            :loading="loading"
+            class="my-2 mx-1"
+            prepend-icon="mdi-check"
+            variant="elevated"
+            color="primario"
+            type="submit"
+            text="Crear Cuenta"
+            @click="validar('reg')"
+          />
+        </v-card-actions>
       </v-form>
-    </v-sheet>
+    </v-card>
   </Transition>
 </v-container>
 </template>

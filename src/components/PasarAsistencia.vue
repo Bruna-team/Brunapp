@@ -114,14 +114,13 @@ watch(()=>dialog.value, ()=>{
           <v-card-actions>
             <v-spacer />
             <v-btn
-              prepend-icon="mdi-cancel"
-              color="error"
+              prepend-icon="madi-close"
               text="Cancelar"
               @click="isActive.value = false"
             />
             <v-btn
               prepend-icon="mdi-check"
-              variant="tonal"
+              variant="elevated"
               color="primario"
               text="Guardar"
               @click="guardarInasistencias"

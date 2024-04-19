@@ -1,19 +1,23 @@
 <script setup lang="ts">
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useTheme, useDisplay } from 'vuetify'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import { ref, onMounted, watch, computed } from 'vue'
-import { brunaApi } from '../funciones/api.ts';
+
+import AlertaMensaje from '../components/AlertaMensaje.vue';
 import { MencionesReportes } from '../types/interfaceTypes'
 import { formatoFechaYHora } from '../funciones/funciones';
-import { useTheme, useDisplay } from 'vuetify'
-import { useRoute } from 'vue-router'
-const { lgAndUp } = useDisplay()
-const theme = ref(useTheme().name)
-const route = useRoute()
-const tabActiva = ref(route.name?.toString())
-const car = ref(localStorage.getItem("bruna"))
+import { brunaApi } from '../funciones/api.ts';
 
-const tabs = ref( (car.value == '2' || car.value == '2')
+const { lgAndUp } = useDisplay()
+const route = useRoute()
+const theme = ref(useTheme().name)
+const car = ref(localStorage.getItem("bruna"))
+const alertaMsj = ref<string>('')
+
+const tabActiva = ref(route.name?.toString())
+const tabs = ref( (car.value == '1' || car.value == '2')
   ?
     [
       {
@@ -84,12 +88,13 @@ const printSubtitle = computed(() => {
   }
 })
 function cargaInicial() {
-  brunaApi({ s: 'menciones' }, '')
+  brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
       organizarSecciones(res.data)
     }
   }).catch(() => {
+    alertaMsj.value = "Hubo un error cargando los datos"
   })
 }
 function organizarSecciones(data:string[]) {
@@ -216,6 +221,7 @@ onMounted(() => {
 });
 </script>
 <template>
+  <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <v-container class="px-0 px-md-2">
     <h2 class="pl-3">Reportes</h2>
     <v-card class="overflow-visible">
@@ -239,7 +245,7 @@ onMounted(() => {
       </v-tabs>
       <v-card-text :class="{'tabPases': tabActiva == 'pases'}">
         <v-row class="d-flex flex-wrap">
-          <v-col cols="12" sm="5" lg="auto" class="px-0">
+          <v-col cols="12" sm="5" lg="5" class="px-0">
             <v-radio-group
               v-model="mencion"
               :inline="lgAndUp"
@@ -254,7 +260,7 @@ onMounted(() => {
               />
             </v-radio-group>
           </v-col>
-          <v-col cols="12" sm="7" lg="12" class="px-0 d-lg-flex">
+          <v-col cols="12" sm="7" lg="7" class="px-0 d-lg-flex">
             <v-radio-group
               v-model="ano"
               inline
