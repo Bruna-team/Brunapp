@@ -10,24 +10,36 @@ const materias = ref<Materias[]>([])
 const profes = ref<Maestros[]>([])
 const modulos= ref<Modulos[]>([])
 const menciones = ref<Menciones[]>([])
+const anosSinOrden = ref<any>([])
 
 const nombreABuscar = ref('')
 const materiaABuscar = ref('')
 const materiaSeleccionada = ref([])
 const jornadas = ref<any>([])
+const prof_guias = ref<any>([])
 const cargos = ref<any>([])
 onMounted(() => {
 	cargaInicial();
 });
 
 function cargaInicial() {
+  brunaApi({ s: 'secciones' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      organizarSecciones(res.data)
+      anosSinOrden.value = res.data
+    }
+  }).catch((e) => {
+    alertaMsj.value = "Hubo un error cargando los datos" + e
+  })
   brunaApi({ s: 'maestros' }, '')
   .then((res:any) => {
     if (res.data) {
       organizarJornadas(res.data)
     }
-  }).catch(() => {
+  }).catch((e) => {
     alertaMsj.value = "Hubo un error cargando los datos"
+    console.log(e)
   })
   brunaApi({ s: 'materias' }, '')
   .then((res:any) => {
@@ -45,14 +57,6 @@ function cargaInicial() {
   }).catch(() => {
     // message: 'Hubo un error cargando los datos',
   })
-  brunaApi({ s: 'secciones' }, '')
-  .then((res:any) => {
-    if (res.data) {
-      organizarSecciones(res.data)
-    }
-  }).catch(() => {
-    alertaMsj.value = "Hubo un error cargando los datos"
-  })
   brunaApi({ s: 'cargos' }, '')
   .then((res:any) => {
     if (res.data) {
@@ -64,10 +68,12 @@ function cargaInicial() {
 }
 function organizarJornadas(data:string[]) {
   const dataJor:any = {}
+  const dataGuia:any = {}
   const dataPro:any = {}
   data.forEach((d:any) => {
     if(!dataJor[d.id_person]) {
       dataJor[d.id_person] = {}
+      dataGuia[d.id_person] = {}
       dataPro[d.id_person] = d
     }
     if (d.id_jor) {
@@ -110,8 +116,38 @@ function organizarJornadas(data:string[]) {
         }
       }
     }
+    if (d.id_ano_guia) {
+      if(!dataGuia[d.id_person][d.id_ano_guia]) {
+        dataGuia[d.id_person][d.id_ano_guia] = {
+          id_ano_guia: d.id_ano_guia,
+          men: {
+            men: buscarAno(d.id_ano_guia).nom_men,
+            ano: {
+              ano: {
+                nom_ano: buscarAno(d.id_ano_guia).nom_ano,
+              }
+            }
+          },
+          ano: {
+            nom_ano: buscarAno(d.id_ano_guia).nom_ano,
+            sec: {
+              sec: {
+                sec_nom: buscarAno(d.id_ano_guia).sec_ano
+              }
+            }
+          },
+          sec: {
+            sec_nom: buscarAno(d.id_ano_guia).sec_ano,
+            id_ano: buscarAno(d.id_ano_guia).id_ano
+          },
+          nuevo: false,
+          edit: false
+        }
+      }
+    }
   })
   jornadas.value = dataJor
+  prof_guias.value = dataGuia
   profes.value = dataPro
 }
 function organizarSecciones(data:string[]) {
@@ -163,6 +199,10 @@ function filtroMaterias() {
   materiaABuscar.value = materiaFiltro
   actualizar()
 }
+function buscarAno(id:string) {
+  const ano = anosSinOrden.value.filter((a:any) => a.id_ano === id)
+  return ano[0]
+}
 </script>
 <template>
   <v-container>
@@ -193,8 +233,26 @@ function filtroMaterias() {
       <v-col v-for="p in profes" :key="p.id_person">
         <v-card>
           <v-card-item>
-            <v-card-title>{{ p.profesor }}</v-card-title>
-            <v-card-subtitle>{{ p.nom_mat }}</v-card-subtitle>
+            <v-card-title>
+              {{ p.profesor }}
+            </v-card-title>
+            <v-card-subtitle>
+              {{ p.nom_mat }}
+            </v-card-subtitle>
+            <template v-if="Object.values(prof_guias[p.id_person]).length">
+              <small>
+                Maestro guia en
+              </small>
+              <v-chip-group column>
+                <v-chip
+                  v-for="secGuia in prof_guias[p.id_person]"
+                  :key="secGuia.id_ano_guia"
+                  :size="'small'"
+                >
+                  {{ secGuia.men.men }} {{ secGuia.ano.nom_ano }} {{ secGuia.sec.sec_nom }}
+                </v-chip>
+              </v-chip-group>
+            </template>
           </v-card-item>
           <v-card-text v-for="jor in jornadas[p.id_person]" class="pb-1">
             {{jor?.dia}}
@@ -221,13 +279,15 @@ function filtroMaterias() {
               :id="p.id_person"
               @recargar="cargaInicial"
             />
-            <!-- <configurar-maestro
+            <configurar-maestro
               :rols="cargos"
               :menciones="menciones"
               :rol="{id_car: p.id_car, nom_car: p.nom_car}"
+              :jornadas="prof_guias[p.id_person]"
               :asignar-rol="true"
               :id="p.id_person"
-            /> -->
+              @recargar="cargaInicial"
+            />
           </v-card-actions>
         </v-card>
       </v-col>
