@@ -481,7 +481,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
               <v-col cols="auto" :class="['order-sm-1', {'d-flex flex-column d-sm-block': periodo.edit}]">
                 <v-btn
                   variant="text"
-                  :prepend-icon="periodo.edit ? 'madi-close' : 'mdi-pen'"
+                  :prepend-icon="periodo.edit ? 'mdi-close' : 'mdi-pen'"
                   @click="periodo.edit ? limpiarPeriodo() : periodo.edit = !periodo.edit"
                 >
                   <span class="d-none d-sm-inline">
@@ -644,21 +644,21 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                 </div>
                 <div class="mt-3 text-center">
                   <v-btn
-                    :variant="men.edit ? 'tonal': 'text'"
+                    :variant="men.edit ? 'elevated': 'text'"
                     :color="men.edit ? 'primario': ''"
                     :prepend-icon="men.edit ? 'mdi-check' : 'mdi-pen'"
-                    :text="men.edit ? 'Guardar' : 'Editar'"
+                    :text="men.edit ? 'Guardar' : ''"
                     :disabled="editMen && !men.edit"
                     @click="men.edit ? guardarMencion(men) : (men.edit = !men.edit, editMen = true)"
                   />
                   <v-btn
-                    variant="text"
-                    :prepend-icon="men.edit ? 'madi-close' : 'mdi-trash-can'"
-                    :disabled="editMen && !men.edit"
+                    variant="plain"
                     class="text-error"
+                    :prepend-icon="men.edit ? 'mdi-close' : 'mdi-trash-can'"
+                    :disabled="editMen && !men.edit"
                     @click="men.edit ? (limpiarMencion(m), editMen = false) : ''"
                   >
-                    <span>{{ men.edit ? 'Cancelar' : 'Eliminar' }}</span>
+                    <span>{{ men.edit ? 'Cancelar' : '' }}</span>
                     <VentanaConfirmar
                       v-if="!men.edit"
                       :message="'desea eliminar esta mención'"
@@ -678,7 +678,13 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                       hide-details="auto"
                       class="flex-fill"
                     />
-                    <v-btn variant="text" text="Agregar año" prepend-icon="mdi-plus" class="ml-sm-4" @click="agregarAno(m)" />
+                    <v-btn
+                      variant="text"
+                      text="Agregar año"
+                      prepend-icon="mdi-plus"
+                      class="ml-sm-4"
+                      @click="agregarAno(m)"
+                    />
                   </v-sheet>
                   <template v-for="(anos, a) in men.ano" :key="anos.id_ano">
                     <v-sheet class="d-sm-flex justify-space-between align-center" color="muted">
@@ -700,7 +706,8 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                           >
                           <template #append-inner>
                             <v-btn
-                              variant="text"
+                              variant="plain"
+                              class="text-error"
                             >
                               <v-icon icon="mdi-trash-can" />
                               <VentanaConfirmar
@@ -738,8 +745,8 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                               >
                                 <template #append>
                                   <v-btn
-                                    variant="text"
-                                    color="text-error"
+                                    variant="plain"
+                                    class="text-error"
                                   >
                                     <v-icon icon="mdi-trash-can"  size="large" />
                                     <VentanaConfirmar
@@ -836,11 +843,11 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                     @click="modulo.edit ? editarModulo(m) : modulo.edit = !modulo.edit"
                   />
                   <v-btn
-                    variant="text"
+                    variant="plain"
                     class="text-error"
                     @click="modulo.edit ? limpiarModulo(m) : ''"
                   >
-                    <v-icon :icon="modulo.edit ? 'madi-close' : 'mdi-trash-can'"  size="x-large"/>
+                    <v-icon :icon="modulo.edit ? 'mdi-close' : 'mdi-trash-can'"  size="x-large"/>
                     <VentanaConfirmar
                       v-if="!modulo.edit"
                       :message="'desea eliminar este módulo'"
@@ -897,11 +904,14 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                   @click="materia.edit ? editarMateria(m) : materia.edit = !materia.edit"
                 />
                 <v-btn
-                  variant="text"
+                  variant="plain"
                   class="text-error"
                   @click="materia.edit ? limpiarMateria(m) : ''"
                 >
-                  <v-icon :icon="materia.edit ? 'madi-close' : 'mdi-trash-can'"  size="x-large"/>
+                  <v-icon
+                    :icon="materia.edit ? 'mdi-close' : 'mdi-trash-can'"
+                    size="x-large"
+                  />
                   <VentanaConfirmar
                     v-if="!materia.edit"
                     :message="'desea eliminar esta materia'"

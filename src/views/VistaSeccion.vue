@@ -620,7 +620,7 @@ watch(()=>cedRe.value.value, ()=>{
             class="flex-fill py-3"
             variant="tonal"
             block
-            :append-icon="editItem ? 'madi-close' : 'mdi-trash-can'"
+            :append-icon="editItem ? 'mdi-close' : 'mdi-trash-can'"
             color="error"
             @click="editItem ? (editItem = false, limpiarItems()) : ''"
           >

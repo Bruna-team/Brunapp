@@ -129,7 +129,7 @@ const docConfiguration = ref({
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          prepend-icon="madi-close"
+          prepend-icon="mdi-close"
           variant="text"
           @click="dialog = false"
         >

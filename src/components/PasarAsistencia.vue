@@ -114,7 +114,7 @@ watch(()=>dialog.value, ()=>{
           <v-card-actions>
             <v-spacer />
             <v-btn
-              prepend-icon="madi-close"
+              prepend-icon="mdi-close"
               text="Cancelar"
               @click="isActive.value = false"
             />
