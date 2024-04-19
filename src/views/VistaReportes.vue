@@ -11,20 +11,36 @@ const { lgAndUp } = useDisplay()
 const theme = ref(useTheme().name)
 const route = useRoute()
 const tabActiva = ref(route.name?.toString())
-const tabs = ref([
-  {
-    link: 'pases' ,
-    title: 'Pases de entrada y salida',
-  },
-  {
-    link: 'observaciones' ,
-    title: 'Observaciones',
-  },
-  {
-    link: 'inasistencias' ,
-    title: 'Inasistencias',
-  }
-])
+const car = ref(localStorage.getItem("bruna"))
+
+const tabs = ref( (car.value == '2' || car.value == '2')
+  ?
+    [
+      {
+        link: 'pases' ,
+        title: 'Pases de entrada y salida',
+      },
+      {
+        link: 'observaciones' ,
+        title: 'Observaciones',
+      },
+      {
+        link: 'inasistencias' ,
+        title: 'Inasistencias',
+      }
+    ]
+  :
+    [
+      {
+        link: 'observaciones' ,
+        title: 'Observaciones',
+      },
+      {
+        link: 'inasistencias' ,
+        title: 'Inasistencias',
+      }
+    ]
+)
 const fechasFiltrar = ref()
 const fechas = ref([''])
 const ano = ref('')
@@ -204,9 +220,10 @@ onMounted(() => {
     <h2 class="pl-3">Reportes</h2>
     <v-card class="overflow-visible">
       <v-tabs
-        show-arrows
         v-model="tabActiva"
-        bg-color="secundario-claro"
+        show-arrows
+        bg-color="secundario"
+        color="white"
       >
         <div
           v-for="tab in tabs"
