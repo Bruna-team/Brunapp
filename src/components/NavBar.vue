@@ -49,7 +49,7 @@ const car = ref(localStorage.getItem("bruna"))
     </RouterLink>
   </v-list>
 </v-navigation-drawer>
-<v-main class="h-screen">
+<v-main>
   <RouterView />
 </v-main>
 </template>

@@ -74,4 +74,21 @@ interface Maestros {
   id_car: string,
   nom_car: string
 }
-export type {Menciones, MencionesReportes, Pase, Modulos, Materias, Periodos, Maestros}
+interface Estudiantes {
+  ced_alum: string,
+  id_estd: string,
+  pape_alum: string,
+  pnom_alum: string,
+  sape_alum: string,
+  snom_alum: string,
+}
+export type {
+  Menciones,
+  MencionesReportes,
+  Pase,
+  Modulos,
+  Materias,
+  Periodos,
+  Maestros,
+  Estudiantes
+}
