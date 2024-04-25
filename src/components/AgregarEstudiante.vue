@@ -122,6 +122,12 @@ const alumno = ref<any>({
       (v: string) => !!v || 'El parentesco es necesario',
     ],
   },
+  sexo: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El sexo del joven es necesario',
+    ],
+  },
   ced: {
     value: '',
     rules: [
@@ -408,6 +414,23 @@ watch(()=>cedRe.value.value, ()=>{
                         />
                       </v-col>
                       <v-col cols="12" sm="6" md="4">
+                        <v-radio-group
+                          v-model="alumno.sexo.value"
+                          label="Sexo"
+                          :rules="alumno.sexo.rules"
+                          inline
+                        >
+                          <v-radio
+                            label="F"
+                            value="F"
+                          />
+                          <v-radio
+                            label="M"
+                            value="M"
+                          />
+                        </v-radio-group>
+                      </v-col>
+                      <v-col cols="12" sm="" md="4">
                         <v-text-field
                           v-model="alumno.fec.value"
                           label="Fecha de nacimiento"
@@ -415,7 +438,7 @@ watch(()=>cedRe.value.value, ()=>{
                           :rules="alumno.fec.rules"
                         />
                       </v-col>
-                      <v-col cols="12">
+                      <v-col cols="12" md="">
                         <v-text-field
                           v-model="alumno.obs.value"
                           label="Observaciones"
