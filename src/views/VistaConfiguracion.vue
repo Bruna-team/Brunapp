@@ -70,7 +70,7 @@ function cargaInicial() {
   brunaApi({ s: 'menciones' }, '')
   .then((res:any) => {
     if (res.data) {
-      const men:any = []
+      const men:any = {}
       res.data.forEach((m:any) => {
         if (!men[m.id_men]) {
           men[m.id_men] = {
@@ -106,7 +106,7 @@ function cargaInicial() {
       res.data.forEach((m:any) => {
         men[m.id_men].ano = men[m.id_men].ano.filter((a:any) => a != null)
       })
-      menciones.value = men.filter((m:any) => m != null)
+      menciones.value = men
     } else {
       alertaMsj.value = "Hubo un error: " + res.data.e
     }
