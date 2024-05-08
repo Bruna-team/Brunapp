@@ -206,7 +206,7 @@ function guardarAlumno() {
   data +=  '&pape=' +  capitalizar(alumno.value.pape.value) + '&sape=' +  capitalizar(alumno.value.sape.value)
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
   data +=  '&paren=' +  capitalizar(alumno.value.paren.value) + '&idAno=' + alumno.value.sec.value
-  data += '&obs=' + alumno.value.obs.value
+  data += '&obs=' + alumno.value.obs.value + '&sex=' + alumno.value.sexo.value
   if (representante.value.id.value) {
     data += '&idRe=' +  representante.value.id.value
   } else {
