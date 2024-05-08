@@ -456,18 +456,10 @@ function editarAlumno() {
   })
 }
 watch(()=>cedRe.value.value, ()=>{
-  disabled.value = false
-  representante.value.id = ''
-  representante.value.nomRe.value = ''
-  representante.value.apeRe.value = ''
-  representante.value.tel.value = ''
-  representante.value.dir.value = ''
-  representante.value.telRe.value = ''
   if (cedRe.value.value?.length < 8) return
   brunaApi({ s: 'buscarRepresentante' }, 'ced=' + cedRe.value.value)
   .then((res:any) => {
     if (res.data[0].id_rep) {
-      disabled.value = true
       representante.value.id = res.data[0].id_rep
       representante.value.nomRe.value = res.data[0].nom_rep
       representante.value.apeRe.value = res.data[0].ape_rep
@@ -810,141 +802,136 @@ watch(()=>cedRe.value.value, ()=>{
                     ></v-list-item>
                   </v-col>
                 </v-row>
-                </template>
-                <template v-else>
-                  <v-form ref="form">
-                    <v-row>
-                      <v-col cols="12" sm="6" md="3">
-                        <v-text-field
-                          label="Primer nombre"
-                          v-model="alumno.pnom.value"
-                          :rules="alumno.pnom.rules"
+              </template>
+              <template v-else>
+                <v-form ref="form">
+                  <v-row>
+                    <v-col cols="12" sm="6" md="3">
+                      <v-text-field
+                        label="Primer nombre"
+                        v-model="alumno.pnom.value"
+                        :rules="alumno.pnom.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="3">
+                      <v-text-field
+                        label="Segundo nombre"
+                        v-model="alumno.snom.value"
+                        :rules="alumno.snom.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="3">
+                      <v-text-field
+                        label="Primer apellido"
+                        v-model="alumno.pape.value"
+                        :rules="alumno.pape.rules"
                         />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="3">
-                        <v-text-field
-                          label="Segundo nombre"
-                          v-model="alumno.snom.value"
-                          :rules="alumno.snom.rules"
+                    </v-col>
+                    <v-col cols="12" sm="6" md="3">
+                      <v-text-field
+                        label="Segundo apellido"
+                        v-model="alumno.sape.value"
+                        :rules="alumno.sape.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="4">
+                      <v-text-field
+                        label="Cédula"
+                        v-model="alumno.ced.value"
+                        hint="Ej: V-12345678"
+                        prefix="V-"
+                        :rules="alumno.ced.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="4">
+                      <v-text-field
+                        type="date"
+                        label="Fecha de nacimiento"
+                        v-model="alumno.fec.value"
+                        :rules="alumno.fec.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="4">
+                      <v-radio-group
+                        v-model="alumno.sex_alum.value"
+                        label="Sexo"
+                        :rules="alumno.sex_alum.rules"
+                        inline
+                      >
+                        <v-radio
+                          label="F"
+                          value="F"
                         />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="3">
-                        <v-text-field
-                          label="Primer apellido"
-                          v-model="alumno.pape.value"
-                          :rules="alumno.pape.rules"
-                          />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="3">
-                        <v-text-field
-                          label="Segundo apellido"
-                          v-model="alumno.sape.value"
-                          :rules="alumno.sape.rules"
+                        <v-radio
+                          label="M"
+                          value="M"
                         />
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-text-field
-                          label="Cédula"
-                          v-model="alumno.ced.value"
-                          hint="Ej: V-12345678"
-                          prefix="V-"
-                          :rules="alumno.ced.rules"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-text-field
-                          type="date"
-                          label="Fecha de nacimiento"
-                          v-model="alumno.fec.value"
-                          :rules="alumno.fec.rules"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="4">
-                        <v-radio-group
-                          v-model="alumno.sex_alum.value"
-                          label="Sexo"
-                          :rules="alumno.sex_alum.rules"
-                          inline
-                        >
-                          <v-radio
-                            label="F"
-                            value="F"
-                          />
-                          <v-radio
-                            label="M"
-                            value="M"
-                          />
-                        </v-radio-group>
-                      </v-col>
-                      <v-col cols="12">
-                        <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
-                        <v-divider/>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Cédula"
-                          v-model="cedRe.value"
-                          hint="Ej: V-12345678"
-                          prefix="V-"
-                          :rules="cedRe.rules"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Nombre del representante"
-                          v-model="representante.nomRe.value"
-                          :rules="representante.nomRe.rules"
-                          :disabled="disabled"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Apellido del representante"
-                          v-model="representante.apeRe.value"
-                          :rules="representante.apeRe.rules"
-                          :disabled="disabled"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Parentesco"
-                          v-model="alumno.paren.value"
-                          :rules="alumno.paren.rules"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Teléfono"
-                          v-model="representante.tel.value"
-                          :rules="representante.tel.rules"
-                          :disabled="disabled"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Teléfono de repuesto"
-                          v-model="representante.telRe.value"
-                          :rules="representante.telRe.rules"
-                          :disabled="disabled"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          label="Dirección"
-                          v-model="representante.dir.value"
-                          :rules="representante.dir.rules"
-                          :disabled="disabled"
-                        />
-                      </v-col>
-                      <v-col cols="12" sm="">
-                        <v-text-field
-                          label="Observaciones"
-                          v-model="alumno.obs.value"
-                        />
-                      </v-col>
-                    </v-row>
-                  </v-form>
-                </template>
+                      </v-radio-group>
+                    </v-col>
+                    <v-col cols="12">
+                      <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
+                      <v-divider/>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Cédula"
+                        v-model="cedRe.value"
+                        hint="Ej: V-12345678"
+                        prefix="V-"
+                        :rules="cedRe.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Nombre del representante"
+                        v-model="representante.nomRe.value"
+                        :rules="representante.nomRe.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Apellido del representante"
+                        v-model="representante.apeRe.value"
+                        :rules="representante.apeRe.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Parentesco"
+                        v-model="alumno.paren.value"
+                        :rules="alumno.paren.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Teléfono"
+                        v-model="representante.tel.value"
+                        :rules="representante.tel.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Teléfono de repuesto"
+                        v-model="representante.telRe.value"
+                        :rules="representante.telRe.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        label="Dirección"
+                        v-model="representante.dir.value"
+                        :rules="representante.dir.rules"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="">
+                      <v-text-field
+                        label="Observaciones"
+                        v-model="alumno.obs.value"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </template>
             </v-card-item>
           </v-card>
           <v-row>
