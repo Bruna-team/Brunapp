@@ -522,7 +522,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                 cols="12" sm="auto"
                 class="text-center"
               >
-                <v-btn
+                <!-- <v-btn
                   variant="text"
                   prepend-icon="mdi-human-handsup"
                   color="secundario"
@@ -536,7 +536,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
                     color-btn="primario"
                     @confirmar="(e) => { e ? console.log('aumento') : '' }"
                   />
-                </v-btn>
+                </v-btn> -->
               </v-col>
             </v-row>
             <v-list-item>
