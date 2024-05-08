@@ -260,6 +260,12 @@ const alumno = ref({
   estd: '',
   num: '',
   nombre: '',
+  sex_alum: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El sexo es necesario',
+    ],
+  },
   pnom: {
     value: '',
     rules: [
@@ -385,6 +391,7 @@ function organizarDatos(data:any) {
   alumno.value.ced.value = data.alum[0].ced_alum
   alumno.value.fec.value = data.alum[0].fec_nac_alum
   alumno.value.obs.value = data.alum[0].obs_alum
+  alumno.value.sex_alum.value = data.alum[0].sex_alum
   alumno.value.entrada.value = data.alum[0].entrada
   alumno.value.salida.value = data.alum[0].salida
   alumno.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
@@ -426,9 +433,10 @@ function organizarDatos(data:any) {
 }
 function editarAlumno() {
   let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
-  data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
-  data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
-  data +=  '&paren=' +  alumno.value.paren.value + '&id=' + alumno.value.id
+  data += '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
+  data += '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
+  data += '&paren=' +  alumno.value.paren.value + '&id=' + alumno.value.id
+  data += '&sex_alum=' + alumno.value.sex_alum.value
   data += '&obs=' + alumno.value.obs.value + '&idRe=' +  representante.value.id
   data += '&nomRe=' + representante.value.nomRe.value + '&apeRe=' + representante.value.apeRe.value
   data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
@@ -648,10 +656,8 @@ watch(()=>cedRe.value.value, ()=>{
     </v-navigation-drawer>
     <!-- Vista -->
     <v-main :class="{'main-content': mobile}">
-      <v-container
-        class="px-0"
-      >
-        <section  class="d-flex flex-wrap">
+      <v-container class="px-0">
+        <div class="d-flex flex-wrap">
           <v-btn
             variant="text"
             prepend-icon="mdi-arrow-left"
@@ -679,7 +685,7 @@ watch(()=>cedRe.value.value, ()=>{
             class="mx-2"
             @click="validarFormEst"
           />
-        </section>
+        </div>
         <v-skeleton-loader v-if="sectionLoading" type="table-heading, article, paragraph" />
         <template v-else-if="alumno.num">
           <v-card variant="tonal" class="ma-1 ma-sm-3 pa-2">
@@ -687,7 +693,10 @@ watch(()=>cedRe.value.value, ()=>{
               <template v-if="!edit">
                 <v-row class="pa-3">
                   <v-col cols="auto" class="d-none d-sm-block">
-                    <v-badge icon="mdi-gender-female" color="pink">
+                    <v-badge
+                      :icon="alumno.sex_alum.value == 'F' ? 'mdi-gender-female' : 'mdi-gender-male'"
+                      :color="alumno.sex_alum.value == 'F' ? 'pink' : 'blue'"
+                    >
                       <v-avatar color="brown">
                         <span class="text-h5">
                           {{ alumno.nombre.split(" ").map(parte => parte.charAt(0))[0] + alumno.nombre.split(" ").map(parte => parte.charAt(0))[1] }}
@@ -805,35 +814,35 @@ watch(()=>cedRe.value.value, ()=>{
                 <template v-else>
                   <v-form ref="form">
                     <v-row>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="6" md="3">
                         <v-text-field
                           label="Primer nombre"
                           v-model="alumno.pnom.value"
                           :rules="alumno.pnom.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="6" md="3">
                         <v-text-field
                           label="Segundo nombre"
                           v-model="alumno.snom.value"
                           :rules="alumno.snom.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="6" md="3">
                         <v-text-field
                           label="Primer apellido"
                           v-model="alumno.pape.value"
                           :rules="alumno.pape.rules"
                           />
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="6" md="3">
                         <v-text-field
                           label="Segundo apellido"
                           v-model="alumno.sape.value"
                           :rules="alumno.sape.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="4">
                         <v-text-field
                           label="Cédula"
                           v-model="alumno.ced.value"
@@ -842,13 +851,30 @@ watch(()=>cedRe.value.value, ()=>{
                           :rules="alumno.ced.rules"
                         />
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
+                      <v-col cols="12" sm="4">
                         <v-text-field
                           type="date"
                           label="Fecha de nacimiento"
                           v-model="alumno.fec.value"
                           :rules="alumno.fec.rules"
                         />
+                      </v-col>
+                      <v-col cols="12" sm="4">
+                        <v-radio-group
+                          v-model="alumno.sex_alum.value"
+                          label="Sexo"
+                          :rules="alumno.sex_alum.rules"
+                          inline
+                        >
+                          <v-radio
+                            label="F"
+                            value="F"
+                          />
+                          <v-radio
+                            label="M"
+                            value="M"
+                          />
+                        </v-radio-group>
                       </v-col>
                       <v-col cols="12">
                         <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
