@@ -21,7 +21,6 @@ const alertaMsj = ref<string>('')
 
 const loading = ref(false)
 const sectionLoading = ref(true)
-const disabled = ref(false)
 onMounted(() => {
 	cargaInicial();
 });
