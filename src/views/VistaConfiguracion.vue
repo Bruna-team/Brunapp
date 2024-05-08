@@ -14,6 +14,16 @@ onMounted(() => {
 
 function cargaInicial() {
   editMen.value = false
+  brunaApi({ s: 'totalEstudiantes' }, '')
+  .then((res:any) => {
+    if (res.data) {
+      totalEstudiantes.value = res.data
+    } else {
+      alertaMsj.value = "No se pudo consultar los estudiantes"
+    }
+  }).catch(() => {
+    alertaMsj.value = "Asigna una fecha de inicio y cierre de año escolar"
+  })
   brunaApi({ s: 'informacion' }, '')
   .then((res:any) => {
     if (res.data) {
@@ -118,6 +128,8 @@ function cargaInicial() {
     alertaMsj.value = "Hubo un error consultando los datos"
   })
 }
+// Variable de estudiantes
+const totalEstudiantes = ref('')
 // SCRUM de periodo
 const periodo = ref<Periodos>({startF: '', endF: '', startS: '', endS: '', edit: false})
 function limpiarPeriodo() {
@@ -614,7 +626,7 @@ function eliminarSeccion(idSec: any, m: any,  a: any, s: any) {
               <p class="text-caption text-medium-emphasis">
                 Total de estudiantes
               </p>
-              650
+              {{ totalEstudiantes }}
             </v-list-item>
           </v-card>
         </v-col>
