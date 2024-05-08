@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useDisplay } from 'vuetify'
-import { brunaApi } from '../funciones/api.ts';
-import { capitalizar } from "../funciones/funciones.ts";
+import { brunaApi } from '@/funciones/api.ts';
+import { capitalizar, validateCed, validateBornDate, } from "@/funciones/funciones.ts";
 import EstudiantesExcel from './EstudiantesExcel.vue'
 const { mobile, smAndUp } = useDisplay()
 const emit = defineEmits([
@@ -79,7 +79,6 @@ const representante = ref<any>({
     value: '',
     rules: [
       (v: string) => !!v || 'El teléfono es necesario',
-      (v: string) => /^(0412|0414|0416|0424|0426|0271|0272)\d{7}$/.test(v)  || 'El numero de teléfono parese ser incorrecto',
     ],
   },
   telRe: {
@@ -132,21 +131,13 @@ const alumno = ref<any>({
     value: '',
     rules: [
       (v: string) => !!v || 'La cédula es necesaria',
-      (v: string) => /^[^.]*$/.test(v)  || 'La cédula no debe tener puntos',
-      (v: string) => /^\d{7,8}$/.test(v)  || 'La cédula no tiene la longitud correcta',
+      (v: string) => validateCed(v),
     ],
   },
   fec: {
     value: '',
     rules: [
-      (v: string) => {
-        let fecha = new Date(v)
-        let hoy = new Date()
-        let edad = hoy.getFullYear() - fecha.getFullYear()
-        fecha.setFullYear(hoy.getFullYear())
-        hoy < fecha ? edad-- : ''
-        return edad>=10 && edad<=18 || 'La fecha de nacimiento no es valida, debe ser mayor de 10 años y menor de 18'
-      },
+      (v: string) => validateBornDate(v),
     ],
   },
   obs: {
@@ -262,7 +253,11 @@ watch(()=>cedRe.value.value, ()=>{
 })
 </script>
 <template>
-<v-dialog v-model="dialog" :fullscreen="!smAndUp" max-width="768">
+<v-dialog
+  v-model="dialog"
+  :fullscreen="!smAndUp"
+  max-width="768"
+>
   <template #activator="{ props }">
     <template v-if="!excelMode">
       <v-btn
@@ -536,75 +531,81 @@ watch(()=>cedRe.value.value, ()=>{
         </v-form>
       </v-sheet>
       <v-sheet v-else class="pa-md-3">
-        <v-form ref="formExcel">
-          <v-card title="Selecciona los datos del curso para agregar los estudiantes" flat>
-            <v-row class="mt-2" justify="space-around">
-              <v-col cols="12">
-                <v-radio-group
-                  v-model="curso.men.value"
-                  :rules="curso.men.rules"
-                  inline
-                  label="Mención"
-                >
-                  <v-radio
-                    v-for="menc in props.menciones"
-                    :key="menc.id_men"
-                    :label="menc.men"
-                    :value="menc.id_men"
-                  />
-                </v-radio-group>
-              </v-col>
-              <v-col cols="12" sm="7">
-                <v-radio-group
-                  v-model="curso.ano.value"
-                  :rules="curso.ano.rules"
-                  inline
-                  label="Año"
-                >
-                  <v-radio
-                    v-if="curso.men.value"
-                    v-for="ano in props.menciones[curso.men.value].ano"
-                    :key="ano.id_ano"
-                    :label="ano.nom_ano"
-                    :value="ano.num_ano"
-                  />
-                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
-                </v-radio-group>
-              </v-col>
-              <v-col cols="12" sm="5">
-                <v-radio-group
-                  v-model="curso.sec.value"
-                  :rules="curso.sec.rules"
-                  inline
-                  label="Sección"
-                >
-                  <v-radio
-                    v-if="curso.ano.value"
-                    v-for="sec in props.menciones[curso.men.value]?.ano[curso.ano.value]?.sec"
-                    :key="sec.id_ano"
-                    :label="sec.sec_nom"
-                    :value="sec.id_ano"
-                  />
-                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
-                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
-                </v-radio-group>
-              </v-col>
-            </v-row>
-            <EstudiantesExcel
-              :estudiantes="estudiantes"
-            />
+        <v-card
+          title="Selecciona los datos del curso para agregar los estudiantes"
+          flat
+        >
+          <v-form ref="formExcel" @submit.prevent>
+            <v-container>
+              <v-row class="mt-2" justify="space-around">
+                <v-col cols="12">
+                  <v-radio-group
+                    v-model="curso.men.value"
+                    :rules="curso.men.rules"
+                    inline
+                    label="Mención"
+                  >
+                    <v-radio
+                      v-for="menc in props.menciones"
+                      :key="menc.id_men"
+                      :label="menc.men"
+                      :value="menc.id_men"
+                    />
+                  </v-radio-group>
+                </v-col>
+                <v-col cols="12" sm="7">
+                  <v-radio-group
+                    v-model="curso.ano.value"
+                    :rules="curso.ano.rules"
+                    inline
+                    label="Año"
+                  >
+                    <v-radio
+                      v-if="curso.men.value"
+                      v-for="ano in props.menciones[curso.men.value].ano"
+                      :key="ano.id_ano"
+                      :label="ano.nom_ano"
+                      :value="ano.num_ano"
+                    />
+                    <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                  </v-radio-group>
+                </v-col>
+                <v-col cols="12" sm="5">
+                  <v-radio-group
+                    v-model="curso.sec.value"
+                    :rules="curso.sec.rules"
+                    inline
+                    label="Sección"
+                  >
+                    <v-radio
+                      v-if="curso.ano.value"
+                      v-for="sec in props.menciones[curso.men.value]?.ano[curso.ano.value]?.sec"
+                      :key="sec.id_ano"
+                      :label="sec.sec_nom"
+                      :value="sec.id_ano"
+                    />
+                    <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                    <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
+                  </v-radio-group>
+                </v-col>
+              </v-row>
+              <EstudiantesExcel
+                @estudiantes="estudiantes = $event"
+              />
+            </v-container>
             <v-card-actions>
               <v-btn
                 block
                 type="submit"
                 text="Agregar estudiantes"
                 color="primario"
+                variant="elevated"
                 prepend-icon="mdi-plus"
-                :disabled="!estudiantes"
+                :disabled="!estudiantes.length || !curso.sec.value"
               />
             </v-card-actions>
-          </v-card>
-        </v-form>
+          </v-form>
+        </v-card>
       </v-sheet>
     </v-card>
   </template>

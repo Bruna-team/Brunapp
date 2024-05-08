@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import * as XLSX from 'xlsx';
 /* load 'fs' for readFile and writeFile support */
 import * as fs from 'fs';
+import { validateCed, validateBornDate } from '@/funciones/funciones';
 XLSX.set_fs(fs);
 const emit = defineEmits([
 	'estudiantes',
@@ -23,9 +24,6 @@ function handleFileUpload(e: any) {
     datosEstudiantes(estudiantesXLS)
   }
   reader.readAsArrayBuffer(file)
-  if (!alertMSJ.value.length) {
-    emit('estudiantes', estudiantes)
-  }
 }
 
 function datosEstudiantes(estudiantesXLS: any[] ) {
@@ -52,11 +50,25 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
           dato: 'no tiene cédula',
         })
       }
+      if(validateCed(estudiante[4]) !== true) {
+        alertMSJ.value.push({
+          estudiante: estudiante[0] || 'El estudiante',
+          posicion: e+3,
+          dato: 'no tiene el formato correcto de cédula. ' + validateCed(estudiante[11]),
+        })
+      }
       if(!estudiante[5]) {
         alertMSJ.value.push({
           estudiante: estudiante[0] || 'El estudiante',
           posicion: e+3,
           dato: 'no tiene fecha de nacimiento',
+        })
+      }
+      if(validateBornDate(estudiante[5]) !== true) {
+        alertMSJ.value.push({
+          estudiante: estudiante[0] || 'El estudiante',
+          posicion: e+3,
+          dato: 'no tiene una fecha de nacimiento correcta. '+validateBornDate(estudiante[5]),
         })
       }
       if(!estudiante[7]) {
@@ -87,6 +99,13 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
           dato: 'no tiene cédula',
         })
       }
+      if(validateCed(estudiante[11]) !== true) {
+        alertMSJ.value.push({
+          estudiante: estudiante[0] ? `El representante de ${estudiante[0]}` : 'El representante',
+          posicion: e+3,
+          dato: 'no tiene el formato correcto de cédula. ' + validateCed(estudiante[11]),
+        })
+      }
       if(!estudiante[12]) {
         alertMSJ.value.push({
           estudiante: estudiante[0] ? `El representante de ${estudiante[0]}` : 'El representante',
@@ -108,11 +127,36 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
           dato: 'no tiene dirección',
         })
       }
-      estudiantes.value.push(estudiante)
+      estudiantes.value[e] = {
+        alumno: {
+          pnom: estudiante[0],
+          snom: estudiante[1],
+          pape: estudiante[2],
+          sape: estudiante[3],
+          paren: estudiante[12],
+          sexo: estudiante[7],
+          ced: estudiante[4],
+          fec: estudiante[5],
+          obs: estudiante[6],
+        },
+        rep: {
+          nomRe: estudiante[9],
+          apeRe: estudiante[10],
+          cedRe: estudiante[11],
+          tel: estudiante[13],
+          telRe: estudiante[14],
+          dir: estudiante[15]
+        }
+      }
     }
   });
 
 }
+
+watch(estudiantes.value, (value) => {
+  if (alertMSJ.value.length) return emit('estudiantes', []);
+  emit('estudiantes', value)
+})
 
 </script>
 <template>
@@ -145,7 +189,7 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
       <template #prepend>
         <v-icon icon="mdi-alert" color="warning" />
       </template>
-      {{ alert.estudiante }} no tiene
+      {{ alert.estudiante }}
       <span class="font-weight-bold">
         {{ alert.dato }}
       </span>

@@ -30,7 +30,6 @@ function formatoFechaYHora (date: Date, type: string) {
       return `${fecha}T${hora}`
   }
 }
-
 function sustituirSpandEmbed(data:any) {
   document.querySelectorAll('.editor-var').forEach((e: any) => {
     const id = e.getAttribute('data-id')
@@ -120,8 +119,29 @@ function sustituirSpandEmbed(data:any) {
     }
   })
 }
+/**
+ * @param {ced} String
+ * @return {Boolean | String}
+ */
+function validateCed(ced: string) {
+  return (/^\d{7,8}$/.test(ced)) || 'La cédula debe tener la longitud correcta y no debe tener puntos, espacios o letras.'
+}
+/**
+ * @param {date} String
+ * @return {Boolean | String}
+ */
+function validateBornDate(date: string) {
+  let fecha = new Date(date)
+  let hoy = new Date()
+  let edad = hoy.getFullYear() - fecha.getFullYear()
+  fecha.setFullYear(hoy.getFullYear())
+  hoy < fecha ? edad-- : ''
+  return edad>=10 && edad<=18 || 'La fecha de nacimiento debe ser para mayor de 10 y menor de 18 años de edad.'
+}
 export {
   capitalizar,
   formatoFechaYHora,
   sustituirSpandEmbed,
+  validateCed,
+  validateBornDate,
 };
