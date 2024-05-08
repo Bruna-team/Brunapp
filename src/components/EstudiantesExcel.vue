@@ -64,6 +64,7 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
           dato: 'no tiene fecha de nacimiento',
         })
       }
+      estudiante[5] = estudiante[5].replace(/\//g, '-')
       if(validateBornDate(estudiante[5]) !== true) {
         alertMSJ.value.push({
           estudiante: estudiante[0] || 'El estudiante',
@@ -76,6 +77,13 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
           estudiante: estudiante[0] || 'El estudiante',
           posicion: e+3,
           dato: 'no tiene sexo',
+        })
+      }
+      if(!/^[fFmM]$/.test(estudiante[7])) {
+        alertMSJ.value.push({
+          estudiante: estudiante[0] || 'El estudiante',
+          posicion: e+3,
+          dato: 'no tiene sexo valido, debe ser "F" o "M"',
         })
       }
       if(!estudiante[9]) {

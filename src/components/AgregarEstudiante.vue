@@ -216,6 +216,29 @@ function guardarAlumno() {
     emit('alerta', 'Hubo un error agregando el alumno')
   })
 }
+function guardarEstudiantes() {
+  let data = ''
+  estudiantes.value.forEach(estudiante => {
+    data =  'pnom=' +  capitalizar(estudiante.alumno.pnom) + '&snom=' +  capitalizar(estudiante.alumno.snom)
+    data +=  '&pape=' +  capitalizar(estudiante.alumno.pape) + '&sape=' +  capitalizar(estudiante.alumno.sape)
+    data +=  '&fec_nac=' +  estudiante.alumno.fec + '&ced=' +  estudiante.alumno.ced
+    data +=  '&paren=' +  capitalizar(estudiante.alumno.paren) + '&idAno=' + curso.value.sec.value
+    data += '&obs=' + estudiante.alumno.obs + '&sex=' + estudiante.alumno.sexo
+    data += '&nomRe=' + capitalizar(estudiante.rep.nomRe) + '&apeRe=' + capitalizar(estudiante.rep.apeRe)
+    data += '&cedRe=' + estudiante.rep.cedRe + '&telRe=' + estudiante.rep.tel
+    data += '&sTelRe=' + estudiante.rep.telRe + '&dirRe=' + estudiante.rep.dir
+    brunaApi({ s: 'agregarAlum' }, data)
+    .then((res:any) => {
+      if (res.data.r) {
+        data = ''
+        console.log(res.data.r)
+      }
+    }).catch(() => {
+      emit('alerta', 'Hubo un error agregando el alumno')
+    })
+    emit('alerta', 'Se han registrado todos los alumnos')
+  });
+}
 function limpiarDatos() {
   dialog.value = false
   step.value = steps.value.length == 2 ? 1 : 0
@@ -363,6 +386,8 @@ watch(()=>cedRe.value.value, ()=>{
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
                         </v-radio-group>
+                      {{alumno.men.value}}
+                      {{alumno.ano.value}}
                       </v-col>
                     </v-row>
                   </v-card>
@@ -602,6 +627,7 @@ watch(()=>cedRe.value.value, ()=>{
                 variant="elevated"
                 prepend-icon="mdi-plus"
                 :disabled="!estudiantes.length || !curso.sec.value"
+                @click="guardarEstudiantes()"
               />
             </v-card-actions>
           </v-form>
