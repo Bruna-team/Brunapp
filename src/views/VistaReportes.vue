@@ -5,10 +5,10 @@ import { useTheme, useDisplay } from 'vuetify'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import { MencionesReportes } from '../types/interfaceTypes'
-import { formatoFechaYHora } from '../funciones/funciones';
-import { brunaApi } from '../funciones/api.ts';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import { MencionesReportes } from '@/types/interfaceTypes'
+import { formatoFechaYHora } from '@/funciones/funciones';
+import { brunaApi } from '@/funciones/api.ts';
 
 const { lgAndUp } = useDisplay()
 const route = useRoute()

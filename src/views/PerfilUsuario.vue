@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { useTheme } from 'vuetify'
-import { brunaApi } from '../funciones/api.ts';
-import { capitalizar } from "../funciones/funciones.ts";
-import router from '../router';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { capitalizar } from "@/funciones/funciones.ts";
+import router from '@/router';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
 
-import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
 
 const form = ref()
 const loading  = ref(false)
@@ -269,4 +269,4 @@ function cerrarSesion() {
   }
 
 }
-</style>../funciones y constantes/api.ts
+</style>@/funciones y constantes/api.ts

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { formatoFechaYHora } from '../funciones/funciones';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import VentanaConfirmar from '../components/VentanaConfirmar.vue';
-import AgregarEstudiante from '../components/AgregarEstudiante.vue'
-import { brunaApi } from '../funciones/api.ts';
-import { Menciones, Modulos, Materias, Periodos } from '../types/interfaceTypes'
+import { formatoFechaYHora } from '@/funciones/funciones';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
+import AgregarEstudiante from '@/components/AgregarEstudiante.vue'
+import { brunaApi } from '@/funciones/api.ts';
+import { Menciones, Modulos, Materias, Periodos } from '@/types/interfaceTypes'
 
 const alertaMsj = ref<string>('')
 onMounted(() => {

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import ModalImpresion from '../../components/ModalImpresion.vue'
-import AlertaMensaje from '../../components/AlertaMensaje.vue'
-import QuillEditorComponentVue from '../../components/QuillEditorComponent.vue';
-import { sustituirSpandEmbed } from '../../funciones/funciones';
+import ModalImpresion from '@/components/ModalImpresion.vue'
+import AlertaMensaje from '@/components/AlertaMensaje.vue'
+import QuillEditorComponentVue from '@/components/QuillEditorComponent.vue';
+import { sustituirSpandEmbed } from '@/funciones/funciones';
 import { useDisplay } from 'vuetify';
-import { brunaApi } from "../../funciones/api";
-import { Pase } from '../../types/interfaceTypes';
-import { paseEntrada, paseSalida } from '../../constantes/plantillas';
+import { brunaApi } from "@/funciones/api";
+import { Pase } from '@/types/interfaceTypes';
+import { paseEntrada, paseSalida } from '@/constantes/plantillas';
 const props = defineProps({
   dataPase: {
     type: Object,

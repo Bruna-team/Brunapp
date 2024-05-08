@@ -7,13 +7,13 @@ import "/node_modules/vue-simple-calendar/dist/css/default.css";
 
 import { ref, watch, onMounted } from "vue";
 import { useDisplay } from 'vuetify'
-import router from "../router";
+import router from "@/router";
 const { mobile } = useDisplay()
-import VentanaConfirmar from '../components/VentanaConfirmar.vue';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import { brunaApi } from '../funciones/api.ts';
-import { formatoFechaYHora } from '../funciones/funciones.ts';
-import { Estudiantes } from '../types/interfaceTypes'
+import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { formatoFechaYHora } from '@/funciones/funciones.ts';
+import { Estudiantes } from '@/types/interfaceTypes'
 
 
 const studentDrawer = ref( mobile.value ? false : true)

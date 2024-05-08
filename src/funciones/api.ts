@@ -1,5 +1,5 @@
 import axios from 'axios'
-import router from '../router'
+import router from '@/router'
 const baseURL = process.env.NODE_ENV === 'production'
   ? 'https://brunapi.000webhostapp.com/api/consultas.php'
   : 'http://localhost/Bruna/Brunapi/api/consultas.php'

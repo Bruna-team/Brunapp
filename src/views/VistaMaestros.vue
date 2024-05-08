@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import ConfigurarMaestro from '../components/ConfigurarMaestro.vue';
-import { brunaApi } from '../funciones/api.ts';
-import { Materias, Maestros, Menciones, Modulos } from '../types/interfaceTypes.ts'
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import ConfigurarMaestro from '@/components/ConfigurarMaestro.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { Materias, Maestros, Menciones, Modulos } from '@/types/interfaceTypes.ts'
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
 const alertaMsj = ref<string>('')
 
 const materias = ref<Materias[]>([])

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {ref,onMounted} from 'vue'
-import { brunaApi } from '../funciones/api.ts';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import PasarAsistencia from '../components/PasarAsistencia.vue';
-import { Menciones } from '../types/interfaceTypes';
+import { brunaApi } from '@/funciones/api.ts';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import PasarAsistencia from '@/components/PasarAsistencia.vue';
+import { Menciones } from '@/types/interfaceTypes';
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
 const tabsLoading = ref<boolean>(true)

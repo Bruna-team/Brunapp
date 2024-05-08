@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { brunaApi } from '../funciones/api.ts';
-import { formatoFechaYHora } from '../funciones/funciones';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { formatoFechaYHora } from '@/funciones/funciones';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
 formatoFechaYHora
 const props = defineProps({
   seccion: {

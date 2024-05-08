@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import imprimirPdf from '../funciones/utilidades'
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import imprimirPdf from '@/funciones/utilidades'
 const printProps = defineProps({
   title: {type: String, default: ''},
   subtitle: {type: String, default: ''},

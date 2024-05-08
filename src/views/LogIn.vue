@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { brunaApi } from '../funciones/api.ts';
-import router from '../router';
-import { capitalizar } from "../funciones/funciones.ts";
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import router from '@/router';
+import { capitalizar } from "@/funciones/funciones.ts";
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
 
 const alertaMsj = ref<string>('')
 const form = ref()
@@ -149,49 +149,51 @@ watch(router.currentRoute, (value) => {
       <v-card-title class="font-weight-black text-primario font-bruna">
         Inicia Sesión
       </v-card-title>
-      <v-form ref="form" validate-on="submit lazy" @submit.prevent>
-      <v-card-text class="w-100">
-        <v-text-field
-          v-model="logData.cedula.value"
-          :rules="logData.cedula.rules"
-          prepend-icon="mdi-account"
-          label="Cédula"
-          prefix="V-"
-        ></v-text-field>
-        <v-text-field
-          v-model="logData.password.value"
-          prepend-icon="mdi-lock"
-          :rules="logData.password.rules"
-          :append-inner-icon="seePassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="seePassword ? 'text' : 'password'"
-          @click:append-inner="seePassword = !seePassword"
-          label="Contraseña"
-        />
+      <v-form ref="form" validate-on="submit lazy" @submit.prevent class="w-sm-75">
+        <v-container class="px-0">
+          <v-text-field
+            v-model="logData.cedula.value"
+            :rules="logData.cedula.rules"
+            prepend-icon="mdi-account"
+            label="Cédula"
+            prefix="V-"
+          ></v-text-field>
+          <v-text-field
+            v-model="logData.password.value"
+            prepend-icon="mdi-lock"
+            :rules="logData.password.rules"
+            :append-inner-icon="seePassword ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="seePassword ? 'text' : 'password'"
+            @click:append-inner="seePassword = !seePassword"
+            label="Contraseña"
+          />
+
+        </v-container>
         <v-checkbox label="Recordar" title="Mantener la sesión iniciada" v-model="recSesion"/>
-      </v-card-text>
-      <v-divider class="my-2"></v-divider>
-      <v-card-actions>
-        <v-btn
-          class="d-block my-2 mx-1"
-          rounded
-          variant="outlined"
-          @click="router.push('SingIn')"
-        >
-        <span class="text-caption">
-          ¿No tienes cuenta? crea la tuya aquí
-        </span>
-      </v-btn>
-      <v-btn
-        :loading="loading"
-        class="my-2 mx-1"
-        prepend-icon="mdi-check"
-        variant="elevated"
-        color="primario"
-        type="submit"
-        text="Iniciar sesión"
-        @click="validar('log')"
-      />
-    </v-card-actions>
+        <v-divider class="my-2"></v-divider>
+        <v-card-actions class="d-flex flex-column">
+          <v-btn
+            class="d-block my-2 mx-1"
+            rounded
+            variant="outlined"
+            @click="router.push('SingIn')"
+          >
+            <span class="text-caption">
+              ¿No tienes cuenta? crea la tuya aquí
+            </span>
+          </v-btn>
+          <v-btn
+            :loading="loading"
+            block
+            class="my-2 mx-1"
+            prepend-icon="mdi-check"
+            variant="elevated"
+            color="primario"
+            type="submit"
+            text="Iniciar sesión"
+            @click="validar('log')"
+          />
+        </v-card-actions>
       </v-form>
     </v-card>
     <v-card
@@ -205,8 +207,8 @@ watch(router.currentRoute, (value) => {
       >
         ¡Crea tu cuenta profesor!
       </v-card-title>
-      <v-form ref="form" validate-on="submit lazy" @submit.prevent>
-        <v-card-text>
+      <v-form ref="form" validate-on="submit lazy" @submit.prevent class="w-sm-75">
+        <v-container class="px-0">
           <v-text-field
             v-model="regData.nombre.value"
             :rules="regData.nombre.rules"
@@ -275,9 +277,9 @@ watch(router.currentRoute, (value) => {
             label="Código de seguridad"
             hint="Este te lo debe dar la institución para crear tu cuenta"
           ></v-text-field>
-        </v-card-text>
+        </v-container>
         <v-divider class="my-4"></v-divider>
-        <v-card-actions>
+        <v-card-actions class="d-flex flex-column">
           <v-btn
             class="my-2 mx-1"
             rounded
@@ -290,6 +292,7 @@ watch(router.currentRoute, (value) => {
           </v-btn>
           <v-btn
             :loading="loading"
+            block
             class="my-2 mx-1"
             prepend-icon="mdi-check"
             variant="elevated"
@@ -319,5 +322,11 @@ watch(router.currentRoute, (value) => {
   transform: translateX(20px);
   opacity: 0;
 }
+
+.w-sm-75 {
+  @media (min-width: 600px) {
+    width: 75%;
+  }
+}
 </style>
-../funciones y constantes/api.ts../funciones y constantes/funciones.ts
+@/funciones y constantes/api.ts@/funciones y constantes/funciones.ts

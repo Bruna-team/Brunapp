@@ -1,5 +1,5 @@
 import * as pdfMake from "pdfmake/build/pdfmake";
-import vfs from "../constantes/pdfFonts";
+import vfs from "@/constantes/pdfFonts";
 // @ts-ignore
 import htmlToPdfmake from 'html-to-pdfmake';
 
