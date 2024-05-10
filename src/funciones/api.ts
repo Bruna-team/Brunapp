@@ -1,9 +1,8 @@
 import axios from 'axios'
 import router from '@/router'
 const baseURL = process.env.NODE_ENV === 'production'
-  ? 'https://brunapi.000webhostapp.com/api/consultas.php'
+  ? 'https://brunapp.000webhostapp.com/brunapi/api/consultas.php'
   : 'http://localhost/Bruna/Brunapi/api/consultas.php'
-
 /**
  * @param {object} params
  * @param {object} data
@@ -20,7 +19,7 @@ function brunaApi (params: any, data: any) {
     })
       .then((respuesta) => {
         if (respuesta.data.e === 'Invalido') {
-          router.push('LogIn')
+          router.push('/LogIn')
         }
         return resolve(respuesta)
       })

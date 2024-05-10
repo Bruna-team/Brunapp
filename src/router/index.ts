@@ -61,21 +61,15 @@ const router = createRouter({
       ]
     },
     {
-      path: "/sesion",
-      name: "sesion",
-      children: [
-        {
-          path: "/LogIn",
-          name: "LogIn",
-          component: () => import("@/views/LogIn.vue"),
-        },
-        {
-          path: "/SingIn",
-          name: "SingIn",
-          component: () => import("@/views/LogIn.vue"),
-        }
-      ]
+      path: "/LogIn",
+      name: "LogIn",
+      component: () => import("@/views/LogIn.vue"),
     },
+    {
+      path: "/SingIn",
+      name: "SingIn",
+      component: () => import("@/views/LogIn.vue"),
+    }
   ],
 });
 

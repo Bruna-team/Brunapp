@@ -176,7 +176,7 @@ watch(router.currentRoute, (value) => {
             class="d-block my-2 mx-1"
             rounded
             variant="outlined"
-            @click="router.push('SingIn')"
+            @click="router.push('/SingIn')"
           >
             <span class="text-caption">
               ¿No tienes cuenta? crea la tuya aquí
@@ -284,7 +284,7 @@ watch(router.currentRoute, (value) => {
             class="my-2 mx-1"
             rounded
             variant="outlined"
-            @click="router.push('LogIn')"
+            @click="router.push('/LogIn')"
           >
             <span class="text-caption">
               ¿Ya tienes cuenta? Inicia sesión aquí

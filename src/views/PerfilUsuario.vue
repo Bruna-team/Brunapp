@@ -126,7 +126,7 @@ function cerrarSesion() {
   .then((r:any) => {
     if (r.data.r) {
       localStorage.removeItem("bruna");
-      router.push('LogIn')
+      router.push('/LogIn')
     }
   }).catch(() => {
     alertaMsj.value = "Hubo un error cerrando sesión"
