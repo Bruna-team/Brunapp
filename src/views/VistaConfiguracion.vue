@@ -80,7 +80,7 @@ function cargaInicial() {
   brunaApi({ s: 'menciones' }, '')
   .then((res:any) => {
     if (res.data) {
-      const men:any = {}
+      const men:any = []
       res.data.forEach((m:any) => {
         if (!men[m.id_men]) {
           men[m.id_men] = {
@@ -88,7 +88,7 @@ function cargaInicial() {
             men: m.nom_men,
             edit: false,
             nuevo: false,
-            ano: {}
+            ano: []
           }
         }
         if (!men[m.id_men].ano[m.num_ano]) {
@@ -97,7 +97,7 @@ function cargaInicial() {
             nom_ano: m.nom_ano,
             num_ano: m.num_ano,
             nuevo: false,
-            sec: {}
+            sec: []
           }
         }
         if (!men[m.id_men].ano[m.num_ano].sec[m.id_ano]) {
@@ -108,19 +108,15 @@ function cargaInicial() {
           }
         }
       });
-      // res.data.forEach((m:any) => {
-      //   if (men[m.id_men].ano[m.num_ano]) {
-      //     men[m.id_men].ano[m.num_ano].sec = men[m.id_men].ano[m.num_ano].sec.filter((s:any) => s != null)
-      //   }
-      // })
-      // console.log('2')
-      // console.log(men)
-      // res.data.forEach((m:any) => {
-      //   men[m.id_men].ano = men[m.id_men].ano.filter((a:any) => a != null)
-      // })
-      // console.log('3')
-      // console.log(men)
-      menciones.value = men
+      res.data.forEach((m:any) => {
+        if (men[m.id_men].ano[m.num_ano]) {
+          men[m.id_men].ano[m.num_ano].sec = men[m.id_men].ano[m.num_ano].sec.filter((s:any) => s != null)
+        }
+      })
+      res.data.forEach((m:any) => {
+        men[m.id_men].ano = men[m.id_men].ano.filter((a:any) => a != null)
+      })
+      menciones.value = men.filter((m:any) => m != null)
     } else {
       alertaMsj.value = "Hubo un error: " + res.data.e
     }
