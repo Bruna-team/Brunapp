@@ -231,12 +231,13 @@ function guardarEstudiantes() {
     .then((res:any) => {
       if (res.data.r) {
         data = ''
-        console.log(res.data.r)
       }
     }).catch(() => {
       emit('alerta', 'Hubo un error agregando el alumno')
     })
     emit('alerta', 'Se han registrado todos los alumnos')
+    limpiarDatos()
+    emit('recargar')
   });
 }
 function limpiarDatos() {
@@ -386,8 +387,6 @@ watch(()=>cedRe.value.value, ()=>{
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
                         </v-radio-group>
-                      {{alumno.men.value}}
-                      {{alumno.ano.value}}
                       </v-col>
                     </v-row>
                   </v-card>
