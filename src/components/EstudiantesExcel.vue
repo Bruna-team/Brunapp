@@ -15,6 +15,7 @@ const alertMSJ = ref<any[]>([])
 function handleFileUpload(e: any) {
   const file = e.target.files[0]
   const reader = new FileReader()
+  if (alertMSJ.value.length){alertMSJ.value = []}
   reader.onload = function(e:any) {
     const workbook = XLSX.read(e.target.result)
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -64,13 +65,21 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
           dato: 'no tiene fecha de nacimiento',
         })
       }
-      estudiante[5] = estudiante[5].replace(/\//g, '-')
-      if(validateBornDate(estudiante[5]) !== true) {
+      if(typeof estudiante[5] !== 'string') {
         alertMSJ.value.push({
           estudiante: estudiante[0] || 'El estudiante',
           posicion: e+3,
-          dato: 'no tiene una fecha de nacimiento correcta. '+validateBornDate(estudiante[5]),
+          dato: 'no tiene un formato de fecha de nacimiento correcta. Asegúrese que en el excel este dentro de "comillas" luego de un signo = igual Ej: ="2010-12-30"',
         })
+      } else {
+        estudiante[5].replace(/\//g, '-')
+        if(validateBornDate(estudiante[5]) !== true) {
+          alertMSJ.value.push({
+            estudiante: estudiante[0] || 'El estudiante',
+            posicion: e+3,
+            dato: 'no tiene una fecha de nacimiento correcta. '+validateBornDate(estudiante[5]),
+          })
+        }
       }
       if(!estudiante[7]) {
         alertMSJ.value.push({
@@ -158,7 +167,6 @@ function datosEstudiantes(estudiantesXLS: any[] ) {
       }
     }
   });
-
 }
 
 watch(estudiantes.value, (value) => {

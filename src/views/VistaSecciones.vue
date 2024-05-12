@@ -97,9 +97,9 @@ function organizarSecciones(data:string[]) {
                 <v-card :class="['ma-3', {'d-flex flex-wrap align-center': Object.values(n.ano[i].sec).length==1}]">
                   <v-card-title>
                     <v-icon :icon="`mdi-numeric-${ano.num_ano}-circle`"/>
-                    {{ ano.nom_ano }} año
+                    {{ ano.nom_ano }}
                   </v-card-title>
-                  <v-sheet :class="['d-flex flex-wrap pb-3 pl-2 justify-space-between', {'flex-fill': Object.values(n.ano[i].sec).length==1}]">
+                  <v-sheet :class="['d-flex flex-wrap pb-3 pl-2 justify-space-around', {'flex-fill': Object.values(n.ano[i].sec).length==1}]">
                     <article
                       v-for="s in n.ano[i].sec"
                       :keys="`${s.num_sec}${s.sec_nom}`"

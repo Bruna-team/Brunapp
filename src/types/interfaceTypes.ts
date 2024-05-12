@@ -75,8 +75,9 @@ interface Maestros {
   nom_car: string
 }
 interface Estudiantes {
-  ced_alum: string,
   id_estd: string,
+  id_ano_estd?: string,
+  ced_alum: string,
   pape_alum: string,
   pnom_alum: string,
   sape_alum: string,

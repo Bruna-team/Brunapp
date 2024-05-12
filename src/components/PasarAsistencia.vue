@@ -3,6 +3,8 @@ import { ref, watch } from 'vue';
 import { brunaApi } from '@/funciones/api.ts';
 import { formatoFechaYHora } from '@/funciones/funciones';
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import { Estudiantes } from '@/types/interfaceTypes'
+
 formatoFechaYHora
 const props = defineProps({
   seccion: {
@@ -14,16 +16,7 @@ const alertaMsj = ref<string>('')
 const dialog = ref(false)
 const asisDate = ref(formatoFechaYHora(new Date, 'fecha'))
 const asisHor = ref(showTime())
-const estudiantes = ref([
-  {
-    ced_alum: "",
-    id_estd: "",
-    pape_alum: "",
-    pnom_alum: "",
-    sape_alum: "",
-    snom_alum: "",
-  },
-])
+const estudiantes = ref<Estudiantes[]>([])
 const inasistencias = ref([])
 function cargaInicial() {
   if (props.seccion) {
