@@ -346,10 +346,10 @@ watch(()=>cedRe.value.value, ()=>{
                           label="Mención"
                         >
                           <v-radio
-                            v-for="menc in props.menciones"
+                            v-for="(menc, imenc) in props.menciones"
                             :key="menc.id_men"
                             :label="menc.men"
-                            :value="menc.id_men"
+                            :value="imenc+1"
                           />
                         </v-radio-group>
                       </v-col>
@@ -362,10 +362,10 @@ watch(()=>cedRe.value.value, ()=>{
                         >
                           <v-radio
                             v-if="alumno.men.value"
-                            v-for="ano in props.menciones[alumno.men.value].ano"
+                            v-for="(ano, iano) in props.menciones[alumno.men.value-1].ano"
                             :key="ano.id_ano"
                             :label="ano.nom_ano"
-                            :value="ano.num_ano"
+                            :value="iano+1"
                           />
                           <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                         </v-radio-group>
@@ -379,7 +379,7 @@ watch(()=>cedRe.value.value, ()=>{
                         >
                           <v-radio
                             v-if="alumno.ano.value"
-                            v-for="sec in props.menciones[alumno.men.value]?.ano[alumno.ano.value]?.sec"
+                            v-for="sec in props.menciones[alumno.men.value-1]?.ano[alumno.ano.value-1]?.sec"
                             :key="sec.id_ano"
                             :label="sec.sec_nom"
                             :value="sec.id_ano"
@@ -570,10 +570,10 @@ watch(()=>cedRe.value.value, ()=>{
                     label="Mención"
                   >
                     <v-radio
-                      v-for="menc in props.menciones"
+                      v-for="(menc, imenc) in props.menciones"
                       :key="menc.id_men"
                       :label="menc.men"
-                      :value="menc.id_men"
+                      :value="imenc+1"
                     />
                   </v-radio-group>
                 </v-col>
@@ -586,10 +586,10 @@ watch(()=>cedRe.value.value, ()=>{
                   >
                     <v-radio
                       v-if="curso.men.value"
-                      v-for="ano in props.menciones[curso.men.value].ano"
+                      v-for="(ano, iano) in props.menciones[curso.men.value-1].ano"
                       :key="ano.id_ano"
                       :label="ano.nom_ano"
-                      :value="ano.num_ano"
+                      :value="iano+1"
                     />
                     <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
                   </v-radio-group>
@@ -603,7 +603,7 @@ watch(()=>cedRe.value.value, ()=>{
                   >
                     <v-radio
                       v-if="curso.ano.value"
-                      v-for="sec in props.menciones[curso.men.value]?.ano[curso.ano.value]?.sec"
+                      v-for="sec in props.menciones[curso.men.value-1]?.ano[curso.ano.value-1]?.sec"
                       :key="sec.id_ano"
                       :label="sec.sec_nom"
                       :value="sec.id_ano"
