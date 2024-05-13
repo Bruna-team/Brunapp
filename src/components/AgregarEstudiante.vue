@@ -198,13 +198,13 @@ function guardarAlumno() {
   data +=  '&pape=' +  capitalizar(alumno.value.pape.value) + '&sape=' +  capitalizar(alumno.value.sape.value) || ''
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
   data +=  '&paren=' +  capitalizar(alumno.value.paren.value) + '&idAno=' + alumno.value.sec.value
-  data += '&obs=' + alumno.value.obs.value || '' + '&sex=' + alumno.value.sexo.value
+  data += '&obs=' + alumno.value.obs.value + '&sex=' + alumno.value.sexo.value
   if (representante.value.id.value) {
     data += '&idRe=' +  representante.value.id.value
   } else {
     data += '&nomRe=' + capitalizar(representante.value.nomRe.value) + '&apeRe=' + capitalizar(representante.value.apeRe.value)
     data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
-    data += '&sTelRe=' + representante.value.telRe.value || '' + '&dirRe=' + representante.value.dir.value
+    data += '&sTelRe=' + representante.value.telRe.value + '&dirRe=' + representante.value.dir.value
   }
   brunaApi({ s: 'agregarAlum' }, data)
   .then((res:any) => {
