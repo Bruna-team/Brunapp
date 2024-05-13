@@ -1,32 +1,14 @@
 <script setup lang="ts">
 import {ref,onMounted} from 'vue'
-import { brunaApi } from '../funciones/api.ts';
-import AgregarEstudiante from '../components/AgregarEstudiante.vue'
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import PasarAsistencia from '../components/PasarAsistencia.vue';
-const car = ref(localStorage.getItem("bruna"))
+import { brunaApi } from '@/funciones/api.ts';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import PasarAsistencia from '@/components/PasarAsistencia.vue';
+import { Menciones } from '@/types/interfaceTypes';
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
 const tabsLoading = ref<boolean>(true)
-const menciones = ref<any[]>([{
-  id_men: '',
-  men: '',
-  ano: [
-    {
-      id_ano: '',
-      nom_ano: '',
-      num_ano: '',
-      sec: [
-        {
-          id_ano: '',
-          sec_nom: '',
-          semanero: '',
-          num_sec: ''
-        }
-      ]
-    }
-  ]
-}])
+const menciones = ref<Menciones[]>([]);
+
 onMounted(() => {
 	cargaInicial();
 });
@@ -71,76 +53,79 @@ function organizarSecciones(data:string[]) {
   menciones.value = dataMen
 }
 </script>
+
 <template>
 <v-container>
   <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <v-skeleton-loader v-if="tabsLoading" type="table-heading, article, paragraph" />
   <template v-else>
-    <v-card>
-      <v-tabs
-        v-model="mencion"
-        fixed-tabs
-        show-arrows
-        bg-color="secundario"
-      >
-        <v-tab
-          v-for="(m) in menciones"
-          :key="m.id_men"
-          >
-          {{ m.men }}
-        </v-tab>
-        <AgregarEstudiante
-          v-if="car == '1' || car == '2'"
-          :menciones="menciones"
-          :classBtn="'ml-2'"
-          @recargar="cargaInicial"
-          @alerta="alertaMsj = $event"
-        />
-      </v-tabs>
-      <v-window v-model="mencion">
-        <v-window-item
-          v-for="n in menciones"
-          :key="n.id_men"
-          :value="n.id_men"
+    <template v-if="!Object.keys(menciones).length">
+      <v-sheet rounded="xl" class="text-center mt-3 pb-2 mx-auto" width="40vw">
+        <v-icon icon="mdi-town-hall" class="text-primario-claro large-icon"/>
+        <v-icon icon="mdi-exclamation" class="text-primario-claro large-icon"/>
+        <p class="text-h6">Parece que aun no tienes una sección asignada</p>
+      </v-sheet>
+    </template>
+    <template v-else>
+      <v-card>
+        <v-tabs
+          v-model="mencion"
+          fixed-tabs
+          show-arrows
+          bg-color="secundario"
         >
-          <v-row no-gutters>
-            <v-col
-              v-for="(ano, i) in n.ano"
-              :keys="ano.id_ano"
-              cols="12" sm="6"
-              class="pa-0"
+          <v-tab
+            v-for="(m) in menciones"
+            :key="m.id_men"
             >
-              <v-card :class="['ma-3', {'d-flex flex-wrap align-center': Object.values(n.ano[i].sec).length==1}]">
-                <v-card-title>
-                  <v-icon :icon="`mdi-numeric-${ano.num_ano}-circle`"/>
-                  {{ ano.nom_ano }} año
-                </v-card-title>
-                <v-sheet :class="['d-flex flex-wrap pb-3 pl-2 justify-space-between', {'flex-fill': Object.values(n.ano[i].sec).length==1}]">
-                  <article
-                    v-for="s in n.ano[i].sec"
-                    :keys="`${s.num_sec}${s.sec_nom}`"
-                    :class="['flex-fill d-inline-flex align-center', {'flex-lg-0-0': Object.values(n.ano[i].sec).length!==1}]"
-                  >
-                    <RouterLink :to="`/seccion/${s.id_ano}`" class="flex-fill">
-                      <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
-                        <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
-                        <p v-if="!s.semanero.includes('null')" class="text-caption">
-                          <span class="d-block text-caption">
-                            Semanero:
-                          </span>
-                          {{ s.semanero }}
-                        </p>
-                      </v-list-item>
-                    </RouterLink>
-                    <PasarAsistencia :seccion="s.id_ano" />
-                  </article>
-                </v-sheet>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-window-item>
-      </v-window>
-    </v-card>
+            {{ m.men }}
+          </v-tab>
+        </v-tabs>
+        <v-window v-model="mencion">
+          <v-window-item
+            v-for="n in menciones"
+            :key="n.id_men"
+            :value="n.id_men"
+          >
+            <v-row no-gutters>
+              <v-col
+                v-for="(ano, i) in n.ano"
+                :keys="ano.id_ano"
+                cols="12" sm="6"
+                class="pa-0"
+              >
+                <v-card :class="['ma-3', {'d-flex flex-wrap align-center': Object.values(n.ano[i].sec).length==1}]">
+                  <v-card-title>
+                    <v-icon :icon="`mdi-numeric-${ano.num_ano}-circle`"/>
+                    {{ ano.nom_ano }}
+                  </v-card-title>
+                  <v-sheet :class="['d-flex flex-wrap pb-3 pl-2 justify-space-around', {'flex-fill': Object.values(n.ano[i].sec).length==1}]">
+                    <article
+                      v-for="s in n.ano[i].sec"
+                      :keys="`${s.num_sec}${s.sec_nom}`"
+                      :class="['flex-fill d-inline-flex align-center', {'flex-lg-0-0': Object.values(n.ano[i].sec).length!==1}]"
+                    >
+                      <RouterLink :to="`/seccion/${s.id_ano}`" class="flex-fill">
+                        <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
+                          <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
+                          <p v-if="!s.semanero?.includes('null')" class="text-caption">
+                            <span class="d-block text-caption">
+                              Semanero:
+                            </span>
+                            {{ s.semanero }}
+                          </p>
+                        </v-list-item>
+                      </RouterLink>
+                      <PasarAsistencia :seccion="s.id_ano" />
+                    </article>
+                  </v-sheet>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-window-item>
+        </v-window>
+      </v-card>
+    </template>
   </template>
 </v-container>
 </template>

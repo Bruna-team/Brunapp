@@ -35,11 +35,11 @@ const car = ref(localStorage.getItem("bruna"))
       <v-icon icon="mdi-human-male-board" />
       Maestros
     </RouterLink>
-    <RouterLink to="/reportes/pases" class="ma-2 nav-link">
+    <RouterLink :to="car == '2' || car == '1' ? '/reportes/pases' : '/reportes/observaciones'" class="ma-2 nav-link">
       <v-icon icon="mdi-file-chart" />
       Reportes
     </RouterLink>
-    <RouterLink to="/configuracion" class="ma-2 nav-link">
+    <RouterLink v-if="car == '2' || car == '1'" to="/configuracion" class="ma-2 nav-link">
       <v-icon icon="mdi-cog" />
       Configuración
     </RouterLink>
@@ -49,7 +49,7 @@ const car = ref(localStorage.getItem("bruna"))
     </RouterLink>
   </v-list>
 </v-navigation-drawer>
-<v-main class="h-screen">
+<v-main>
   <RouterView />
 </v-main>
 </template>

@@ -21,7 +21,9 @@ a {
   text-overflow: clip;
   overflow: auto;
 }
-
+body > div:nth-child(2) > a {
+  display: none !important;
+}
 /* Iconos personalizados */
 i.logo::before {
   display: block;

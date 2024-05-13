@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify'
-import { brunaApi } from '../funciones/api.ts';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
 const emit = defineEmits([
 	'recargar'
 ]);
@@ -328,7 +328,7 @@ function eliminarRol(id: any) {
               Horario
             </span>
             <v-btn
-              :variant="jornada.edit ? 'text' : 'tonal'"
+              variant="text"
               :prepend-icon="jornada.edit ? 'mdi-close' :'mdi-pen'"
               :text="jornada.edit ? 'Cancelar' :'Editar'"
               @click="jornada.edit = !jornada.edit"
@@ -416,7 +416,7 @@ function eliminarRol(id: any) {
         <v-btn
           prepend-icon="mdi-check"
           text="Guardar"
-          variant="tonal"
+          variant="elevated"
           color="primario"
           @click="asignarRol ? guardarRol() : guardarJornada()"
         />

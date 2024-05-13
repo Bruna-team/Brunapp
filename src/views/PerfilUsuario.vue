@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import { useTheme } from 'vuetify'
-import { brunaApi } from '../funciones/api.ts';
-import { capitalizar } from "../funciones/funciones.ts";
-import router from '../router';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { capitalizar } from "@/funciones/funciones.ts";
+import router from '@/router';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
 
-import VentanaConfirmar from '../components/VentanaConfirmar.vue';
+import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
 
 const form = ref()
 const loading  = ref(false)
@@ -126,7 +126,7 @@ function cerrarSesion() {
   .then((r:any) => {
     if (r.data.r) {
       localStorage.removeItem("bruna");
-      router.push('LogIn')
+      router.push('/LogIn')
     }
   }).catch(() => {
     alertaMsj.value = "Hubo un error cerrando sesión"
@@ -180,19 +180,18 @@ function cerrarSesion() {
       :class="temaLight ? 'icon-moon' : 'icon-sun'"
     />
     <v-btn
-      :variant="edit ? 'tonal' : 'text'"
+      variant="text"
       :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
       :text="edit ? 'Cancelar' : 'Editar'"
-      :color="edit ? 'error' : ''"
       @click="edit = !edit"
     />
     <v-btn
       v-if="edit"
       :loading="loading"
-      variant="tonal"
+      variant="elevated"
       prepend-icon="mdi-sync"
       text="Guardar"
-      color="secundario"
+      color="primario"
       @click="validar"
     />
   </div>
@@ -270,4 +269,4 @@ function cerrarSesion() {
   }
 
 }
-</style>../funciones y constantes/api.ts
+</style>@/funciones y constantes/api.ts

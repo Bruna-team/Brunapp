@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { brunaApi } from '../funciones/api.ts';
-import { formatoFechaYHora } from '../funciones/funciones';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { formatoFechaYHora } from '@/funciones/funciones';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import { Estudiantes } from '@/types/interfaceTypes'
+
 formatoFechaYHora
 const props = defineProps({
   seccion: {
@@ -14,16 +16,7 @@ const alertaMsj = ref<string>('')
 const dialog = ref(false)
 const asisDate = ref(formatoFechaYHora(new Date, 'fecha'))
 const asisHor = ref(showTime())
-const estudiantes = ref([
-  {
-    ced_alum: "",
-    id_estd: "",
-    pape_alum: "",
-    pnom_alum: "",
-    sape_alum: "",
-    snom_alum: "",
-  },
-])
+const estudiantes = ref<Estudiantes[]>([])
 const inasistencias = ref([])
 function cargaInicial() {
   if (props.seccion) {
@@ -78,14 +71,14 @@ watch(()=>dialog.value, ()=>{
       <template #default="{ isActive }">
         <v-toolbar dark>
           <v-toolbar-title>Pasar asistencia</v-toolbar-title>
-            <v-toolbar-items>
-              <v-btn
-                icon="mdi-close"
-                dark
-                @click="isActive.value = false"
-              />
-            </v-toolbar-items>
-          </v-toolbar>
+          <v-toolbar-items>
+            <v-btn
+              icon="mdi-close"
+              dark
+              @click="isActive.value = false"
+            />
+          </v-toolbar-items>
+        </v-toolbar>
         <v-card>
           <v-card-text style="height: 300px;">
             <v-text-field v-model="asisDate" type="date" label="Selecciona la fecha de la asistencia" />
@@ -114,14 +107,13 @@ watch(()=>dialog.value, ()=>{
           <v-card-actions>
             <v-spacer />
             <v-btn
-              prepend-icon="mdi-cancel"
-              color="error"
+              prepend-icon="mdi-close"
               text="Cancelar"
               @click="isActive.value = false"
             />
             <v-btn
               prepend-icon="mdi-check"
-              variant="tonal"
+              variant="elevated"
               color="primario"
               text="Guardar"
               @click="guardarInasistencias"

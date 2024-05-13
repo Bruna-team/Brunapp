@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import ModalImpresion from "../../components/ModalImpresion.vue"
+import ModalImpresion from "@/components/ModalImpresion.vue"
 const props = defineProps({
   students: {type: Array, default: ref<any[] | [{name: String, obs: string, date: string}]>([])},
   subtitle: String,

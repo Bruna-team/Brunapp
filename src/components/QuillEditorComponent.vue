@@ -4,9 +4,9 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 // @ts-ignore
 import BlotFormatter from 'quill-blot-formatter/dist/BlotFormatter';
-import {SpanEmbed} from '../funciones/quillConfigModule'
+import {SpanEmbed} from '@/funciones/quillConfigModule'
 import { Quill } from '@vueup/vue-quill'
-import { paseEntrada } from '../constantes/plantillas';
+import { paseEntrada } from '@/constantes/plantillas';
 Quill.register(SpanEmbed);
 
 const props = defineProps({

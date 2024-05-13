@@ -4,22 +4,23 @@ import { CalendarView, CalendarViewHeader, CalendarMath } from "vue-simple-calen
 import "/node_modules/vue-simple-calendar/dist/style.css";
 import "/node_modules/vue-simple-calendar/dist/css/holidays-us.css";
 import "/node_modules/vue-simple-calendar/dist/css/default.css";
-// import AgregarEstudiante from "../components/AgregarEstudiante.vue";
-import VentanaConfirmar from '../components/VentanaConfirmar.vue';
-import AlertaMensaje from '../components/AlertaMensaje.vue';
-import { brunaApi } from '../funciones/api.ts';
-import { formatoFechaYHora } from '../funciones/funciones.ts';
 
-import router from "../router";
 import { ref, watch, onMounted } from "vue";
 import { useDisplay } from 'vuetify'
+import router from "@/router";
 const { mobile } = useDisplay()
+import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
+import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import { brunaApi } from '@/funciones/api.ts';
+import { formatoFechaYHora } from '@/funciones/funciones.ts';
+import { Estudiantes } from '@/types/interfaceTypes'
+
+
 const studentDrawer = ref( mobile.value ? false : true)
 const alertaMsj = ref<string>('')
 
 const loading = ref(false)
 const sectionLoading = ref(true)
-const disabled = ref(false)
 onMounted(() => {
 	cargaInicial();
 });
@@ -92,13 +93,6 @@ const items = ref([
 ])
 
 // Funcionalidades del calendario
-function onDrop(item: any, date: any) {
-  // Determine the delta between the old start date and the date chosen,
-  // and apply that delta to both the start and end date to move the item.
-  const eLength = CalendarMath.dayDiff(item.startDate, date)
-  item.originalItem.startDate = CalendarMath.addDays(item.startDate, eLength)
-  item.originalItem.endDate = CalendarMath.addDays(item.endDate, eLength)
-}
 function onClickDay(d: any) {
   calendarNav.value = true
   selectedDate.value = d
@@ -227,16 +221,7 @@ const menciones = ref({
   mencion: '',
   id_ano: ''
 })
-const estudiantes = ref([
-  {
-    ced_alum: "",
-    id_estd: "",
-    pape_alum: "",
-    pnom_alum: "",
-    sape_alum: "",
-    snom_alum: "",
-  },
-])
+const estudiantes = ref<Estudiantes[]>([])
 const representante = ref({
   id: '',
   nombre: '',
@@ -274,6 +259,12 @@ const alumno = ref({
   estd: '',
   num: '',
   nombre: '',
+  sex_alum: {
+    value: '',
+    rules: [
+      (v: string) => !!v || 'El sexo es necesario',
+    ],
+  },
   pnom: {
     value: '',
     rules: [
@@ -399,6 +390,7 @@ function organizarDatos(data:any) {
   alumno.value.ced.value = data.alum[0].ced_alum
   alumno.value.fec.value = data.alum[0].fec_nac_alum
   alumno.value.obs.value = data.alum[0].obs_alum
+  alumno.value.sex_alum.value = data.alum[0].sex_alum
   alumno.value.entrada.value = data.alum[0].entrada
   alumno.value.salida.value = data.alum[0].salida
   alumno.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
@@ -440,9 +432,10 @@ function organizarDatos(data:any) {
 }
 function editarAlumno() {
   let data =  'pnom=' +  alumno.value.pnom.value + '&snom=' +  alumno.value.snom.value
-  data +=  '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
-  data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
-  data +=  '&paren=' +  alumno.value.paren.value + '&id=' + alumno.value.id
+  data += '&pape=' +  alumno.value.pape.value + '&sape=' +  alumno.value.sape.value
+  data += '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
+  data += '&paren=' +  alumno.value.paren.value + '&id=' + alumno.value.id
+  data += '&sex_alum=' + alumno.value.sex_alum.value
   data += '&obs=' + alumno.value.obs.value + '&idRe=' +  representante.value.id
   data += '&nomRe=' + representante.value.nomRe.value + '&apeRe=' + representante.value.apeRe.value
   data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
@@ -462,18 +455,10 @@ function editarAlumno() {
   })
 }
 watch(()=>cedRe.value.value, ()=>{
-  disabled.value = false
-  representante.value.id = ''
-  representante.value.nomRe.value = ''
-  representante.value.apeRe.value = ''
-  representante.value.tel.value = ''
-  representante.value.dir.value = ''
-  representante.value.telRe.value = ''
-  if (cedRe.value.value.length < 8) return
+  if (cedRe.value.value?.length < 8) return
   brunaApi({ s: 'buscarRepresentante' }, 'ced=' + cedRe.value.value)
   .then((res:any) => {
     if (res.data[0].id_rep) {
-      disabled.value = true
       representante.value.id = res.data[0].id_rep
       representante.value.nomRe.value = res.data[0].nom_rep
       representante.value.apeRe.value = res.data[0].ape_rep
@@ -488,343 +473,367 @@ watch(()=>cedRe.value.value, ()=>{
 </script>
 
 <template>
-<v-card color="transparent">
   <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
-  <v-navigation-drawer
-    v-model="studentDrawer"
-    floating
-    :location="mobile ? 'bottom' : 'left'"
-    :class="mobile ? 'h-75' : ''"
-    touchless
-  >
-    <v-list-item class="text-center item-text-inline item-sticky px-0">
-      <template v-if="mobile" #prepend>
-        <v-btn variant="text" icon="mdi-arrow-down" class="d-inline" @click="studentDrawer = false"/>
-      </template>
-      <span class="d-inline-block">
-        {{  alumno.men_abre }}
-        <span class="text-caption d-block">
-        {{  alumno.men }}
-        </span>
-      </span>
-      <!-- <AgregarEstudiante
-        :data-academica="menciones"
-        :variant="true"
-        :classBtn="'float-right float-lg-none mt-2 mt-lg-1'"
-        @recargar="cargaInicial"
-      /> -->
-    </v-list-item>
-    <v-list v-if="estudiantes[0].id_estd" lines="one" density="compact" nav>
-      <v-list-item
-        v-for="estudiante in estudiantes"
-        :key="estudiante.id_estd"
-        :title="`${estudiante.pnom_alum}
-                ${estudiante.snom_alum !== 'undefined' ? estudiante.snom_alum : ''}
-                ${estudiante.pape_alum}
-                ${estudiante.sape_alum !== 'undefined' ? estudiante.sape_alum : ''}`"
-        :subtitle="estudiante.ced_alum"
-        class="my-3"
-        @click="buscarEstudiante(estudiante.id_estd)"
+  <v-layout style="height: auto;">
+    <!-- SIDENAV de estudiantes desktop -->
+    <v-navigation-drawer
+      v-model="studentDrawer"
+      floating
+      :location="mobile ? 'bottom' : 'left'"
+      :class="mobile ? 'h-75' : 'fixed-navigation'"
+      touchless
+    >
+      <v-list
+        v-if="estudiantes[0]?.id_estd"
+        lines="one"
+        density="compact"
+        nav
       >
-        <template #prepend>
-          <v-avatar color="brown">
-            <span class="text-h5">{{estudiantes.indexOf(estudiante) + 1}}</span>
-          </v-avatar>
-        </template>
-      </v-list-item>
-    </v-list>
-  </v-navigation-drawer>
-  <v-bottom-navigation v-if="mobile && estudiantes[0].id_estd">
-    <v-btn @click="studentDrawer = !studentDrawer">
-      <v-icon icon="mdi-account-school-outline" />
-      Lista de estudiantes
-    </v-btn>
-  </v-bottom-navigation>
-  <v-navigation-drawer
-    v-model="calendarNav"
-    temporary
-    location="right"
-    class="sidebar-width"
-  >
-    <v-sheet class="pa-2">
-      <v-btn variant="plain" prepend-icon="mdi-close" text="Cerrar" block @click="calendarNav = !calendarNav" />
-      <template v-if="selectedItem.id && !editItem">
-        <p class="text-center text-capitalize text-medium-emphasis">
-          {{new Date(selectedItem.startDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
-          <template v-if="selectedItem.endDate.toString() !== selectedItem.startDate.toString()">
-            <span class="text-caption">
-              al
-            </span>
-            {{new Date(selectedItem.endDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+        <v-list-item class="text-center item-text-inline item-sticky px-0">
+          <template v-if="mobile" #prepend>
+            <v-btn
+              variant="text"
+              icon="mdi-arrow-down"
+              class="d-inline"
+              @click="studentDrawer = false"
+            />
           </template>
-        </p>
-        <p class="text-h5 text-center mb-2">{{ selectedItem.originalItem.title }}</p>
-        <p class="text-center"><v-chip :class="asignarClases(selectedItem.originalItem.obsType)">{{ selectedItem.originalItem.obs }}</v-chip></p>
-        <p>{{ selectedItem.originalItem.obsDes }}</p>
-      </template>
-      <template v-else>
-        <v-form v-model="formObsValidate" ref="formObs">
-          <p class="text-h5 text-center text-capitalize mb-4">
-            {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
-          </p>
-          <v-text-field v-model="newItemTitle" label="Titulo de la observación"/>
-          <v-text-field
-            v-if="editItem"
-            v-model="newItemStartDate"
-            label="Fecha y hora de la observación"
-            type="datetime-local"
-            hint="Ej: Pasó el dia... a las..."
-            persistent-hint
-            class="mb-3"
-          />
-          <v-text-field
-            v-else
-            v-model="newItemStartDateTime.value"
-            :rules="newItemStartDateTime.rules"
-            label="Hora de la observación (opcional)"
-            type="time"
-            hint="Ej: Pasó a las..."
-            persistent-hint
-            class="mb-3"
-          />
-          <v-radio-group
-            v-model="newItemType.value"
-            :rules="newItemType.rules"
-            label="Tipo de observación"
-            class="mb-2"
-          >
-            <v-radio v-for="m in motivos" :keys="m.id_mo" :label="m.tipo_mo" :value="m.id_mo"></v-radio>
-          </v-radio-group>
-          <v-text-field
-            v-model="newItemEndDate"
-            label="Observación hasta el..."
-            type="datetime-local"
-            persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
-            class="mb-3"
-          />
-          <v-textarea label="Observación" v-model="newItemObservacion"/>
-        </v-form>
-      </template>
-    </v-sheet>
-    <template #append>
-      <template  v-if="selectedItem.id">
-        <v-btn
-          class="flex-fill py-3"
-          variant="tonal"
-          block
-          :append-icon="editItem ? 'mdi-cancel' : 'mdi-trash-can'"
-          color="error"
-          @click="editItem ? (editItem = false, limpiarItems()) : ''"
-        >
-          <span>{{ editItem ? 'Cancelar' : 'Eliminar' }}</span>
-          <VentanaConfirmar
-            v-if="!editItem"
-            :message="'desea eliminar esta observación'"
-            btnicon="mdi-trash-can"
-            @confirmar="(e) => { e ? eliminarItem(selectedItem) : '' }"
-          />
-        </v-btn>
-        <v-btn
-          class="flex-fill py-3"
-          block
-          :append-icon="editItem ? 'mdi-sync' :'mdi-pen'"
-          :text="editItem ? 'Actualizar' : 'Editar'"
-          :color="editItem ? 'primario' : 'secundario-claro'"
-          @click="editItem ? actualizarItem(selectedItem) : editarItem(selectedItem)"
-        />
-      </template>
-      <template  v-else>
-        <v-btn class="py-7" color="primario-claro" block @click="validarFormObs()">Agregar</v-btn>
-      </template>
-    </template>
-  </v-navigation-drawer>
-  <section>
-    <v-container class="px-0">
-      <section  class="d-flex flex-wrap">
-        <v-btn
-          variant="text"
-          prepend-icon="mdi-arrow-left"
-          @click="router.push('/')"
-        >
-          <span class="d-none d-sm-inline">
-            Regresar
+          <span class="d-inline-block">
+            {{  alumno.men_abre }}
+            <span class="text-caption d-block">
+            {{  alumno.men }}
+            </span>
           </span>
-        </v-btn>
-        <v-spacer></v-spacer>
+        </v-list-item>
+        <v-list-item
+          v-for="estudiante in estudiantes"
+          :key="estudiante.id_estd"
+          :title="`${estudiante.pnom_alum}
+                  ${estudiante.snom_alum !== 'undefined' ? estudiante.snom_alum : ''}
+                  ${estudiante.pape_alum}
+                  ${estudiante.sape_alum !== 'undefined' ? estudiante.sape_alum : ''}`"
+          :subtitle="estudiante.ced_alum"
+          class="my-3"
+          @click="buscarEstudiante(estudiante.id_estd), !mobile || (studentDrawer = !studentDrawer)"
+        >
+          <template #prepend>
+            <v-icon color="brown">
+              <span class="text-h5">{{estudiantes.indexOf(estudiante) + 1}}</span>
+            </v-icon>
+          </template>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <!-- Nav mobile de estudiantes -->
+    <v-bottom-navigation
+      v-if="mobile && estudiantes[0]?.id_estd"
+    >
+      <v-btn @click="studentDrawer = !studentDrawer">
+        <v-icon icon="mdi-account-school-outline" />
+        Lista de estudiantes
+      </v-btn>
+    </v-bottom-navigation>
+    <!-- SIDEBAR de observaciones -->
+    <v-navigation-drawer
+      v-model="calendarNav"
+      temporary
+      location="right"
+      class="sidebar-width h-screen fixed-navigation"
+    >
+      <v-sheet class="pa-2">
         <v-btn
-          v-if="alumno.num && !sectionLoading"
-          :variant="edit ? 'tonal' : 'text'"
-          :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
-          :text="edit ? 'Cancelar' : 'Editar'"
-          :color="edit ? 'error' : ''"
-          class="mx-2"
-          @click="edit = !edit"
+          variant="plain"
+          prepend-icon="mdi-close"
+          class="float-right"
+          @click="calendarNav = !calendarNav"
         />
-        <v-btn
-          v-if="edit"
-          :loading="loading"
-          variant="tonal"
-          prepend-icon="mdi-sync"
-          text="Guardar"
-          color="secundario"
-          class="mx-2"
-          @click="validarFormEst"
-        />
-      </section>
-      <v-skeleton-loader v-if="sectionLoading" type="table-heading, article, paragraph" />
-      <template v-else-if="alumno.num">
-        <v-card variant="tonal" class="ma-1 ma-sm-3 pa-2">
-          <v-card-item class="pa-0">
-            <template v-if="!edit">
-              <v-row class="pa-3">
-                <v-col cols="auto" class="d-none d-sm-block">
-                  <v-badge icon="mdi-gender-female" color="pink">
-                    <v-avatar color="brown">
-                      <span class="text-h5">
-                        {{ alumno.nombre.split(" ").map(parte => parte.charAt(0))[0] + alumno.nombre.split(" ").map(parte => parte.charAt(0))[1] }}
+        <template v-if="selectedItem.id && !editItem">
+          <p class="text-center text-capitalize text-medium-emphasis">
+            {{new Date(selectedItem.startDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+            <template v-if="selectedItem.endDate.toString() !== selectedItem.startDate.toString()">
+              <span class="text-caption">
+                al
+              </span>
+              {{new Date(selectedItem.endDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric'})}}
+            </template>
+          </p>
+          <p class="text-h5 text-center mb-2">{{ selectedItem.originalItem.title }}</p>
+          <p class="text-center"><v-chip :class="asignarClases(selectedItem.originalItem.obsType)">{{ selectedItem.originalItem.obs }}</v-chip></p>
+          <p>{{ selectedItem.originalItem.obsDes }}</p>
+        </template>
+        <template v-else>
+          <v-form v-model="formObsValidate" ref="formObs">
+            <p class="text-h5 text-center text-capitalize mb-4">
+              {{new Date(selectedDate).toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}}
+            </p>
+            <v-text-field
+              v-model="newItemTitle"
+              label="Titulo de la observación"
+              hide-details
+            />
+            <v-text-field
+              v-if="editItem"
+              v-model="newItemStartDate"
+              label="Fecha y hora de la observación"
+              type="datetime-local"
+              hint="Ej: Pasó el dia... a las..."
+              persistent-hint
+              class="mb-3"
+            />
+            <v-text-field
+              v-else
+              v-model="newItemStartDateTime.value"
+              :rules="newItemStartDateTime.rules"
+              label="Hora de la observación"
+              type="time"
+              hint="Ej: Pasó a las..."
+              persistent-hint
+              class="mb-3"
+            />
+            <v-radio-group
+              v-model="newItemType.value"
+              :rules="newItemType.rules"
+              label="Tipo de observación"
+              class="mb-2"
+            >
+              <v-radio v-for="m in motivos" :keys="m.id_mo" :label="m.tipo_mo" :value="m.id_mo"></v-radio>
+            </v-radio-group>
+            <v-text-field
+              v-model="newItemEndDate"
+              label="Observación hasta el..."
+              type="datetime-local"
+              persistent-hint hint="Preferiblemente usar cuando se trata de un reposo"
+              class="mb-3"
+            />
+            <v-textarea
+              label="Observación"
+              v-model="newItemObservacion"
+              hide-details
+            />
+          </v-form>
+        </template>
+      </v-sheet>
+      <template #append>
+        <template  v-if="selectedItem.id">
+          <v-btn
+            class="flex-fill py-3"
+            variant="tonal"
+            block
+            :append-icon="editItem ? 'mdi-close' : 'mdi-trash-can'"
+            color="error"
+            @click="editItem ? (editItem = false, limpiarItems()) : ''"
+          >
+            <span>{{ editItem ? 'Cancelar' : 'Eliminar' }}</span>
+            <VentanaConfirmar
+              v-if="!editItem"
+              :message="'desea eliminar esta observación'"
+              btnicon="mdi-trash-can"
+              @confirmar="(e) => { e ? eliminarItem(selectedItem) : '' }"
+            />
+          </v-btn>
+          <v-btn
+            class="flex-fill py-3"
+            block
+            :append-icon="editItem ? 'mdi-sync' :'mdi-pen'"
+            :text="editItem ? 'Actualizar' : 'Editar'"
+            :color="editItem ? 'primario' : 'secundario-claro'"
+            @click="editItem ? actualizarItem(selectedItem) : editarItem(selectedItem)"
+          />
+        </template>
+        <template  v-else>
+          <v-btn class="py-7" color="primario-claro" block @click="validarFormObs()">Agregar</v-btn>
+        </template>
+      </template>
+    </v-navigation-drawer>
+    <!-- Vista -->
+    <v-main :class="{'main-content': mobile}">
+      <v-container class="px-0">
+        <div class="d-flex flex-wrap">
+          <v-btn
+            variant="text"
+            prepend-icon="mdi-arrow-left"
+            @click="router.push('/')"
+          >
+            <span class="d-none d-sm-inline">
+              Regresar
+            </span>
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn
+            v-if="alumno.num && !sectionLoading"
+            :variant="edit ? 'tonal' : 'text'"
+            :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
+            :text="edit ? 'Cancelar' : 'Editar'"
+            class="mx-2"
+            @click="edit = !edit"
+          />
+          <v-btn
+            v-if="edit"
+            :loading="loading"
+            prepend-icon="mdi-sync"
+            text="Guardar"
+            color="primario"
+            class="mx-2"
+            @click="validarFormEst"
+          />
+        </div>
+        <v-skeleton-loader v-if="sectionLoading" type="table-heading, article, paragraph" />
+        <template v-else-if="alumno.num">
+          <v-card variant="tonal" class="ma-1 ma-sm-3 pa-2">
+            <v-card-item class="pa-0">
+              <template v-if="!edit">
+                <v-row class="pa-3">
+                  <v-col cols="auto" class="d-none d-sm-block">
+                    <v-badge
+                      :icon="alumno.sex_alum.value == 'F' ? 'mdi-gender-female' : 'mdi-gender-male'"
+                      :color="alumno.sex_alum.value == 'F' ? 'pink' : 'blue'"
+                    >
+                      <v-avatar color="brown">
+                        <span class="text-h5">
+                          {{ alumno.nombre.split(" ").map(parte => parte.charAt(0))[0] + alumno.nombre.split(" ").map(parte => parte.charAt(0))[1] }}
+                        </span>
+                      </v-avatar>
+                    </v-badge>
+                  </v-col>
+                  <v-col cols="auto" sm="10" class="px-0">
+                    <v-card-title class="text-h4">
+                      <v-tooltip text="Número de lista">
+                        <template #activator="{ props }">
+                          <span v-bind="props" class="text-primario">{{ alumno.num }}</span>
+                        </template>
+                      </v-tooltip>
+                      {{ alumno.nombre }}
+                    </v-card-title>
+                    <p>
+                      <span class="text-caption font-weight-bold text-medium-emphasis">
+                        C.I.
                       </span>
-                    </v-avatar>
-                  </v-badge>
-                </v-col>
-                <v-col cols="auto" sm="10" class="px-0">
-                  <v-card-title class="text-h4">
-                    <v-tooltip text="Número de lista">
-                      <template #activator="{ props }">
-                        <span v-bind="props" class="text-primario">{{ alumno.num }}</span>
-                      </template>
-                    </v-tooltip>
-                    {{ alumno.nombre }}
-                  </v-card-title>
-                  <p>
-                    <span class="text-caption font-weight-bold text-medium-emphasis">
-                      C.I.
-                    </span>
-                    <span class="font-weight-bold letter-spacing">{{ alumno.ced.value }}</span>
-                  </p>
-                  <p>
-                    <span class="text-caption font-weight-bold text-medium-emphasis">
-                      Fecha de nacimiento
-                    </span>
-                    <span class="font-weight-bold letter-spacing">
-                      {{ alumno.fec.value }}
-                    </span>
-                  </p>
-                </v-col>
-                <v-col cols="12" sm="4" class="pa-0 px-sm-2 py-sm-0">
-                  <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
-                  <v-divider/>
-                  <div class="d-sm-flex">
+                      <span class="font-weight-bold letter-spacing">{{ alumno.ced.value }}</span>
+                    </p>
+                    <p>
+                      <span class="text-caption font-weight-bold text-medium-emphasis">
+                        Fecha de nacimiento
+                      </span>
+                      <span class="font-weight-bold letter-spacing">
+                        {{ alumno.fec.value }}
+                      </span>
+                    </p>
+                  </v-col>
+                  <v-col cols="12" sm="4" class="pa-0 px-sm-2 py-sm-0">
+                    <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
+                    <v-divider/>
+                    <div class="d-sm-flex">
+                      <v-list-item
+                        :title="representante.nombre"
+                        class="px-0 pr-sm-3"
+                      >
+                        <template #subtitle>
+                          <p>
+                            <span class="text-caption font-weight-bold text-medium-emphasis">
+                              Parentesco:
+                            </span>
+                            <span class="font-weight-bold letter-spacing">
+                              {{ alumno.paren.value }}
+                            </span>
+                          </p>
+                          <p>
+                            <span class="text-caption font-weight-bold text-medium-emphasis">
+                              Teléfono:
+                            </span>
+                            <span class="font-weight-bold letter-spacing">
+                              {{ representante.tel.value }}
+                            </span>
+                          </p>
+                          <p v-if="representante.telRe.value">
+                            <span class="text-caption font-weight-bold text-medium-emphasis">
+                              Teléfonode repuesto:
+                            </span>
+                            <span class="font-weight-bold letter-spacing">
+                              {{ representante.telRe.value }}
+                            </span>
+                          </p>
+                          <p>
+                            <span class="text-caption font-weight-bold text-medium-emphasis">
+                              Dirección:
+                            </span>
+                            <span class="font-weight-bold letter-spacing">
+                              {{ representante.dir.value }}
+                            </span>
+                          </p>
+                        </template>
+                      </v-list-item>
+                    </div>
+                  </v-col>
+                  <v-col cols="12" sm="3" class="pa-0 px-sm-2 py-sm-0">
+                    <p class="text-caption font-weight-bold text-medium-emphasis">Estatus</p>
+                    <v-divider/>
+                    <div class="d-sm-flex flex-wrap align-start">
+                      <v-list-item
+                        class="flex-1-0 px-0 pr-sm-2"
+                      >
+                        <template #subtitle>
+                          <p>
+                            <span class="text-caption font-weight-bold text-medium-emphasis">
+                              Pases de entrada:
+                            </span>
+                            <span class="font-weight-bold letter-spacing">
+                              {{  alumno.entrada.value }}
+                            </span>
+                          </p>
+                          <p>
+                            <span class="text-caption font-weight-bold text-medium-emphasis">
+                              Pases de salida
+                            </span>
+                            <span class="font-weight-bold letter-spacing">
+                              {{  alumno.salida.value }}
+                            </span>
+                          </p>
+                        </template>
+                      </v-list-item>
+                    </div>
+                  </v-col>
+                  <v-col cols="12" sm="5" class="pa-0 px-sm-2 py-sm-0">
+                    <p class="text-caption font-weight-bold text-medium-emphasis">Observaciones</p>
+                    <v-divider/>
                     <v-list-item
-                      :title="representante.nombre"
-                      class="px-0 pr-sm-3"
-                    >
-                      <template #subtitle>
-                        <p>
-                          <span class="text-caption font-weight-bold text-medium-emphasis">
-                            Parentesco:
-                          </span>
-                          <span class="font-weight-bold letter-spacing">
-                            {{ alumno.paren.value }}
-                          </span>
-                        </p>
-                        <p>
-                          <span class="text-caption font-weight-bold text-medium-emphasis">
-                            Teléfono:
-                          </span>
-                          <span class="font-weight-bold letter-spacing">
-                            {{ representante.tel.value }}
-                          </span>
-                        </p>
-                        <p v-if="representante.telRe.value">
-                          <span class="text-caption font-weight-bold text-medium-emphasis">
-                            Teléfonode repuesto:
-                          </span>
-                          <span class="font-weight-bold letter-spacing">
-                            {{ representante.telRe.value }}
-                          </span>
-                        </p>
-                        <p>
-                          <span class="text-caption font-weight-bold text-medium-emphasis">
-                            Dirección:
-                          </span>
-                          <span class="font-weight-bold letter-spacing">
-                            {{ representante.dir.value }}
-                          </span>
-                        </p>
-                      </template>
-                    </v-list-item>
-                  </div>
-                </v-col>
-                <v-col cols="12" sm="3" class="pa-0 px-sm-2 py-sm-0">
-                  <p class="text-caption font-weight-bold text-medium-emphasis">Estatus</p>
-                  <v-divider/>
-                  <div class="d-sm-flex flex-wrap align-start">
-                    <v-list-item
+                      :subtitle="alumno.obs.value || 'Sin Observaciones'"
                       class="flex-1-0 px-0 pr-sm-2"
-                    >
-                      <template #subtitle>
-                        <p>
-                          <span class="text-caption font-weight-bold text-medium-emphasis">
-                            Pases de entrada:
-                          </span>
-                          <span class="font-weight-bold letter-spacing">
-                            {{  alumno.entrada.value }}
-                          </span>
-                        </p>
-                        <p>
-                          <span class="text-caption font-weight-bold text-medium-emphasis">
-                            Pases de salida
-                          </span>
-                          <span class="font-weight-bold letter-spacing">
-                            {{  alumno.salida.value }}
-                          </span>
-                        </p>
-                      </template>
-                    </v-list-item>
-                  </div>
-                </v-col>
-                <v-col cols="12" sm="5" class="pa-0 px-sm-2 py-sm-0">
-                  <p class="text-caption font-weight-bold text-medium-emphasis">Observaciones</p>
-                  <v-divider/>
-                  <v-list-item
-                    :subtitle="alumno.obs.value || 'Sin Observaciones'"
-                    class="flex-1-0 px-0 pr-sm-2"
-                  ></v-list-item>
-                </v-col>
-              </v-row>
+                    ></v-list-item>
+                  </v-col>
+                </v-row>
               </template>
               <template v-else>
                 <v-form ref="form">
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="3">
                       <v-text-field
                         label="Primer nombre"
                         v-model="alumno.pnom.value"
                         :rules="alumno.pnom.rules"
                       />
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="3">
                       <v-text-field
                         label="Segundo nombre"
                         v-model="alumno.snom.value"
                         :rules="alumno.snom.rules"
                       />
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="3">
                       <v-text-field
                         label="Primer apellido"
                         v-model="alumno.pape.value"
                         :rules="alumno.pape.rules"
                         />
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="6" md="3">
                       <v-text-field
                         label="Segundo apellido"
                         v-model="alumno.sape.value"
                         :rules="alumno.sape.rules"
                       />
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="4">
                       <v-text-field
                         label="Cédula"
                         v-model="alumno.ced.value"
@@ -833,13 +842,30 @@ watch(()=>cedRe.value.value, ()=>{
                         :rules="alumno.ced.rules"
                       />
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="4">
                       <v-text-field
                         type="date"
                         label="Fecha de nacimiento"
                         v-model="alumno.fec.value"
                         :rules="alumno.fec.rules"
                       />
+                    </v-col>
+                    <v-col cols="12" sm="4">
+                      <v-radio-group
+                        v-model="alumno.sex_alum.value"
+                        label="Sexo"
+                        :rules="alumno.sex_alum.rules"
+                        inline
+                      >
+                        <v-radio
+                          label="F"
+                          value="F"
+                        />
+                        <v-radio
+                          label="M"
+                          value="M"
+                        />
+                      </v-radio-group>
                     </v-col>
                     <v-col cols="12">
                       <p class="text-caption font-weight-bold text-medium-emphasis">Representante</p>
@@ -859,7 +885,6 @@ watch(()=>cedRe.value.value, ()=>{
                         label="Nombre del representante"
                         v-model="representante.nomRe.value"
                         :rules="representante.nomRe.rules"
-                        :disabled="disabled"
                       />
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -867,7 +892,6 @@ watch(()=>cedRe.value.value, ()=>{
                         label="Apellido del representante"
                         v-model="representante.apeRe.value"
                         :rules="representante.apeRe.rules"
-                        :disabled="disabled"
                       />
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -882,7 +906,6 @@ watch(()=>cedRe.value.value, ()=>{
                         label="Teléfono"
                         v-model="representante.tel.value"
                         :rules="representante.tel.rules"
-                        :disabled="disabled"
                       />
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -890,7 +913,6 @@ watch(()=>cedRe.value.value, ()=>{
                         label="Teléfono de repuesto"
                         v-model="representante.telRe.value"
                         :rules="representante.telRe.rules"
-                        :disabled="disabled"
                       />
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -898,7 +920,6 @@ watch(()=>cedRe.value.value, ()=>{
                         label="Dirección"
                         v-model="representante.dir.value"
                         :rules="representante.dir.rules"
-                        :disabled="disabled"
                       />
                     </v-col>
                     <v-col cols="12" sm="">
@@ -910,46 +931,60 @@ watch(()=>cedRe.value.value, ()=>{
                   </v-row>
                 </v-form>
               </template>
-          </v-card-item>
-        </v-card>
-        <v-row>
-          <v-col cols="12" md="">
-            <v-radio-group v-model="periodo" inline label="Periodo">
-              <v-radio label="Semana" value="week"></v-radio>
-              <v-radio label="Mes" value="month"></v-radio>
-            </v-radio-group>
-          </v-col>
-        </v-row>
-        <calendar-view
-          :items="items"
-          :display-period-uom="periodo"
-          :starting-day-of-week="1"
-          show-times
-          :show-date="showDate"
-          :enable-drag-drop="true"
-          :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
-          @drop-on-date="onDrop"
-          @click-date="onClickDay"
-          @click-item="onClickItem"
-          class="calendar theme-default holiday-us-traditional holiday-us-official"
-        >
-          <template #header="{ headerProps }">
-            <calendar-view-header :header-props="headerProps" @input="setShowDate" />
-          </template>
-        </calendar-view>
-      </template>
-      <template v-else>
-        <v-sheet rounded="xl" class="text-center mt-3 pb-2 mx-auto" width="40vw">
-          <v-icon icon="mdi-account-school-outline" class="text-primario-claro large-icon"/>
-          <p class="text-h6">No hay estudiantes registrados</p>
-        </v-sheet>
-      </template>
-    </v-container>
-  </section>
-</v-card>
+            </v-card-item>
+          </v-card>
+          <v-row>
+            <v-col cols="12" md="">
+              <v-radio-group v-model="periodo" inline label="Periodo">
+                <v-radio label="Semana" value="week"></v-radio>
+                <v-radio label="Mes" value="month"></v-radio>
+              </v-radio-group>
+            </v-col>
+          </v-row>
+          <v-sheet>
+            <calendar-view
+              :items="items"
+              :display-period-uom="periodo"
+              :starting-day-of-week="1"
+              show-times
+              :show-date="showDate"
+              :enable-drag-drop="false"
+              :time-format-options="{ hour: 'numeric', minute: '2-digit' }"
+              @click-date="onClickDay"
+              @click-item="onClickItem"
+              class="calendar theme-default holiday-us-traditional holiday-us-official"
+            >
+              <template #header="{ headerProps }">
+                <calendar-view-header :header-props="headerProps" @input="setShowDate" />
+              </template>
+            </calendar-view>
+          </v-sheet>
+        </template>
+        <template v-else>
+          <v-sheet
+            class="text-center mt-3 pb-2 mx-auto"
+            width="40vw"
+          >
+            <v-icon icon="mdi-account-school-outline" class="text-primario-claro large-icon"/>
+            <p class="text-h6">No hay estudiantes registrados</p>
+          </v-sheet>
+        </template>
+      </v-container>
+    </v-main>
+  </v-layout>
 </template>
 
 <style>
+.fixed-navigation {
+  position: fixed !important;
+  top: 4rem !important;
+  height: calc(100vh - 4rem) !important;
+}
+.main-content {
+  height: calc(100vh - 4rem);
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 .v-navigation-drawer--temporary.sidebar-width {
   min-width: 300px;
   width: fit-content !important;
