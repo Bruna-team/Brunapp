@@ -230,14 +230,17 @@ function buscarAno(id:string) {
       </v-col>
     </v-row>
     <v-row>
-      <v-col v-for="p in profes" :key="p.id_person">
+      <v-col cols="12" sm="6" lg="4"  v-for="p in profes" :key="p.id_person">
         <v-card>
           <v-card-item>
             <v-card-title>
               {{ p.profesor }}
             </v-card-title>
+            <v-chip color="primario" class="float-right">
+              {{p.nom_car}}
+            </v-chip>
             <v-card-subtitle>
-              {{ p.nom_mat }}
+              {{ p.nom_mat || 'Sin materia asignada'}}
             </v-card-subtitle>
             <template v-if="Object.values(prof_guias[p.id_person]).length">
               <small>
@@ -254,7 +257,17 @@ function buscarAno(id:string) {
               </v-chip-group>
             </template>
           </v-card-item>
-          <v-card-text v-for="jor in jornadas[p.id_person]" class="pb-1">
+          <v-card-text
+            v-if="!Object.keys(jornadas[p.id_person]).length"
+          >
+            Configura al maestro para asignarle jornadas
+          </v-card-text>
+          <v-card-text
+            v-else
+            v-for="(jor, j) in jornadas[p.id_person]"
+            :key="j"
+            class="pb-1"
+          >
             {{jor?.dia}}
             <span class="d-block text-medium-emphasis">
               {{jor?.inicio}} - {{jor?.fin}}

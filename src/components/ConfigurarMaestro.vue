@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useDisplay } from 'vuetify'
 import { brunaApi } from '@/funciones/api.ts';
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
+import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
 const emit = defineEmits([
 	'recargar'
 ]);
@@ -44,8 +45,37 @@ const props = defineProps({
   }
 })
 const materias = computed(()=> props.materias)
-const jornadasPersonal = ref(props.jornadas)
-const rol = ref(props.rol)
+const cambios = computed(()=> {
+  if (props.rol.id_car !== rol.value.id_car) {
+    if (props.rol.id_car == '2') {
+      return 'Este docente esta configurado como coordinador, al asignarle otro rol le estas limitando las acciones que puede hacer en el sistema'
+    }
+    else if (rol.value.id_car == '2') {
+      return 'Has cambiado el rol del maestro a coordinador, ahora podrá hacer muchas mas acciones administrativas'
+    }
+    else {
+      return 'Has cambiado el rol del maestro'
+    }
+  } else if (Object.keys(props.jornadas).length < Object.keys(jornadasPersonal.value).length) {
+    return 'Has agregado más secciones a este maestro guía'
+  } else if (Object.keys(props.jornadas).length < Object.keys(jornadasPersonal.value).length) {
+    return 'Has eliminado secciones a este maestro guía'
+  } else {
+    return ''
+  }
+})
+const validarCambios = computed(() => {
+  if(rol.value.id_car == '4') {
+    if (!Object.values(jornadasPersonal.value).length) {
+      return true
+    }
+    return Object.values(jornadasPersonal.value).some(item => !item.sec || !item.sec.id_ano)
+  } else {
+    return false
+  }
+})
+const jornadasPersonal = ref({...props.jornadas})
+const rol = ref({...props.rol})
 function AgregarRol() {
   jornadasPersonal.value[obtenerUltimoIdRol() + 1] = {
     modulo: '',
@@ -70,7 +100,7 @@ function AgregarJornada() {
 }
 function limpiarJornada() {
   emit('recargar')
-  jornadasPersonal.value = props.jornadas
+  jornadasPersonal.value = {...props.jornadas}
 }
 function obtenerUltimoIdRol() {
     let ultimoId = Object.keys(jornadasPersonal.value).length;
@@ -192,7 +222,6 @@ function guardarRol() {
       .then((res:any) => {
         if (res.data.r) {
           alertaMsj.value = "Se ha modificado el rol correctamente"
-          dialog.value = false
         } else {
           alertaMsj.value = "Ha ocurrido un error modificando el rol"
         }
@@ -214,6 +243,7 @@ function eliminarRol(id: any) {
       if (res.data.r) {
         alertaMsj.value = res.data.e
         delete jornadasPersonal.value[id]
+        emit('recargar')
       } else {
         alertaMsj.value = "Hubo un error: " + res.data.e
       }
@@ -224,6 +254,9 @@ function eliminarRol(id: any) {
     delete jornadasPersonal.value[id]
   }
 }
+watch(()=> props.jornadas,()=> {
+  jornadasPersonal.value = {...props.jornadas}
+})
 </script>
 <template>
 <AlertaMensaje :mensaje="alertaMsj" @limpiarMsj="alertaMsj = ''" />
@@ -243,19 +276,19 @@ function eliminarRol(id: any) {
   </template>
 
   <template v-slot:default="{ isActive }">
-    <v-toolbar dark>
-      <v-toolbar-title>
-        {{ asignarRol ? 'Asignar rol' : 'Configurar' }}
-      </v-toolbar-title>
-      <v-toolbar-items>
-        <v-btn
-          icon="mdi-close"
-          dark
-          @click="isActive.value = false; limpiarJornada()"
-        />
-      </v-toolbar-items>
-    </v-toolbar>
     <v-card class="pb-16 pb-sm-2">
+      <v-toolbar dark>
+        <v-toolbar-title>
+          {{ asignarRol ? 'Asignar rol' : 'Configurar' }}
+        </v-toolbar-title>
+        <v-toolbar-items>
+          <v-btn
+            icon="mdi-close"
+            dark
+            @click="isActive.value = false; limpiarJornada()"
+          />
+        </v-toolbar-items>
+      </v-toolbar>
       <v-card-text v-if="asignarRol">
         <v-combobox
           label="Asignar rol"
@@ -306,7 +339,7 @@ function eliminarRol(id: any) {
                   />
                 </v-col>
               </template>
-              <v-col cols="1">
+              <v-col cols="1" v-if="Object.keys(jornadasPersonal).length > 1">
                 <v-btn icon="mdi-trash-can" color="error" variant="text" @click="eliminarRol(i)"/>
               </v-col>
             </v-row>
@@ -318,6 +351,9 @@ function eliminarRol(id: any) {
             :text="Object.values(jornadas).length ? 'Asignar otra sección' : 'Asignar sección'"
             @click="AgregarRol"
           />
+          <template v-if="!Object.keys(jornadasPersonal).length">
+            <p class="text-center text-medium-emphasis">No puedes asignar un dicente guía sin asignarle una sección</p>
+          </template>
         </template>
       </v-card-text>
       <v-card-text v-else>
@@ -415,11 +451,20 @@ function eliminarRol(id: any) {
         />
         <v-btn
           prepend-icon="mdi-check"
-          text="Guardar"
           variant="elevated"
           color="primario"
-          @click="asignarRol ? guardarRol() : guardarJornada()"
-        />
+          :disabled="!cambios.length || validarCambios"
+          @click=""
+        >
+          Guardar
+          <VentanaConfirmar
+            :message="'desea aplicar esta configuración'"
+            :subtitle="cambios"
+            btnicon="mdi-check"
+            colorBtn="primario"
+            @confirmar="(e) => { e ? asignarRol ? guardarRol() : guardarJornada() : '' }"
+          />
+        </v-btn>
       </v-card-actions>
     </v-card>
   </template>

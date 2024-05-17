@@ -69,17 +69,17 @@ watch(()=>dialog.value, ()=>{
         <v-btn icon="mdi-list-status" variant="text" v-bind="props" class="mx-1 px-2"/>
       </template>
       <template #default="{ isActive }">
-        <v-toolbar dark>
-          <v-toolbar-title>Pasar asistencia</v-toolbar-title>
-          <v-toolbar-items>
-            <v-btn
-              icon="mdi-close"
-              dark
-              @click="isActive.value = false"
-            />
-          </v-toolbar-items>
-        </v-toolbar>
         <v-card>
+          <v-toolbar dark>
+            <v-toolbar-title>Pasar asistencia</v-toolbar-title>
+            <v-toolbar-items>
+              <v-btn
+                icon="mdi-close"
+                dark
+                @click="isActive.value = false"
+              />
+            </v-toolbar-items>
+          </v-toolbar>
           <v-card-text style="height: 300px;">
             <v-text-field v-model="asisDate" type="date" label="Selecciona la fecha de la asistencia" />
             <v-text-field
