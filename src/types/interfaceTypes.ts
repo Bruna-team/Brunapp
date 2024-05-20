@@ -28,18 +28,6 @@ interface MencionesReportes {
     [key: string]: Anos
   }
 }
-interface Pase {
-  ano: string,
-  mencion: string,
-  seccion: string,
-  pasefecha: string,
-  pasehor: string,
-  id: string,
-  estudiante: string,
-  estudianteCedula: string,
-  representante: string,
-  type?: string,
-}
 interface Modulos {
   id_hor: string,
   modulo_hor: string,
@@ -83,13 +71,39 @@ interface Estudiantes {
   sape_alum: string,
   snom_alum: string,
 }
+interface EstudianteObservaciones {
+  name: string,
+  abstente: string,
+  justified: string,
+  tabstense: string,
+  pases: string,
+}
+interface EstudianteInasistencias {
+  name: string,
+  obs: string,
+  date: string,
+}
+interface EstudiantePase {
+  id_estd: string,
+  nombre: string,
+  nom_men: string,
+  num_ano: string,
+  sec_ano: string,
+  ced_alum: string,
+  modulo_hor: string,
+  representantes: string,
+  nom_mat: string,
+  profesor: string,
+}
 export type {
   Menciones,
   MencionesReportes,
-  Pase,
   Modulos,
   Materias,
   Periodos,
   Maestros,
-  Estudiantes
+  Estudiantes,
+  EstudianteObservaciones,
+  EstudianteInasistencias,
+  EstudiantePase,
 }

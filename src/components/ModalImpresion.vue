@@ -5,6 +5,7 @@ import imprimirPdf from '@/funciones/utilidades'
 const printProps = defineProps({
   title: {type: String, default: ''},
   subtitle: {type: String, default: ''},
+  btnClass: {type: String, default: 'mb-2'},
   content: [Array, String],
   quill: {type: Boolean, default: false},
   datosValidos: {type: Boolean, default: true}
@@ -48,11 +49,14 @@ const docConfiguration = ref({
   >
     <template v-slot:activator>
       <v-btn
-        @click="printProps.datosValidos ? dialog = true : (alertaMsj = 'Faltan información para poder imprimir')"
+        @click="
+          printProps.datosValidos
+            ? dialog = true
+            : (alertaMsj = 'Faltan información para poder imprimir')"
         variant="tonal"
         prepend-icon="mdi-printer"
         text="Imprimir"
-        class="mb-2"
+        :class="printProps.btnClass"
       />
     </template>
     <v-card>

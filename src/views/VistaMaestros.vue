@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import ConfigurarMaestro from '@/components/ConfigurarMaestro.vue';
 import { brunaApi } from '@/funciones/api.ts';
 import { Materias, Maestros, Menciones, Modulos } from '@/types/interfaceTypes.ts'
+import { organizarSecciones } from '@/funciones/funciones';
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
 const alertaMsj = ref<string>('')
 
@@ -26,7 +27,7 @@ function cargaInicial() {
   brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
-      organizarSecciones(res.data)
+      menciones.value = organizarSecciones(res.data)
       anosSinOrden.value = res.data
     }
   }).catch((e) => {
@@ -149,35 +150,6 @@ function organizarJornadas(data:string[]) {
   jornadas.value = dataJor
   prof_guias.value = dataGuia
   profes.value = dataPro
-}
-function organizarSecciones(data:string[]) {
-  const dataMen:any = {}
-  data.forEach((d:any) => {
-    if (!dataMen[d.id_men]) {
-      dataMen[d.id_men] = {
-        id_men: d.id_men,
-        men: d.nom_men,
-        ano: {}
-      }
-    }
-    if(!dataMen[d.id_men].ano[d.nom_ano]) {
-      dataMen[d.id_men].ano[d.nom_ano] = {
-        id_ano: d.id_ano,
-        nom_ano: d.nom_ano,
-        num_ano: d.num_ano,
-        sec: {}
-      }
-    }
-    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
-      dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
-        id_ano: d.id_ano,
-        sec_nom: d.sec_ano,
-        semanero: d.pnom_alum + ' ' + d.pape_alum,
-        num_sec: d.num_est
-      }
-    }
-  })
-  menciones.value = dataMen
 }
 function actualizar() {
   brunaApi({ s: 'maestros' }, 'nom=' + (nombreABuscar.value !== 'null' ? nombreABuscar.value : '') + '&mat=' + materiaABuscar.value)

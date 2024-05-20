@@ -1,7 +1,78 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 const drawer = ref(false)
 const car = ref(localStorage.getItem("bruna"))
+const navItems = computed(() => {
+  return car.value == '2' || car.value == '1' ?
+    [
+      {
+        title: 'Secciones',
+        props: {
+          to: '/',
+          prependIcon: 'mdi-chair-school',
+        }
+      },
+      {
+        title: 'Maestros',
+        props: {
+          to: '/maestros',
+          prependIcon: 'mdi-human-male-board',
+        }
+      },
+      {
+        title: 'Reportes',
+        props: {
+          to: '/reportes',
+          prependIcon: 'mdi-file-chart',
+        }
+      },
+      {
+        title: 'Pases',
+        props: {
+          to: '/pases',
+          prependIcon: 'mdi-file-certificate',
+        }
+      },
+      {
+        title: 'Configuración',
+        props: {
+          to: '/configuracion',
+          prependIcon: 'mdi-cog',
+        }
+      },
+      {
+        title: 'Perfil',
+        props: {
+          to: '/usuario',
+          prependIcon: 'mdi-account',
+        }
+      },
+    ]
+  :
+    [
+      {
+        title: 'Secciones',
+        props: {
+          to: '/',
+          prependIcon: 'mdi-chair-school',
+        }
+      },
+      {
+        title: 'Reportes',
+        props: {
+          to: 'reportes',
+          prependIcon: 'mdi-file-chart',
+        }
+      },
+      {
+        title: 'Perfil',
+        props: {
+          to: 'usuario',
+          prependIcon: 'mdi-account',
+        }
+      },
+    ]
+})
 </script>
 <template>
 <v-app-bar color="primario" prominent>
@@ -26,32 +97,12 @@ const car = ref(localStorage.getItem("bruna"))
   </v-row>
 </v-app-bar>
 <v-navigation-drawer v-model="drawer" location="left" temporary>
-  <v-list class="d-flex flex-column">
-    <RouterLink to="/" class="ma-2 nav-link">
-      <v-icon icon="mdi-chair-school" />
-      Secciones
-    </RouterLink>
-    <RouterLink v-if="car == '2' || car == '1'" to="/maestros" class="ma-2 nav-link">
-      <v-icon icon="mdi-human-male-board" />
-      Maestros
-    </RouterLink>
-    <RouterLink :to="car == '2' || car == '1' ? '/reportes/pases' : '/reportes/observaciones'" class="ma-2 nav-link">
-      <v-icon icon="mdi-file-chart" />
-      Reportes
-    </RouterLink>
-    <RouterLink v-if="car == '2' || car == '1'" to="/configuracion" class="ma-2 nav-link">
-      <v-icon icon="mdi-cog" />
-      Configuración
-    </RouterLink>
-    <RouterLink to="/usuario" class="ma-2 nav-link">
-      <v-icon icon="mdi-account" />
-      Perfil
-    </RouterLink>
-  </v-list>
+  <v-list
+    density="compact"
+    :items="navItems"
+    nav
+    />
 </v-navigation-drawer>
-<v-main>
-  <RouterView />
-</v-main>
 </template>
 <style>
 .v-navigation-drawer a:hover {

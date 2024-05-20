@@ -26,7 +26,7 @@ function cargaInicial() {
         estudiantes.value = res.data
       }
     }).catch(() => {
-      // message: 'Hubo un error cargando los datos',
+      alertaMsj.value = "Hubo un error cargando los datos"
     })
   }
 }
@@ -36,6 +36,7 @@ function guardarInasistencias() {
     .then((res:any) => {
       if (res.data.r) {
         dialog.value = false
+        inasistencias.value = []
         alertaMsj.value = res.data.e
       } else {
         alertaMsj.value = res.data.e
@@ -64,6 +65,7 @@ watch(()=>dialog.value, ()=>{
       v-model="dialog"
       scrollable
       width="400"
+      height="95vh"
     >
       <template v-slot:activator="{ props }">
         <v-btn icon="mdi-list-status" variant="text" v-bind="props" class="mx-1 px-2"/>
@@ -71,7 +73,10 @@ watch(()=>dialog.value, ()=>{
       <template #default="{ isActive }">
         <v-card>
           <v-toolbar dark>
-            <v-toolbar-title>Pasar asistencia</v-toolbar-title>
+            <v-toolbar-title>
+              Pasar asistencia
+              <span class="d-block text-caption">{{ inasistencias.length }} Inasistentes</span>
+            </v-toolbar-title>
             <v-toolbar-items>
               <v-btn
                 icon="mdi-close"

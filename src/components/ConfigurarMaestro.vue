@@ -290,7 +290,7 @@ watch(()=> props.jornadas,()=> {
         </v-toolbar-items>
       </v-toolbar>
       <v-card-text v-if="asignarRol">
-        <v-combobox
+        <v-select
           label="Asignar rol"
           v-model="rol"
           :items="Object.values(props.rols)"

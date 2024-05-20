@@ -37,21 +37,21 @@ function sustituirSpandEmbed(data:any) {
       case 'Estudiante':
         switch(id) {
           case 'Ename':
-            if(data.estudiante) {
+            if(data.nombre) {
               e.getElementsByTagName('span')[0].textContent =
-              data.estudiante
+              data.nombre
             }
             break;
           case 'representante':
-            if(data.representante) {
+            if(data.representantes) {
                e.getElementsByTagName('span')[0].textContent =
-               data.representante
+               data.representantes
             }
             break;
           case 'Ecedula':
-            if(data.estudianteCedula) {
+            if(data.ced_alum) {
               e.getElementsByTagName('span')[0].textContent =
-              data.estudianteCedula
+              data.ced_alum
             }
             break;
         }
@@ -59,27 +59,27 @@ function sustituirSpandEmbed(data:any) {
       case 'Academico':
         switch(id) {
            case 'modulo':
-            if(data.modulo) {
+            if(data.modulo_hor) {
               e.getElementsByTagName('span')[0].textContent =
-              data.modulo
+              data.modulo_hor
             }
             break;
           case 'seccion':
-            if(data.seccion) {
+            if(data.sec_ano) {
               e.getElementsByTagName('span')[0].textContent =
-              data.seccion
+              data.sec_ano
             }
             break;
           case 'mencion':
-            if(data.mencion) {
+            if(data.nom_men) {
               e.getElementsByTagName('span')[0].textContent =
-              data.mencion
+              data.nom_men
             }
             break;
           case 'curso':
-            if(data.ano) {
+            if(data.nom_ano) {
               e.getElementsByTagName('span')[0].textContent =
-              data.ano
+              data.nom_ano
             }
             break;
         }
@@ -93,9 +93,9 @@ function sustituirSpandEmbed(data:any) {
             }
             break;
           case'materia':
-            if(data.materia) {
+            if(data.nom_mat) {
               e.getElementsByTagName('span')[0].textContent =
-              data.materia
+              data.nom_mat
             }
             break;
           }
@@ -138,10 +138,52 @@ function validateBornDate(date: string) {
   hoy < fecha ? edad-- : ''
   return edad>=10 && edad<=18 || 'La fecha de nacimiento debe ser para mayor de 10 y menor de 18 años de edad.'
 }
+/**
+ * @param {data} Array
+ * @param {semanero} Boolean
+ * @return {Array}
+ */
+function organizarSecciones(data:string[], semanero?:boolean) {
+  const dataMen:any = {}
+  data.forEach((d:any) => {
+    if (!dataMen[d.id_men]) {
+      dataMen[d.id_men] = {
+        id_men: d.id_men,
+        men: d.nom_men,
+        ano: {}
+      }
+    }
+    if(!dataMen[d.id_men].ano[d.nom_ano]) {
+      dataMen[d.id_men].ano[d.nom_ano] = {
+        id_ano: d.id_ano,
+        nom_ano: d.nom_ano,
+        num_ano: d.num_ano,
+        sec: {}
+      }
+    }
+    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
+      if(semanero) {
+        dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
+          id_ano: d.id_ano,
+          sec_nom: d.sec_ano,
+          semanero: d.pnom_alum + ' ' + d.pape_alum,
+          num_sec: d.num_est
+        }
+      } else {
+        dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
+          id_ano: d.id_ano,
+          sec_nom: d.sec_ano,
+        }
+      }
+    }
+  })
+  return dataMen
+}
 export {
   capitalizar,
   formatoFechaYHora,
   sustituirSpandEmbed,
   validateCed,
   validateBornDate,
+  organizarSecciones,
 };

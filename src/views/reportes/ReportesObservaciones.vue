@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import ModalImpresion from "@/components/ModalImpresion.vue"
+import { EstudianteInasistencias } from "@/types/interfaceTypes";
 const props = defineProps({
-  students: {type: Array, default: ref<any[] | [{name: String, obs: string, date: string}]>([])},
+  students: {
+    type: Array as () => EstudianteInasistencias[],
+    default: []
+  },
   subtitle: String,
   dataPase: {
     type: Object,
@@ -37,8 +41,11 @@ const contentPrint = computed(() => {
   ])
   if (props.students?.length) {
     for (let s = 0; s < props.students?.length; s++) {
-      // @ts-ignore
-      tabla.push([props.students[s]?.name, props.students[s]?.obs, props.students[s]?.date])
+      tabla.push([
+        props.students[s]?.name,
+        props.students[s]?.obs,
+        props.students[s]?.date
+      ])
     }
   }
   content.push({

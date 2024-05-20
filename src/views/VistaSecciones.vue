@@ -3,6 +3,7 @@ import {ref,onMounted} from 'vue'
 import { brunaApi } from '@/funciones/api.ts';
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
 import PasarAsistencia from '@/components/PasarAsistencia.vue';
+import { organizarSecciones } from '@/funciones/funciones';
 import { Menciones } from '@/types/interfaceTypes';
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
@@ -16,41 +17,12 @@ function cargaInicial() {
   brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
-      organizarSecciones(res.data)
+      menciones.value = organizarSecciones(res.data, true)
+      tabsLoading.value = false
     }
   }).catch(() => {
     alertaMsj.value = "Hubo un error cargando los datos"
   })
-}
-function organizarSecciones(data:string[]) {
-  const dataMen:any = {}
-  data.forEach((d:any) => {
-    if (!dataMen[d.id_men]) {
-      dataMen[d.id_men] = {
-        id_men: d.id_men,
-        men: d.nom_men,
-        ano: {}
-      }
-    }
-    if(!dataMen[d.id_men].ano[d.nom_ano]) {
-      dataMen[d.id_men].ano[d.nom_ano] = {
-        id_ano: d.id_ano,
-        nom_ano: d.nom_ano,
-        num_ano: d.num_ano,
-        sec: {}
-      }
-    }
-    if(!dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano]) {
-      dataMen[d.id_men].ano[d.nom_ano].sec[d.sec_ano] = {
-        id_ano: d.id_ano,
-        sec_nom: d.sec_ano,
-        semanero: d.pnom_alum + ' ' + d.pape_alum,
-        num_sec: d.num_est
-      }
-    }
-  })
-  tabsLoading.value = false
-  menciones.value = dataMen
 }
 </script>
 
@@ -106,8 +78,13 @@ function organizarSecciones(data:string[]) {
                       :class="['flex-fill d-inline-flex align-center', {'flex-lg-0-0': Object.values(n.ano[i].sec).length!==1}]"
                     >
                       <RouterLink :to="`/seccion/${s.id_ano}`" class="flex-fill">
-                        <v-list-item :title="'Sección '+s.sec_nom" :subtitle="s.num_sec+' alumnos'">
-                          <template #prepend><v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/></template>
+                        <v-list-item
+                          :title="'Sección '+s.sec_nom"
+                          :subtitle="s.num_sec+' alumnos'"
+                        >
+                          <template #prepend>
+                            <v-icon :icon="`mdi-alpha-${(s.sec_nom).toLowerCase()}-circle-outline`"/>
+                          </template>
                           <p v-if="!s.semanero?.includes('null')" class="text-caption">
                             <span class="d-block text-caption">
                               Semanero:

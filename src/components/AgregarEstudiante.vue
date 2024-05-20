@@ -194,8 +194,8 @@ async function validacion () {
   loading.value = false
 }
 function guardarAlumno() {
-  let data =  'pnom=' +  capitalizar(alumno.value.pnom.value) + '&snom=' +  capitalizar(alumno.value.snom.value) || ''
-  data +=  '&pape=' +  capitalizar(alumno.value.pape.value) + '&sape=' +  capitalizar(alumno.value.sape.value) || ''
+  let data =  'pnom=' +  capitalizar(alumno.value.pnom.value) + '&snom=' +  (capitalizar(alumno.value.snom.value) || '')
+  data +=  '&pape=' +  capitalizar(alumno.value.pape.value) + '&sape=' +  (capitalizar(alumno.value.sape.value) || '')
   data +=  '&fec_nac=' +  alumno.value.fec.value + '&ced=' +  alumno.value.ced.value
   data +=  '&paren=' +  capitalizar(alumno.value.paren.value) + '&idAno=' + alumno.value.sec.value
   data += '&obs=' + alumno.value.obs.value + '&sex=' + alumno.value.sexo.value
@@ -204,7 +204,7 @@ function guardarAlumno() {
   } else {
     data += '&nomRe=' + capitalizar(representante.value.nomRe.value) + '&apeRe=' + capitalizar(representante.value.apeRe.value)
     data += '&cedRe=' + cedRe.value.value + '&telRe=' + representante.value.tel.value
-    data += '&sTelRe=' + representante.value.telRe.value + '&dirRe=' + representante.value.dir.value
+    data += '&sTelRe=' + (representante.value.telRe.value || '' )+ '&dirRe=' + representante.value.dir.value
   }
   brunaApi({ s: 'agregarAlum' }, data)
   .then((res:any) => {
@@ -220,14 +220,14 @@ function guardarAlumno() {
 function guardarEstudiantes() {
   let data = ''
   estudiantes.value.forEach(estudiante => {
-    data =  'pnom=' +  capitalizar(estudiante.alumno.pnom) + '&snom=' +  capitalizar(estudiante.alumno.snom) || ''
-    data +=  '&pape=' +  capitalizar(estudiante.alumno.pape) + '&sape=' +  capitalizar(estudiante.alumno.sape) || ''
+    data =  'pnom=' +  capitalizar(estudiante.alumno.pnom) + '&snom=' +  (capitalizar(estudiante.alumno.snom) || '')
+    data +=  '&pape=' +  capitalizar(estudiante.alumno.pape) + '&sape=' +  (capitalizar(estudiante.alumno.sape) || '')
     data +=  '&fec_nac=' +  estudiante.alumno.fec + '&ced=' +  estudiante.alumno.ced
     data +=  '&paren=' +  capitalizar(estudiante.alumno.paren) + '&idAno=' + curso.value.sec.value
-    data += '&obs=' + estudiante.alumno.obs || '' + '&sex=' + estudiante.alumno.sexo
+    data += '&obs=' + (estudiante.alumno.obs || '') + '&sex=' + estudiante.alumno.sexo
     data += '&nomRe=' + capitalizar(estudiante.rep.nomRe) + '&apeRe=' + capitalizar(estudiante.rep.apeRe)
     data += '&cedRe=' + estudiante.rep.cedRe + '&telRe=' + estudiante.rep.tel
-    data += '&sTelRe=' + estudiante.rep.telRe || '' + '&dirRe=' + estudiante.rep.dir
+    data += '&sTelRe=' + (estudiante.rep.telRe || '') + '&dirRe=' + estudiante.rep.dir
     brunaApi({ s: 'agregarAlum' }, data)
     .then((res:any) => {
       if (res.data.r) {
