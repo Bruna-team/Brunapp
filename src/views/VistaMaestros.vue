@@ -152,7 +152,9 @@ function organizarJornadas(data:string[]) {
   profes.value = dataPro
 }
 function actualizar() {
-  brunaApi({ s: 'maestros' }, 'nom=' + (nombreABuscar.value !== 'null' ? nombreABuscar.value : '') + '&mat=' + materiaABuscar.value)
+  brunaApi({ s: 'maestros' },
+    'nom=' + (nombreABuscar.value !== 'null' ? nombreABuscar.value : '') +
+    '&mat=' + materiaABuscar.value)
   .then((res:any) => {
     if (res.data) {
       organizarJornadas(res.data)

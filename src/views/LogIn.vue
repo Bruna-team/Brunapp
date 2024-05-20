@@ -116,7 +116,7 @@ function registro() {
   let data = 'nom=' + capitalizar(regData.value.nombre.value) + '&ape=' + capitalizar(regData.value.apellido.value)
   data += '&ced=' + regData.value.cedula.value + '&ema=' + regData.value.email.value
   data += '&tel=' + regData.value.telefono.value + '&dir=' + regData.value.direccion.value
-  data += '&car=' + regData.value.rol.value + '&clave=' + btoa(regData.value.password.value)
+  data += '&car=3' + '&clave=' + btoa(regData.value.password.value)
   data += '&cod=' + btoa(segurityCode.value)
   brunaApi({ s: 'register' }, data)
   .then((res:any) => {
@@ -259,7 +259,7 @@ watch(router.currentRoute, (value) => {
             @click:append-inner="seePassword = !seePassword"
             label="Contraseña"
           ></v-text-field>
-          <v-radio-group
+          <!-- <v-radio-group
             v-model="regData.rol.value"
             :rules="regData.rol.rules"
             inline
@@ -268,7 +268,7 @@ watch(router.currentRoute, (value) => {
             <v-radio label="Profesor" value="3"></v-radio>
             <v-radio label="Guía de sección" value="4"></v-radio>
             <v-radio label="Coordinador" value="2"></v-radio>
-          </v-radio-group>
+          </v-radio-group> -->
           <v-text-field
             v-model="segurityCode"
             prepend-icon="mdi-key"
