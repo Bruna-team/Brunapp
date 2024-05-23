@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import ConfigurarMaestro from '@/components/ConfigurarMaestro.vue';
 import { brunaApi } from '@/funciones/api.ts';
+import { autoComaYAutoY } from '@/funciones/funciones.ts';
 import { Materias, Maestros, Menciones, Modulos } from '@/types/interfaceTypes.ts'
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
 const alertaMsj = ref<string>('')
@@ -75,7 +76,9 @@ function organizarJornadas(data:string[]) {
       dataJor[d.id_person] = {}
       dataGuia[d.id_person] = {}
       dataPro[d.id_person] = d
+      dataPro[d.id_person].materias = []
     }
+    dataPro[d.id_person].materias.push(d.nom_mat)
     if (d.id_jor) {
       if(!dataJor[d.id_person][d.id_jor]) {
         dataJor[d.id_person][d.id_jor] = {
@@ -237,7 +240,7 @@ function buscarAno(id:string) {
               {{ p.profesor }}
             </v-card-title>
             <v-card-subtitle>
-              {{ p.nom_mat }}
+              {{ autoComaYAutoY(p.materias) }}
             </v-card-subtitle>
             <template v-if="Object.values(prof_guias[p.id_person]).length">
               <small>

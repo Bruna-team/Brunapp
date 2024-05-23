@@ -1,4 +1,15 @@
 /**
+ * Retorna un string con comas e y
+ * @param {Array} array a comprobar
+ * @return {String} Valor de la comprobación
+ * @description Valida que el parametro enviado sea un string valido
+ */
+function autoComaYAutoY(array: any) {
+  if (array.length) {
+    return array.length == 1 ? `${array[0]}` : `${array.slice(0, -1).join(', ')} y ${array.slice(-1)}`;
+  }
+}
+/**
  * @param {string} string
  * @return {string}
  */
@@ -139,6 +150,7 @@ function validateBornDate(date: string) {
   return edad>=10 && edad<=18 || 'La fecha de nacimiento debe ser para mayor de 10 y menor de 18 años de edad.'
 }
 export {
+  autoComaYAutoY,
   capitalizar,
   formatoFechaYHora,
   sustituirSpandEmbed,

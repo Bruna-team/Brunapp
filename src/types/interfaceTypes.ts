@@ -72,7 +72,8 @@ interface Maestros {
   profesor: string,
   sec_ano: string,
   id_car: string,
-  nom_car: string
+  nom_car: string,
+  materias?: string[]
 }
 interface Estudiantes {
   id_estd: string,
