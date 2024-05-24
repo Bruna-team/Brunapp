@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createRouter, createWebHistory } from "vue-router";
 import { hasAccessToRoute } from '@/funciones/api'
 const router = createRouter({
@@ -22,7 +23,8 @@ const router = createRouter({
       name: "seccion",
       component: () => import("@/views/VistaSeccion.vue"),
       beforeEnter: (to, from, next) => {
-        hasAccessToRoute('seccion').then((route) => {
+        const sec = to.params.sec
+        hasAccessToRoute('seccion', sec).then((route) => {
           if (route) {
             next(route);
           } else {

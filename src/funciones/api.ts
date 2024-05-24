@@ -27,9 +27,9 @@ function brunaApi (params: any, data: any) {
   })
 }
 
-function hasAccessToRoute(vista: string) {
+function hasAccessToRoute(vista: string, sec?: string) {
   return new Promise((resolve, reject) => {
-    brunaApi({ s: 'estatusMaestro' }, `vista=${vista}`)
+    brunaApi({ s: 'estatusMaestro' }, `vista=${vista}&sec=${sec}`)
       .then((res: any) => {
         if (res.data.l) {
           console.log(res.data.e)

@@ -5,13 +5,30 @@ const route = useRoute()
 const message = computed(() => {
   switch (route.query.message) {
     case 'noAccess':
-      return {text: 'Ups... parece que no tienes permisos para ver esta sección', icon: 'mdi-book-alert'}
+      return {
+        text: 'Ups... parece que no tienes permisos para ver esta sección',
+        icon: 'mdi-book-alert'
+      }
     case 'locked':
-      return { text: 'Ups... parece que tu usuario esta bloqueado', icon: 'mdi-lock'}
+      return {
+        text: 'Ups... parece que tu usuario esta bloqueado',
+        icon: 'mdi-lock'
+      }
+    case 'sectionNoAssigned':
+      return {
+        text: 'Parece que no tienes acceso a esta sección, consulta con la institución para saber mas al respecto.',
+        icon: 'mdi-book-alert'
+      }
     case 'err':
-      return { text: 'Hubo un error al cargar la pagina', icon: 'mdi-alert'}
+      return {
+        text: 'Hubo un error al cargar la pagina',
+        icon: 'mdi-alert'
+      }
     default:
-      return { text: 'Parece que no puedes acceder a esta ruta', icon: 'mdi-book-alert'}
+      return {
+        text: 'Parece que no puedes acceder a esta ruta',
+        icon: 'mdi-book-alert'
+      }
   }
 })
 </script>

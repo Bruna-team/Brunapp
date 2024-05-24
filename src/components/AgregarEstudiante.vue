@@ -236,10 +236,10 @@ function guardarEstudiantes() {
     }).catch(() => {
       emit('alerta', 'Hubo un error agregando el alumno')
     })
-    emit('alerta', 'Se han registrado todos los alumnos')
-    limpiarDatos()
-    emit('recargar')
   });
+  emit('alerta', 'Se han registrado todos los alumnos')
+  limpiarDatos()
+  emit('recargar')
 }
 function limpiarDatos() {
   dialog.value = false
