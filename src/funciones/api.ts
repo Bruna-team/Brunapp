@@ -27,6 +27,23 @@ function brunaApi (params: any, data: any) {
   })
 }
 
+function hasAccessToRoute(vista: string) {
+  return new Promise((resolve, reject) => {
+    brunaApi({ s: 'estatusMaestro' }, `vista=${vista}`)
+      .then((res: any) => {
+        if (res.data.l) {
+          console.log(res.data.e)
+          resolve({ path: res.data.l, query: { message: res.data.e } });
+        } else {
+          resolve(null);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
 export {
-  brunaApi
+  brunaApi,
+  hasAccessToRoute,
 }

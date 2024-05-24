@@ -37,8 +37,12 @@ function cargaInicial() {
   <v-skeleton-loader v-if="tabsLoading" type="table-heading, article, paragraph" />
   <template v-else>
     <template v-if="!Object.keys(menciones).length && mensaje">
-      <v-sheet rounded="xl" class="text-center mt-3 pb-2 mx-auto" width="40vw">
-        <v-icon :icon="mensaje?.i" class="text-primario-claro large-icon"/>
+      <v-sheet
+        rounded="xl"
+        class="text-center mt-3 pb-2 mx-auto"
+        max-width="600px"
+      >
+        <v-icon icon="mdi-book-alert" class="text-primario-claro large-icon"/>
         <p class="text-h6">{{ mensaje?.e }}</p>
       </v-sheet>
     </template>
