@@ -8,13 +8,13 @@ import "/node_modules/vue-simple-calendar/dist/css/default.css";
 import { ref, watch, onMounted } from "vue";
 import { useDisplay } from 'vuetify'
 import router from "@/router";
-const { mobile } = useDisplay()
 import VentanaConfirmar from '@/components/VentanaConfirmar.vue';
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
 import { brunaApi } from '@/funciones/api.ts';
 import { formatoFechaYHora } from '@/funciones/funciones.ts';
 import { Estudiantes } from '@/types/interfaceTypes'
 
+const { mobile } = useDisplay()
 
 const studentDrawer = ref( mobile.value ? false : true)
 const alertaMsj = ref<string>('')
@@ -390,7 +390,7 @@ function organizarDatos(data:any) {
   alumno.value.ced.value = data.alum[0].ced_alum
   alumno.value.fec.value = data.alum[0].fec_nac_alum
   alumno.value.obs.value = data.alum[0].obs_alum
-  alumno.value.sex_alum.value = data.alum[0].sex_alum
+  alumno.value.sex_alum.value = data.alum[0].sex_alum.toUpperCase()
   alumno.value.entrada.value = data.alum[0].entrada
   alumno.value.salida.value = data.alum[0].salida
   alumno.value.men_abre = data.alum[0].num_ano + ' "' + data.alum[0].sec_ano + '" ' + data.alum[0].abre_men
