@@ -7,7 +7,7 @@ const message = computed(() => {
     case 'noAccess':
       return {text: 'Ups... parece que no tienes permisos para ver esta sección', icon: 'mdi-book-alert'}
     case 'locked':
-      return { text: 'Ups... parece que tu usuario esta bloqueado', icon: 'mdi-book-alert'}
+      return { text: 'Ups... parece que tu usuario esta bloqueado', icon: 'mdi-lock'}
     case 'err':
       return { text: 'Hubo un error al cargar la pagina', icon: 'mdi-alert'}
     default:

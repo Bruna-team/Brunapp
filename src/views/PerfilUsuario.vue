@@ -18,6 +18,7 @@ onMounted(() => {
 	cargaInicial();
 });
 
+const estatus = ref()
 const usuario = ref({
   nombre: {
     value: '',
@@ -98,6 +99,7 @@ function cargaInicial() {
         usuario.value.informacion.dirección.value = d.dir_per
         usuario.value.informacion.correo.value = d.ema_per
         usuario.value.rol = d.nom_car
+        estatus.value = d.estatus
         iniciales.value = d.nom_per.substring(0,1)+d.ape_per.substring(0,1)
       });
     }
@@ -244,6 +246,15 @@ function cerrarSesion() {
       :subtitle="usuario.rol"
     ></v-list-item>
   </v-list>
+  <v-sheet
+    v-if="estatus == '1'"
+    rounded="xl"
+    class="text-center mt-3 pb-2 mx-auto px-2"
+    max-width="600px"
+  >
+    <v-icon icon="mdi-lock" class="text-primario-claro large-icon"/>
+    <p class="text-h6">Tu usuario esta bloqueado, ponte en contacto con la institución para solicitar un desbloqueo.</p>
+  </v-sheet>
 </v-container>
 </template>
 <style>
