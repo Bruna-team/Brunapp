@@ -23,6 +23,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  estatus: {
+    type: String,
+    default: ''
+  },
   modulos: {
     type: Object,
     default: {}
@@ -44,6 +48,7 @@ const props = defineProps({
     default: {}
   }
 })
+const estatus = computed(()=> props.estatus)
 const materias = computed(()=> props.materias)
 const cambios = computed(()=> {
   if (props.rol.id_car !== rol.value.id_car) {
@@ -254,6 +259,20 @@ function eliminarRol(id: any) {
     delete jornadasPersonal.value[id]
   }
 }
+function actualizarEstatusMaestro() {
+  const nuevoEstatus = estatus.value == '0' ? '1' : '0'
+  brunaApi({ s: 'ModificarEstatusMaestro' }, 'id_person='+props.id+'&est='+nuevoEstatus)
+      .then((res:any) => {
+        if (res.data.r) {
+          alertaMsj.value = res.data.e
+        } else {
+          alertaMsj.value = res.data.e
+        }
+      }).catch(() => {
+        alertaMsj.value = "Hubo un error modificando los datos"
+      })
+  emit('recargar')
+}
 watch(()=> props.jornadas,()=> {
   jornadasPersonal.value = {...props.jornadas}
 })
@@ -271,7 +290,7 @@ watch(()=> props.jornadas,()=> {
       v-bind="props"
       color="secundario"
       :prepend-icon="asignarRol ? 'mdi-account-convert' : 'mdi-account-file-text'"
-      :text="asignarRol ? 'Asignar rol' : 'Configurar'"
+      :text="asignarRol ? 'Configurar' : 'Jornadas'"
     />
   </template>
 
@@ -279,7 +298,7 @@ watch(()=> props.jornadas,()=> {
     <v-card class="pb-16 pb-sm-2">
       <v-toolbar dark>
         <v-toolbar-title>
-          {{ asignarRol ? 'Asignar rol' : 'Configurar' }}
+          {{ asignarRol ? 'Configurar docente' : 'Jornadas' }}
         </v-toolbar-title>
         <v-toolbar-items>
           <v-btn
@@ -289,18 +308,44 @@ watch(()=> props.jornadas,()=> {
           />
         </v-toolbar-items>
       </v-toolbar>
-      <v-card-text v-if="asignarRol">
-        <v-select
-          label="Asignar rol"
-          v-model="rol"
-          :items="Object.values(props.rols)"
-          return-object
-          item-title="nom_car"
-          item-value="id_car"
-          class="w-50"
-        />
+      <v-container v-if="asignarRol">
+        <v-row align="center" justify="center" justify-sm="space-between">
+          <v-col cols="12" sm="" md="7">
+            <v-select
+              label="Asignar rol"
+              v-model="rol"
+              :items="Object.values(props.rols)"
+              return-object
+              item-title="nom_car"
+              item-value="id_car"
+              hide-details
+            />
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              :text="estatus == '0' ? 'Bloquear docente' : 'Desbloquear docente'"
+              color="error"
+              :variant="estatus == '0' ? 'plain' : 'elevated'"
+              title="Bloquea o deshabilita un maestro en el sistema."
+              :prepend-icon="estatus == '0' ? 'mdi-lock-open' : 'mdi-lock'"
+            />
+            <VentanaConfirmar
+              :message="estatus == '0' ? 'bloquear a este maestro' : 'desbloquear a este maestro'"
+              :subtitle="estatus == '0'
+                ? 'Al desbloquear al maestro podrá retomar las actividades con respecto al rol asignado.'
+                : 'Al bloquear al maestro, este no podrá realizar ninguna acción en el sistema, ni podrá ver información almacenada'"
+              btnicon="mdi-check"
+              colorBtn="primario"
+              @confirmar="(e) => { e ? actualizarEstatusMaestro() : '' }"
+            />
+          </v-col>
+        </v-row>
         <template v-if="rol.id_car == 4">
-          <section v-for="(curso, i) in jornadasPersonal" :key="curso">
+          <v-divider class="my-3"/>
+          <div
+            v-for="(curso, i) in jornadasPersonal"
+            :key="curso"
+          >
             <v-row align="center">
               <v-col v-if="!curso.edit">
                 {{curso.men.men}} {{curso.ano.nom_ano}} {{curso.ano.sec.sec.sec_nom}}
@@ -328,7 +373,7 @@ watch(()=> props.jornadas,()=> {
                     @click="curso.sec = ''"
                   />
                 </v-col>
-                <v-col cols="12" sm="3" v-if="curso.ano">
+                <v-col cols="12" sm="" v-if="curso.ano">
                   <v-combobox
                     label="Sección"
                     v-model="curso.sec"
@@ -344,7 +389,7 @@ watch(()=> props.jornadas,()=> {
               </v-col>
             </v-row>
             <v-divider class="my-3"/>
-          </section>
+          </div>
           <v-btn
             block
             color="secundario"
@@ -355,8 +400,8 @@ watch(()=> props.jornadas,()=> {
             <p class="text-center text-medium-emphasis">No puedes asignar un dicente guía sin asignarle una sección</p>
           </template>
         </template>
-      </v-card-text>
-      <v-card-text v-else>
+      </v-container>
+      <v-container v-else>
         <section v-for="(jornada, j) in jornadasPersonal" key="j">
           <v-divider/>
           <p class="d-flex align-center">
@@ -441,8 +486,8 @@ watch(()=> props.jornadas,()=> {
           @click="AgregarJornada"
           text="Agregar otra jornada"
         />
-      </v-card-text>
-      <v-card-actions>
+      </v-container>
+      <v-card-actions class="bottom-dialog-actions">
         <v-spacer />
         <v-btn
           prepend-icon="mdi-close"

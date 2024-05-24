@@ -177,6 +177,16 @@ function buscarAno(id:string) {
   const ano = anosSinOrden.value.filter((a:any) => a.id_ano === id)
   return ano[0]
 }
+function asignarColorRol(rol: string) {
+  switch (rol) {
+    case 'Coordinador':
+      return 'primario'
+    case 'Guía':
+      return 'secundario-claro'
+    default:
+      return 'warning'
+  }
+}
 </script>
 <template>
   <v-container>
@@ -208,9 +218,13 @@ function buscarAno(id:string) {
         <v-card>
           <v-card-item>
             <v-card-title>
+              <v-icon v-if="p.estatus == '1'" icon="mdi-lock"/>
               {{ p.profesor }}
             </v-card-title>
-            <v-chip color="primario" class="float-right">
+            <v-chip
+              :color="asignarColorRol(p.nom_car)"
+              class="float-right"
+            >
               {{p.nom_car}}
             </v-chip>
             <v-card-subtitle>
@@ -269,6 +283,7 @@ function buscarAno(id:string) {
             <configurar-maestro
               :rols="cargos"
               :menciones="menciones"
+              :estatus="p.estatus"
               :rol="{id_car: p.id_car, nom_car: p.nom_car}"
               :jornadas="prof_guias[p.id_person]"
               :asignar-rol="true"

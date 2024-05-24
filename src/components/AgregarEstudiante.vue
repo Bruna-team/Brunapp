@@ -323,7 +323,7 @@ watch(()=>cedRe.value.value, ()=>{
           />
         </v-toolbar-items>
       </v-toolbar>
-      <v-sheet v-if="!excelMode" class="pa-md-3">
+      <template v-if="!excelMode">
         <v-form ref="form">
           <v-stepper
             v-model="step"
@@ -535,7 +535,9 @@ watch(()=>cedRe.value.value, ()=>{
               </Transition>
             </v-stepper-window>
             <template #actions>
-              <v-card-actions class="d-flex justify-space-around">
+              <v-card-actions
+                class="bottom-dialog-actions d-flex justify-space-around"
+              >
                 <v-btn
                   text="Atrás"
                   prepend-icon="mdi-arrow-left"
@@ -554,85 +556,81 @@ watch(()=>cedRe.value.value, ()=>{
             </template>
           </v-stepper>
         </v-form>
-      </v-sheet>
-      <v-sheet v-else class="pa-md-3">
-        <v-card
-          title="Selecciona los datos del curso para agregar los estudiantes"
-          flat
-        >
-          <v-form ref="formExcel" @submit.prevent>
-            <v-container>
-              <v-row class="mt-2" justify="space-around">
-                <v-col cols="12">
-                  <v-radio-group
-                    v-model="curso.men.value"
-                    :rules="curso.men.rules"
-                    inline
-                    label="Mención"
-                  >
-                    <v-radio
-                      v-for="(menc, imenc) in props.menciones"
-                      :key="menc.id_men"
-                      :label="menc.men"
-                      :value="imenc+1"
-                    />
-                  </v-radio-group>
-                </v-col>
-                <v-col cols="12" sm="7">
-                  <v-radio-group
-                    v-model="curso.ano.value"
-                    :rules="curso.ano.rules"
-                    inline
-                    label="Año"
-                  >
-                    <v-radio
-                      v-if="curso.men.value"
-                      v-for="(ano, iano) in props.menciones[curso.men.value-1].ano"
-                      :key="ano.id_ano"
-                      :label="ano.nom_ano"
-                      :value="iano+1"
-                    />
-                    <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
-                  </v-radio-group>
-                </v-col>
-                <v-col cols="12" sm="5">
-                  <v-radio-group
-                    v-model="curso.sec.value"
-                    :rules="curso.sec.rules"
-                    inline
-                    label="Sección"
-                  >
-                    <v-radio
-                      v-if="curso.ano.value"
-                      v-for="sec in props.menciones[curso.men.value-1]?.ano[curso.ano.value-1]?.sec"
-                      :key="sec.id_ano"
-                      :label="sec.sec_nom"
-                      :value="sec.id_ano"
-                    />
-                    <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
-                    <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
-                  </v-radio-group>
-                </v-col>
-              </v-row>
-              <EstudiantesExcel
-                @estudiantes="estudiantes = $event"
-              />
-            </v-container>
-            <v-card-actions>
-              <v-btn
-                block
-                type="submit"
-                text="Agregar estudiantes"
-                color="primario"
-                variant="elevated"
-                prepend-icon="mdi-plus"
-                :disabled="!estudiantes.length || !curso.sec.value"
-                @click="guardarEstudiantes()"
-              />
-            </v-card-actions>
-          </v-form>
-        </v-card>
-      </v-sheet>
+      </template>
+      <template v-else>
+        <v-form ref="formExcel" @submit.prevent>
+          <v-container>
+            <p class="text-body-1">Selecciona los datos del curso para agregar los estudiantes</p>
+            <v-row class="mt-2" justify="space-around">
+              <v-col cols="12">
+                <v-radio-group
+                  v-model="curso.men.value"
+                  :rules="curso.men.rules"
+                  inline
+                  label="Mención"
+                >
+                  <v-radio
+                    v-for="(menc, imenc) in props.menciones"
+                    :key="menc.id_men"
+                    :label="menc.men"
+                    :value="imenc+1"
+                  />
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12" sm="7">
+                <v-radio-group
+                  v-model="curso.ano.value"
+                  :rules="curso.ano.rules"
+                  inline
+                  label="Año"
+                >
+                  <v-radio
+                    v-if="curso.men.value"
+                    v-for="(ano, iano) in props.menciones[curso.men.value-1].ano"
+                    :key="ano.id_ano"
+                    :label="ano.nom_ano"
+                    :value="iano+1"
+                  />
+                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                </v-radio-group>
+              </v-col>
+              <v-col cols="12" sm="5">
+                <v-radio-group
+                  v-model="curso.sec.value"
+                  :rules="curso.sec.rules"
+                  inline
+                  label="Sección"
+                >
+                  <v-radio
+                    v-if="curso.ano.value"
+                    v-for="sec in props.menciones[curso.men.value-1]?.ano[curso.ano.value-1]?.sec"
+                    :key="sec.id_ano"
+                    :label="sec.sec_nom"
+                    :value="sec.id_ano"
+                  />
+                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención primero</span>
+                  <span class="medium-emphasis text-muted ml-2" v-else>Selecciona una mención y un año primero</span>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+            <EstudiantesExcel
+              @estudiantes="estudiantes = $event"
+            />
+          </v-container>
+          <v-card-actions class="bottom-dialog-actions">
+            <v-btn
+              block
+              type="submit"
+              text="Agregar estudiantes"
+              color="primario"
+              variant="elevated"
+              prepend-icon="mdi-plus"
+              :disabled="!estudiantes.length || !curso.sec.value"
+              @click="guardarEstudiantes()"
+            />
+          </v-card-actions>
+        </v-form>
+      </template>
     </v-card>
   </template>
 </v-dialog>

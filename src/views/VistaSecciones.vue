@@ -4,9 +4,10 @@ import { brunaApi } from '@/funciones/api.ts';
 import AlertaMensaje from '@/components/AlertaMensaje.vue';
 import PasarAsistencia from '@/components/PasarAsistencia.vue';
 import { organizarSecciones } from '@/funciones/funciones';
-import { Menciones } from '@/types/interfaceTypes';
+import { Menciones, MensajesApi } from '@/types/interfaceTypes';
 const mencion = ref(0)
 const alertaMsj = ref<string>('')
+const mensaje = ref<MensajesApi>()
 const tabsLoading = ref<boolean>(true)
 const menciones = ref<Menciones[]>([]);
 
@@ -17,7 +18,11 @@ function cargaInicial() {
   brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
-      menciones.value = organizarSecciones(res.data, true)
+      if(!res.data.r) {
+        menciones.value = organizarSecciones(res.data, true)
+      } else {
+        mensaje.value = res.data
+      }
       tabsLoading.value = false
     }
   }).catch(() => {
@@ -31,11 +36,10 @@ function cargaInicial() {
   <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <v-skeleton-loader v-if="tabsLoading" type="table-heading, article, paragraph" />
   <template v-else>
-    <template v-if="!Object.keys(menciones).length">
+    <template v-if="!Object.keys(menciones).length && mensaje">
       <v-sheet rounded="xl" class="text-center mt-3 pb-2 mx-auto" width="40vw">
-        <v-icon icon="mdi-town-hall" class="text-primario-claro large-icon"/>
-        <v-icon icon="mdi-exclamation" class="text-primario-claro large-icon"/>
-        <p class="text-h6">Parece que aun no tienes una sección asignada</p>
+        <v-icon :icon="mensaje?.i" class="text-primario-claro large-icon"/>
+        <p class="text-h6">{{ mensaje?.e }}</p>
       </v-sheet>
     </template>
     <template v-else>

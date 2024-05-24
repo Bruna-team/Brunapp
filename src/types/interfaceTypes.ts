@@ -51,6 +51,7 @@ interface Periodos {
 }
 interface Maestros {
   id_person: string,
+  estatus: string
   dia_hor: string,
   fin_hor: string,
   inicio_hor: string,
@@ -95,6 +96,11 @@ interface EstudiantePase {
   nom_mat: string,
   profesor: string,
 }
+interface MensajesApi {
+  r: string,
+  i: string,
+  e: string,
+}
 export type {
   Menciones,
   MencionesReportes,
@@ -106,4 +112,5 @@ export type {
   EstudianteObservaciones,
   EstudianteInasistencias,
   EstudiantePase,
+  MensajesApi
 }
