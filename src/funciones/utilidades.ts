@@ -1,8 +1,6 @@
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfmakeFont from 'pdfmake/build/vfs_fonts'
 const vfs = pdfmakeFont.pdfMake.vfs;
-console.log(vfs)
-// import vfs from "@/constantes/pdfFonts";
 // @ts-ignore
 import htmlToPdfmake from 'html-to-pdfmake';
 
