@@ -12,9 +12,9 @@ onMounted(() => {
 	cargaInicial();
 });
 
-function cargaInicial() {
+async function cargaInicial() {
   editMen.value = false
-  brunaApi({ s: 'totalEstudiantes' }, '')
+  await brunaApi({ s: 'totalEstudiantes' }, '')
   .then((res:any) => {
     if (res.data) {
       totalEstudiantes.value = res.data
@@ -24,7 +24,7 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Asigna una fecha de inicio y cierre de año escolar"
   })
-  brunaApi({ s: 'informacion' }, '')
+  await brunaApi({ s: 'informacion' }, '')
   .then((res:any) => {
     if (res.data) {
       periodo.value.startF = res.data[0].ano_oct_inf
@@ -37,7 +37,7 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Asigna una fecha de inicio y cierre de año escolar"
   })
-  brunaApi({ s: 'horarios' }, '')
+  await brunaApi({ s: 'horarios' }, '')
   .then((res:any) => {
     if (res.data) {
       let hor:any = []
@@ -58,7 +58,7 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Hubo un error consultando los datos"
   })
-  brunaApi({ s: 'materias' }, '')
+  await brunaApi({ s: 'materias' }, '')
   .then((res:any) => {
     if (res.data) {
       let mat:any = []
@@ -77,7 +77,7 @@ function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Hubo un error consultando los datos"
   })
-  brunaApi({ s: 'menciones' }, '')
+  await brunaApi({ s: 'menciones' }, '')
   .then((res:any) => {
     if (res.data) {
       const men:any = []

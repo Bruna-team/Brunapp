@@ -18,9 +18,9 @@ const asisDate = ref(formatoFechaYHora(new Date, 'fecha'))
 const asisHor = ref(showTime())
 const estudiantes = ref<Estudiantes[]>([])
 const inasistencias = ref([])
-function cargaInicial() {
+async function cargaInicial() {
   if (props.seccion) {
-    brunaApi({ s: 'estudiantes' }, 'ano=' + props.seccion)
+    await brunaApi({ s: 'estudiantes' }, 'ano=' + props.seccion)
     .then((res:any) => {
       if (res.data) {
         estudiantes.value = res.data

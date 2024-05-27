@@ -6,19 +6,17 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import BlotFormatter from 'quill-blot-formatter/dist/BlotFormatter';
 import {SpanEmbed} from '@/funciones/quillConfigModule'
 import { Quill } from '@vueup/vue-quill'
-import { paseEntrada } from '@/constantes/plantillas';
 Quill.register(SpanEmbed);
 
+const emit = defineEmits(['content', 'actualizar'])
 const props = defineProps({
-  plantilla: {
+  contentData: {
     type: String,
     default: ''
   }
 })
-const emit = defineEmits(['content', 'actualizar'])
-
 onMounted(() => {
-  emit('content', content.value)
+  content.value = props.contentData
 })
 
 const editor = ref()
@@ -33,7 +31,7 @@ const toolbar = ref([
   [{ 'direction': 'rtl' }, {'align': []}, {'indent': '-1'}, {'indent': '+1'}, {'list': 'ordered'}, {'list': 'bullet'}, 'image'],
 ])
 const focusEditor = ref(false)
-const content = ref(paseEntrada)
+const content = ref('')
 
 function insertSomething(value:Object) {
   const e = editor.value.getQuill()
@@ -43,15 +41,27 @@ function insertSomething(value:Object) {
 watch(content, (value) => {
   emit('content', value)
 })
-watch(()=> props.plantilla,()=> {
-  content.value = props.plantilla
-  emit('actualizar')
-})
 </script>
 
 <template>
   <v-sheet color="muted">
     <v-row no-gutters>
+      <v-col cols="auto">
+        <v-btn
+          flat
+          class="px-1"
+          color="muted"
+          @click="insertSomething({
+              text: 'TIPO DE PASE',
+              id: 'pase',
+              type: 'Pase',
+            })"
+        >
+          <v-chip variant="outlined" color="white">
+            Tipo de pase
+          </v-chip>
+        </v-btn>
+      </v-col>
       <v-col cols="auto">
         <v-btn
           flat

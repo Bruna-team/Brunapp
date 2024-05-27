@@ -8,7 +8,6 @@ import { sustituirSpandEmbed } from '@/funciones/funciones';
 import { useDisplay } from 'vuetify';
 import { brunaApi } from "@/funciones/api";
 import { EstudiantePase } from '@/types/interfaceTypes';
-import { paseEntrada, paseSalida } from '@/constantes/plantillas';
 import { formatoFechaYHora } from '@/funciones/funciones';
 
 const { smAndUp } = useDisplay()
@@ -16,33 +15,8 @@ const { smAndUp } = useDisplay()
 const alertaMsj = ref('')
 const estudiante = ref<EstudiantePase>();
 
-const plantilla = computed(() => {
-  if (paseTipo.value == '5') {
-    return paseEntrada
-  } else {
-    return paseSalida
-  }
-})
-
-// const dataPase:any = computed(()=> {
-//   const hor = paseFecha.value.split('T')
-//   return {
-//     ano: estudiante.value?.num_ano,
-//     mencion: estudiante.value?.nom_men,
-//     seccion: estudiante.value?.sec_ano,
-//     pasefecha: hor[0],
-//     pasehor: hor[1],
-//     id: estudiante.value?.id_estd,
-//     estudiante: estudiante.value?.nombre,
-//     estudianteCedula: estudiante.value?.ced_alum,
-//     representante: estudiante.value?.representantes,
-//     modulo: estudiante.value?.modulo_hor,
-//     profesor: estudiante.value?.profesor,
-//     materia: estudiante.value?.nom_mat,
-//   }
-// })
 const paseFecha = ref(formatoFechaYHora(new Date(), 'fechaYhora'))
-const content = ref('')
+const content = ref("<p><strong>E.T.C \"MADRE RAFOLS\"</strong></p><p><strong>VALERA ESTADO TRUJILLO</strong></p><h4 class=\"ql-align-center\"><span class=\"editor-var\" data-type=\"Pase\" data-id=\"pase\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">Pase de entrada</span>﻿</span>﻿</span></h4><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"Date\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">2024-03-05</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><span class=\"editor-var\" data-type=\"Fecha\" data-id=\"DateTime\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">20:05</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></p><p>Estudiante: <span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"Ename\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">ESTUDIANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Curso: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"curso\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">CURSO</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Sección: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"seccion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">SECCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p>Mención: <span class=\"editor-var\" data-type=\"Academico\" data-id=\"mencion\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MENCIÓN</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span></p><p><br></p><p>Tiene permiso para entrar a la clase de <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"materia\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MATERIA</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span> correspondiente al <span class=\"editor-var\" data-type=\"Academico\" data-id=\"modulo\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">MÓDULO</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span> módulo.</p><p><br></p><p><strong>Motivo del retraso: </strong></p><p><br></p><p><br></p><p>Firma del representante                       Firma del coordinador</p><p><span class=\"editor-var\" data-type=\"Estudiante\" data-id=\"representante\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">REPRESENTANTE NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>  <span class=\"editor-var\" data-type=\"Profesor\" data-id=\"Pname\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">﻿<span contenteditable=\"false\">PROFESOR NOMBRES</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span>﻿</span> </p>")
 const paseTipo = ref('5')
 const valido = computed(() => {
   return estudiante.value ? Object.values(estudiante.value).every((d: any) => d !== '') : false
@@ -70,8 +44,12 @@ function registrarPase() {
     alertaMsj.value = "Faltan datos"
   }
 }
+watch(()=> paseTipo.value,(value)=> {
+  sustituirSpandEmbed({pase: value == '5' ? 'Pase de entrada' : 'Pase de salida'})
+})
 watch(()=> estudiante.value,(value)=> {
   sustituirSpandEmbed(value)
+  sustituirSpandEmbed({pase: paseTipo.value == '5' ? 'Pase de entrada' : 'Pase de salida'})
   const elements = document.getElementsByClassName('ql-editor');
   const elementContents = Array.from(elements).map(element => element.innerHTML)[0];
   content.value = JSON.stringify(elementContents).replace(/"/g, '')
@@ -133,7 +111,7 @@ watch(()=> estudiante.value,(value)=> {
       />
     </v-sheet>
     <QuillEditorComponentVue
-      :plantilla="plantilla"
+      :contentData="content"
       @content="content=$event"
       @actualizar="sustituirSpandEmbed(estudiante)"
     />

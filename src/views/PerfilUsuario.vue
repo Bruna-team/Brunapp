@@ -87,8 +87,8 @@ async function validar () {
   loading.value = false
 }
 
-function cargaInicial() {
-  brunaApi({ s: 'perfil' }, '')
+async function cargaInicial() {
+  await brunaApi({ s: 'perfil' }, '')
   .then((res:any) => {
     if (res.data) {
       res.data.forEach((d:any) => {

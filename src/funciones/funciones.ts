@@ -34,6 +34,12 @@ function sustituirSpandEmbed(data:any) {
   document.querySelectorAll('.editor-var').forEach((e: any) => {
     const id = e.getAttribute('data-id')
     switch (e.getAttribute('data-type')) {
+      case 'Pase':
+        if(data.pase) {
+          e.getElementsByTagName('span')[0].textContent =
+          data.pase
+        }
+        break;
       case 'Estudiante':
         switch(id) {
           case 'Ename':

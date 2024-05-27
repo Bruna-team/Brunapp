@@ -343,18 +343,18 @@ async function validarFormEst () {
   }
   loading.value = false
 }
-function cargaInicial() {
+async function cargaInicial() {
   sectionLoading.value = true
-  brunaApi({ s: 'motivos' }, '')
+  await brunaApi({ s: 'motivos' }, '')
   .then((res:any) => {
     if (res.data) {
       motivos.value = res.data
     }
   }).catch(() => {
     sectionLoading.value = false
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los motivos"
   })
-  brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
+  await brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec)
   .then((res:any) => {
     if (res.data) {
       organizarDatos(res.data)
@@ -362,19 +362,19 @@ function cargaInicial() {
     }
   }).catch(() => {
     sectionLoading.value = false
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando el estudiante"
   })
   sectionLoading.value = false
 }
-function buscarEstudiante(id:string) {
-  brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec + "&estd=" + id)
+async function buscarEstudiante(id:string) {
+  await brunaApi({ s: 'sesion' }, 'ano=' + router.currentRoute.value.params.sec + "&estd=" + id)
   .then((res:any) => {
     if (res.data) {
       organizarDatos(res.data)
       estudiantes.value = res.data.estd
     }
   }).catch(() => {
-    alertaMsj.value = "Hubo un error cargando los datos"
+    alertaMsj.value = "Hubo un error buscando el estudiante"
   })
 }
 function organizarDatos(data:any) {

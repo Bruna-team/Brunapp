@@ -23,48 +23,47 @@ onMounted(() => {
 	cargaInicial();
 });
 
-function cargaInicial() {
-  brunaApi({ s: 'secciones' }, '')
+async function cargaInicial() {
+  await brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
       menciones.value = organizarSecciones(res.data)
       anosSinOrden.value = res.data
     }
-  }).catch((e) => {
-    alertaMsj.value = "Hubo un error cargando los datos" + e
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error cargando las secciones"
   })
-  brunaApi({ s: 'maestros' }, '')
+  await brunaApi({ s: 'maestros' }, '')
   .then((res:any) => {
     if (res.data) {
       organizarJornadas(res.data)
     }
-  }).catch((e) => {
-    alertaMsj.value = "Hubo un error cargando los datos"
-    console.log(e)
+  }).catch(() => {
+    alertaMsj.value = "Hubo un error cargando los maestros"
   })
-  brunaApi({ s: 'materias' }, '')
+  await brunaApi({ s: 'materias' }, '')
   .then((res:any) => {
     if (res.data) {
       materias.value = res.data
     }
   }).catch(() => {
-    alertaMsj.value = "Hubo un error cargando los datos"
+    alertaMsj.value = "Hubo un error cargando las materias"
   })
-  brunaApi({ s: 'horarios' }, '')
+  await brunaApi({ s: 'horarios' }, '')
   .then((res:any) => {
     if (res.data) {
       modulos.value = res.data
     }
   }).catch(() => {
-    // message: 'Hubo un error cargando los datos',
+    alertaMsj.value = "Hubo un error cargando los horarios"
   })
-  brunaApi({ s: 'cargos' }, '')
+  await brunaApi({ s: 'cargos' }, '')
   .then((res:any) => {
     if (res.data) {
       cargos.value = res.data
     }
   }).catch(() => {
-    alertaMsj.value = "Hubo un error cargando los datos"
+    alertaMsj.value = "Hubo un error cargando los cargos"
   })
 }
 function organizarJornadas(data:string[]) {

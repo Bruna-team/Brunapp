@@ -14,8 +14,8 @@ const menciones = ref<Menciones[]>([]);
 onMounted(() => {
 	cargaInicial();
 });
-function cargaInicial() {
-  brunaApi({ s: 'secciones' }, '')
+async function cargaInicial() {
+  await brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
       if(!res.data.r) {

@@ -48,8 +48,8 @@ const menciones = ref<MencionesReportes[]>([]);
 const paseFecha = ref(formatoFechaYHora(new Date(), 'FechayHora'))
 const fechasFiltrar = ref()
 const fechas = ref([''])
-function cargaInicial() {
-  brunaApi({ s: 'secciones' }, '')
+async function cargaInicial() {
+  await brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
       menciones.value = organizarSecciones(res.data)
