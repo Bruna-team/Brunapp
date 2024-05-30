@@ -23,7 +23,9 @@ onMounted(() => {
 	cargaInicial();
 });
 
+const loading = ref(false)
 async function cargaInicial() {
+  loading.value = true
   await brunaApi({ s: 'secciones' }, '')
   .then((res:any) => {
     if (res.data) {
@@ -65,6 +67,7 @@ async function cargaInicial() {
   }).catch(() => {
     alertaMsj.value = "Hubo un error cargando los cargos"
   })
+  loading.value = false
 }
 function organizarJornadas(data:string[]) {
   const dataJor:any = {}
@@ -212,7 +215,18 @@ function asignarColorRol(rol: string) {
         />
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="loading">
+      <v-col>
+        <v-skeleton-loader type="avatar, article, actions" />
+      </v-col>
+      <v-col class="d-none d-sm-block">
+        <v-skeleton-loader type="avatar, article, actions"/>
+      </v-col>
+      <v-col class="d-none d-md-block">
+        <v-skeleton-loader type="avatar, article, actions"/>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="Object.keys(profes).length">
       <v-col cols="12" sm="6" lg="4"  v-for="p in profes" :key="p.id_person">
         <v-card>
           <v-card-item>
@@ -293,5 +307,14 @@ function asignarColorRol(rol: string) {
         </v-card>
       </v-col>
     </v-row>
+    <v-sheet
+      v-else
+      rounded="xl"
+      class="text-center mt-3 pb-2 mx-auto"
+      max-width="600px"
+    >
+      <v-icon icon="mdi-human-male-board" class="text-primario-claro large-icon"/>
+      <p class="text-h6">Parece que aun no hay maestros registrados</p>
+    </v-sheet>
   </v-container>
 </template>

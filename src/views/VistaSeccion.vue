@@ -962,8 +962,9 @@ watch(()=>cedRe.value.value, ()=>{
         </template>
         <template v-else>
           <v-sheet
+            rounded="xl"
             class="text-center mt-3 pb-2 mx-auto"
-            width="40vw"
+            max-width="600px"
           >
             <v-icon icon="mdi-account-school-outline" class="text-primario-claro large-icon"/>
             <p class="text-h6">No hay estudiantes registrados</p>

@@ -1,6 +1,5 @@
 import * as pdfMake from "pdfmake/build/pdfmake";
-import * as pdfmakeFont from 'pdfmake/build/vfs_fonts'
-const vfs = pdfmakeFont.pdfMake.vfs;
+import * as vfs from './fonts'
 // @ts-ignore
 import htmlToPdfmake from 'html-to-pdfmake';
 
@@ -171,10 +170,8 @@ function imprimirPdf (
     Roboto: {
       normal: 'Roboto-Regular.ttf',
       bold: 'Roboto-Medium.ttf',
-      italics: 'Roboto-Italic.ttf',
-      bolditalics: 'Roboto-MediumItalic.ttf'
     }
-  }, vfs).open()
+  }, vfs.default).open()
 }
 
 export default imprimirPdf

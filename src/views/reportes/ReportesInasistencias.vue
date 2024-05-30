@@ -78,6 +78,8 @@ const contentPrint = computed(() => {
       :headers="headers"
       :items="props.students"
       density="compact"
+      no-data-text="Sin estudiantes con inasistencias en esta fecha"
+      items-per-page-text="Alumnos por pagina:"
       :sort-by="[{ key: 'pases', order: 'desc' }]"
     >
       <template v-slot:top>

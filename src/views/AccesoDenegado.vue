@@ -41,5 +41,13 @@ const message = computed(() => {
   >
     <v-icon :icon="message.icon" class="text-primario-claro large-icon"/>
     <p class="text-h6">{{ message.text }}</p>
+    <v-btn
+      v-if="route.query.message !== 'locked'"
+      to="/"
+      color="primario"
+      class="mt-2"
+      text="Volver al inicio"
+      prepend-icon="mdi-home"
+    />
   </v-sheet>
 </template>

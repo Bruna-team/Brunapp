@@ -140,112 +140,124 @@ function cerrarSesion() {
 <v-container>
   <AlertaMensaje :mensaje="alertaMsj" @limpiar-msj="alertaMsj = ''" />
   <template v-if="!edit">
-    <div class="d-flex justify-center align-center mb-3">
-      <span class="text-h5 text-sm-h4 flex-fill text-center ml-md-3 my-md-3">
-        <v-avatar size="70" color="brown">
-          <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
-        </v-avatar>
-        {{ usuario.nombre.value }} {{ usuario.apellido.value }}
-      </span>
-      <v-btn
-        variant="text"
-        append-icon="mdi-logout"
-      >
-        <span class="d-none d-md-inline">Cerrar sesión</span>
-        <VentanaConfirmar
-          :message="'desea cerrar sesión'"
-          btnicon="mdi-logout"
-          @confirmar="(e) => { e ? cerrarSesion() : '' }"
-        />
-      </v-btn>
-    </div>
+    <v-row class="justify-center align-center">
+      <v-col cols="12" sm >
+        <div class="d-flex d-sm-inline justify-center">
+          <v-avatar size="70" color="brown" class="mx-auto">
+            <span class="text-h5">{{ iniciales.toUpperCase() }}</span>
+          </v-avatar>
+        </div>
+        <span class="text-h5 text-sm-h4 text-center ml-md-3 my-md-3">
+          <span class="d-block d-sm-inline">
+            {{ usuario.nombre.value }} {{ usuario.apellido.value }}
+          </span>
+        </span>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          variant="text"
+          append-icon="mdi-logout"
+        >
+          Cerrar sesión
+          <VentanaConfirmar
+            :message="'desea cerrar sesión'"
+            btnicon="mdi-logout"
+            @confirmar="(e) => { e ? cerrarSesion() : '' }"
+          />
+        </v-btn>
+      </v-col>
+    </v-row>
   </template>
   <template v-else>
     <v-form ref="form">
       <v-row>
-        <v-col>
+        <v-col cols="12" sm="6">
           <v-text-field label="Nombre" v-model="usuario.nombre.value" :rules="usuario.nombre.rules" variant="underlined" hint="Escribe tu nombre" />
         </v-col>
-        <v-col>
+        <v-col cols="12" sm="6">
           <v-text-field label="Apellido" v-model="usuario.apellido.value" :rules="usuario.apellido.rules" variant="underlined" hint="Escribe tu apellido" />
         </v-col>
       </v-row>
     </v-form>
   </template>
-  <v-divider></v-divider>
-  <div class="d-flex align-center">
-    <v-switch
-      v-model="temaLight"
-      hide-details
-      inset
-      :label="temaLight ? 'Tema claro' : 'Tema oscuro'"
-      :class="temaLight ? 'icon-moon' : 'icon-sun'"
-    />
-    <v-btn
-      variant="text"
-      :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
-      :text="edit ? 'Cancelar' : 'Editar'"
-      @click="edit = !edit"
-    />
-    <v-btn
-      v-if="edit"
-      :loading="loading"
-      variant="elevated"
-      prepend-icon="mdi-sync"
-      text="Guardar"
-      color="primario"
-      @click="validar"
-    />
-  </div>
-  <v-list>
-    <v-list-item
-      v-if="!edit"
-      v-for="(info, value) in usuario.informacion"
-      :key="info.value"
-      :title="value.charAt(0).toUpperCase() + value.slice(1)"
-      :subtitle="info.value"
-    ></v-list-item>
-    <template v-else>
-      <v-form ref="form">
-        <v-list-item>
-          <v-text-field
-            label="Cédula"
-            v-model="usuario.informacion.cédula.value"
-            :rules="usuario.informacion.cédula.rules"
-            prefix="V-"
-            hint="Ej: V-12345678"
-          />
-        </v-list-item>
-        <v-list-item>
-          <v-text-field
-            label="Dirección"
-            v-model="usuario.informacion.dirección.value"
-            :rules="usuario.informacion.dirección.rules"
-          />
-        </v-list-item>
-        <v-list-item>
-          <v-text-field
-            label="Teléfono"
-            v-model="usuario.informacion.teléfono.value"
-            :rules="usuario.informacion.teléfono.rules"
-            hint="Ej: 04121234567"
-          />
-        </v-list-item>
-        <v-list-item>
-          <v-text-field
-            label="Correo"
-            v-model="usuario.informacion.correo.value"
-            :rules="usuario.informacion.correo.rules"
-            hint="Ej: ejemplo@gmail.com"
-          />
-        </v-list-item>
-      </v-form>
-    </template>
-    <v-list-item
-      title="Rol"
-      :subtitle="usuario.rol"
-    ></v-list-item>
-  </v-list>
+  <v-divider class="my-2"/>
+  <v-switch
+    v-model="temaLight"
+    hide-details
+    inset
+    :label="temaLight ? 'Tema claro' : 'Tema oscuro'"
+    :class="temaLight ? 'icon-moon' : 'icon-sun'"
+  />
+  <v-card>
+    <v-card-text>
+      <v-list>
+        <v-list-item
+          v-if="!edit"
+          v-for="(info, value) in usuario.informacion"
+          :key="info.value"
+          :title="value.charAt(0).toUpperCase() + value.slice(1)"
+          :subtitle="info.value"
+        ></v-list-item>
+        <template v-else>
+          <v-form ref="form">
+            <v-list-item>
+              <v-text-field
+                label="Cédula"
+                v-model="usuario.informacion.cédula.value"
+                :rules="usuario.informacion.cédula.rules"
+                prefix="V-"
+                hint="Ej: V-12345678"
+              />
+            </v-list-item>
+            <v-list-item>
+              <v-text-field
+                label="Dirección"
+                v-model="usuario.informacion.dirección.value"
+                :rules="usuario.informacion.dirección.rules"
+              />
+            </v-list-item>
+            <v-list-item>
+              <v-text-field
+                label="Teléfono"
+                v-model="usuario.informacion.teléfono.value"
+                :rules="usuario.informacion.teléfono.rules"
+                hint="Ej: 04121234567"
+              />
+            </v-list-item>
+            <v-list-item>
+              <v-text-field
+                label="Correo"
+                v-model="usuario.informacion.correo.value"
+                :rules="usuario.informacion.correo.rules"
+                hint="Ej: ejemplo@gmail.com"
+              />
+            </v-list-item>
+          </v-form>
+        </template>
+        <v-list-item
+          title="Rol"
+          :subtitle="usuario.rol"
+        ></v-list-item>
+      </v-list>
+    </v-card-text>
+    <v-card-actions class="justify-space-around">
+      <v-btn
+        variant="text"
+        :prepend-icon="edit ? 'mdi-close' :'mdi-pen'"
+        :text="edit ? 'Cancelar' : 'Editar'"
+        @click="edit = !edit"
+      />
+      <v-btn
+        v-if="edit"
+        :loading="loading"
+        variant="elevated"
+        prepend-icon="mdi-sync"
+        text="Guardar"
+        color="primario"
+        @click="validar"
+      />
+    </v-card-actions>
+  </v-card>
   <v-sheet
     v-if="estatus == '1'"
     rounded="xl"
